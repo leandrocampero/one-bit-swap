@@ -3,6 +3,7 @@
     "syler.sass-indented",
     "esbenp.prettier-vscode",
     "dbaeumer.vscode-eslint",
-    "EditorConfig.EditorConfig"
+    "editorconfig.editorconfig",
+    "vscodeshift.mui-snippets"
   ]
 }
