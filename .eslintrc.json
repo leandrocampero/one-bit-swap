@@ -10,7 +10,8 @@
   },
   "parser": "@typescript-eslint/parser",
   "rules": {
-    "@typescript-eslint/no-unused-vars": "error",
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": ["error", { "vars": "local" }],
     "@typescript-eslint/no-explicit-any": "error",
     "prettier/prettier": "error"
   }
