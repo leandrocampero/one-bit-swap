@@ -28,6 +28,7 @@ export default function Layout() {
           sx={{ width: 56, height: 56 }}
         />
       </Link>
+      <h1> Steban GIL</h1>
     </Box>
   )
 }
