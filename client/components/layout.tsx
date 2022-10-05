@@ -2,11 +2,16 @@ import { Avatar, Box, TextField } from '@mui/material'
 import { grey } from '@mui/material/colors'
 import styles from '@styles/layout.module.scss'
 import Link from 'next/link'
-
-const text =
-  'Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto, libero!'
+import React from 'react'
 
 export default function Layout() {
+  const [text, setText] = React.useState(
+    'Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto, libero!'
+  )
+  const changeText = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const tex = event.target.value
+    setText(tex)
+  }
   return (
     <Box
       sx={{
@@ -20,7 +25,7 @@ export default function Layout() {
       className={styles.base}
     >
       <h1>OneBitSwap</h1>
-      <TextField id="test" label="" value={text} />
+      <TextField id="test" label="" value={text} onChange={changeText} />
       <Link href={'/'}>
         <Avatar
           alt="Kirby"
