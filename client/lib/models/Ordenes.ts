@@ -1,4 +1,4 @@
-import { EstadosOrdenes, TiposOrdenes } from '../common'
+import { EstadosOrdenes, TiposOrdenes } from '../types'
 import Billeteras from './Billeteras'
 import Tokens from './Tokens'
 

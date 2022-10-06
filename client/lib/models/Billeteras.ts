@@ -1,4 +1,4 @@
-import { Estados, RolesBilleteras } from '../CommonTypes'
+import { Estados, RolesBilleteras } from '../types'
 export default class Billeteras {
   private _direccion: string
   private _rol: RolesBilleteras

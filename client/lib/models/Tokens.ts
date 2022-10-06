@@ -1,4 +1,4 @@
-import { Estados } from '../common'
+import { Estados } from '../types'
 export default class Tokens {
   private _ticker: string
   private _contrato: string
