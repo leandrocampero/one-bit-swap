@@ -12,10 +12,12 @@ export default class GestorBilleteras implements IGestor<Billeteras> {
     this._billeteras.concat([obj])
     return true
   }
+
   modificar(obj: Billeteras): boolean {
     this._billeteras[0] = obj
     return true
   }
+
   buscar(): Billeteras[] {
     return this._billeteras
   }

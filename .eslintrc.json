@@ -26,6 +26,12 @@
         ]
       }
     ],
+    "lines-between-class-members": "off",
+    "@typescript-eslint/lines-between-class-members": [
+      "error",
+      "always",
+      { "exceptAfterOverload": true, "exceptAfterSingleLine": true }
+    ],
     "prettier/prettier": "error"
   }
 }

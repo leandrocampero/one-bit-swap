@@ -13,18 +13,23 @@ export default class Billeteras {
   public get direccion(): string {
     return this._direccion
   }
+
   public set direccion(value: string) {
     this._direccion = value
   }
+
   public get rol(): RolesBilleteras {
     return this._rol
   }
+
   public set rol(value: RolesBilleteras) {
     this._rol = value
   }
+
   public get estado(): Estados {
     return this._estado
   }
+
   public set estado(value: Estados) {
     this._estado = value
   }
