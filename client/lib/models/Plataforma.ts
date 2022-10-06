@@ -10,6 +10,22 @@ export default class Plataforma {
   private _gestorBilleteras: IGestor<Billeteras>
   private _gestorOrdenes: IGestor<Ordenes>
 
+  constructor(
+    estado: number,
+    contrato: string,
+    chainid: number,
+    gestorTokens: IGestor<Tokens>,
+    gestorBilleteras: IGestor<Billeteras>,
+    gestorOrdenes: IGestor<Ordenes>
+  ) {
+    this._estado = estado
+    this._contrato = contrato
+    this._chainid = chainid
+    this._gestorTokens = gestorTokens
+    this._gestorBilleteras = gestorBilleteras
+    this._gestorOrdenes = gestorOrdenes
+  }
+
   public get estado(): number {
     return this._estado
   }
@@ -45,21 +61,5 @@ export default class Plataforma {
   }
   public set gestorOrdenes(value: IGestor<Ordenes>) {
     this._gestorOrdenes = value
-  }
-
-  constructor(
-    estado: number,
-    contrato: string,
-    chainid: number,
-    gestorTokens: IGestor<Tokens>,
-    gestorBilleteras: IGestor<Billeteras>,
-    gestorOrdenes: IGestor<Ordenes>
-  ) {
-    this._estado = estado
-    this._contrato = contrato
-    this._chainid = chainid
-    this._gestorTokens = gestorTokens
-    this._gestorBilleteras = gestorBilleteras
-    this._gestorOrdenes = gestorOrdenes
   }
 }

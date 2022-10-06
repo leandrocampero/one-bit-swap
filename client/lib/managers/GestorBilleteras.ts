@@ -4,6 +4,10 @@ import IGestor from '../Interfaces/IGestor'
 export default class GestorBilleteras implements IGestor<Billeteras> {
   private _billeteras: Array<Billeteras>
 
+  constructor() {
+    this._billeteras = []
+  }
+
   nuevo(obj: Billeteras): boolean {
     this._billeteras.concat([obj])
     return true
@@ -14,9 +18,5 @@ export default class GestorBilleteras implements IGestor<Billeteras> {
   }
   buscar(): Billeteras[] {
     return this._billeteras
-  }
-
-  constructor() {
-    this._billeteras = []
   }
 }

@@ -13,6 +13,19 @@
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": ["error", { "vars": "local" }],
     "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/member-ordering": [
+      "error",
+      {
+        "default": [
+          "signature",
+          "field",
+          "static-initialization",
+          "constructor",
+          "method",
+          ["get", "set"]
+        ]
+      }
+    ],
     "prettier/prettier": "error"
   }
 }

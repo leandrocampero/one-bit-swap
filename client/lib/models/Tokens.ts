@@ -1,10 +1,23 @@
-import { Estados } from '../CommonTypes'
+import { Estados } from '../common'
 export default class Tokens {
   private _ticker: string
   private _contrato: string
   private _oraculo: string | undefined
   private _decimales: number
   private _estado: Estados
+
+  constructor(
+    ticker: string,
+    contrato: string,
+    oraculo: string,
+    decimales: number
+  ) {
+    this._ticker = ticker
+    this._contrato = contrato
+    this._oraculo = oraculo
+    this._decimales = decimales
+    this._estado = Estados.activo
+  }
 
   public get ticker(): string {
     return this._ticker
@@ -32,18 +45,5 @@ export default class Tokens {
   }
   public get estado(): Estados {
     return this._estado
-  }
-
-  constructor(
-    ticker: string,
-    contrato: string,
-    oraculo: string,
-    decimales: number
-  ) {
-    this._ticker = ticker
-    this._contrato = contrato
-    this._oraculo = oraculo
-    this._decimales = decimales
-    this._estado = Estados.activo
   }
 }

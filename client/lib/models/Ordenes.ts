@@ -1,4 +1,4 @@
-import { EstadosOrdenes, TiposOrdenes } from './../CommonTypes'
+import { EstadosOrdenes, TiposOrdenes } from '../common'
 import Billeteras from './Billeteras'
 import Tokens from './Tokens'
 
@@ -17,6 +17,42 @@ export default class Ordenes {
   private _montoCompraUSD: number
   private _estado: EstadosOrdenes
   private _tipo: TiposOrdenes
+
+  constructor(
+    idOrden: string,
+    vendedor: Billeteras,
+    comprador: Billeteras,
+    tokenVenta: Tokens,
+    tokenCompra: Tokens,
+    montoVenta: bigint,
+    montoCompra: bigint,
+    fechaCreacion: Date,
+    montoVentaUSD: number,
+    montoCompraUSD: number,
+    tipo: TiposOrdenes
+  ) {
+    this._idOrden = idOrden
+    this._vendedor = vendedor
+    this._comprador = comprador
+    this._tokenVenta = tokenVenta
+    this._tokenCompra = tokenCompra
+    this._montoVenta = montoVenta
+    this._montoCompra = montoCompra
+    this._fechaCreacion = fechaCreacion
+    this._fechaCaducidad = new Date(fechaCreacion.getDate() + 2)
+    this._montoVentaUSD = montoVentaUSD
+    this._montoCompraUSD = montoCompraUSD
+    this._estado = EstadosOrdenes.activa
+    this._tipo = tipo
+  }
+
+  public ejecutar(comprador: Billeteras) {
+    this._comprador = comprador
+    this._estado = EstadosOrdenes.finalizada
+  }
+  public cancelar() {
+    this._estado = EstadosOrdenes.cancelada
+  }
 
   public get idOrden(): string {
     return this._idOrden
@@ -95,41 +131,5 @@ export default class Ordenes {
   }
   public get tipo(): TiposOrdenes {
     return this._tipo
-  }
-
-  public ejecutar(comprador: Billeteras) {
-    this._comprador = comprador
-    this._estado = EstadosOrdenes.finalizada
-  }
-  public cancelar() {
-    this._estado = EstadosOrdenes.cancelada
-  }
-
-  constructor(
-    idOrden: string,
-    vendedor: Billeteras,
-    comprador: Billeteras,
-    tokenVenta: Tokens,
-    tokenCompra: Tokens,
-    montoVenta: bigint,
-    montoCompra: bigint,
-    fechaCreacion: Date,
-    montoVentaUSD: number,
-    montoCompraUSD: number,
-    tipo: TiposOrdenes
-  ) {
-    this._idOrden = idOrden
-    this._vendedor = vendedor
-    this._comprador = comprador
-    this._tokenVenta = tokenVenta
-    this._tokenCompra = tokenCompra
-    this._montoVenta = montoVenta
-    this._montoCompra = montoCompra
-    this._fechaCreacion = fechaCreacion
-    this._fechaCaducidad = new Date(fechaCreacion.getDate() + 2)
-    this._montoVentaUSD = montoVentaUSD
-    this._montoCompraUSD = montoCompraUSD
-    this._estado = EstadosOrdenes.activa
-    this._tipo = tipo
   }
 }

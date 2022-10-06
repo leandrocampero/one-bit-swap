@@ -1,4 +1,6 @@
-# One Bit Swap
+# Scripts
+
+## Init
 
 ```bash
 yarn create next-app --typescript
@@ -8,6 +10,8 @@ yarn add --dev @typescript-eslint/parser @typescript-eslint/eslint-plugin eslint
 yarn add --dev prettier eslint-config-prettier eslint-plugin-prettier
 yarn add --dev husky
 ```
+
+## Install
 
 ```bash
 yarn install

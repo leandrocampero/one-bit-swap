@@ -4,6 +4,12 @@ export default class Billeteras {
   private _rol: RolesBilleteras
   private _estado: Estados
 
+  constructor(direccion: string) {
+    this._direccion = direccion
+    this._rol = RolesBilleteras.usuario
+    this._estado = Estados.activo
+  }
+
   public get direccion(): string {
     return this._direccion
   }
@@ -21,11 +27,5 @@ export default class Billeteras {
   }
   public set estado(value: Estados) {
     this._estado = value
-  }
-
-  constructor(direccion: string) {
-    this._direccion = direccion
-    this._rol = RolesBilleteras.usuario
-    this._estado = Estados.activo
   }
 }

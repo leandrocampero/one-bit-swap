@@ -1,13 +1,13 @@
 export enum Estados {
   activo = 1,
-  suspendido,
+  suspendido = 2,
 }
 
 export enum EstadosOrdenes {
   activa = 1,
-  bloqueada,
-  cancelada,
-  finalizada,
+  bloqueada = 2,
+  cancelada = 3,
+  finalizada = 4,
 }
 
 export enum TiposOrdenes {
@@ -17,6 +17,6 @@ export enum TiposOrdenes {
 
 export enum RolesBilleteras {
   usuario = 1,
-  administrador,
-  propietario,
+  administrador = 2,
+  propietario = 3,
 }
