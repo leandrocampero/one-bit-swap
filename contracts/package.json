@@ -1,0 +1,23 @@
+{
+  "name": "contracts",
+  "version": "1.0.0",
+  "description": "Repositorio de contratos inteligentes para compilar y desplegar como parte de la plataforma",
+  "main": "index.js",
+  "author": "Campero, L. - Roman, J. E. - Sas, E. J.",
+  "license": "MIT",
+  "scripts": {
+    "hardhat": "npx hardhat",
+    "compile": "npx hardhat compile",
+    "help": "npx hardhat help",
+    "test": "npx hardhat test",
+    "node": "npx hardhat node",
+    "deploy:local": "npx hardhat run scripts/deploy.ts --network localhost"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^2.0.0",
+    "@nomiclabs/hardhat-ethers": "^2.2.0",
+    "@openzeppelin/hardhat-upgrades": "^1.21.0",
+    "ethers": "^5.7.1",
+    "hardhat": "^2.12.0"
+  }
+}
