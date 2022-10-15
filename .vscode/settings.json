@@ -7,5 +7,36 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[solidity]": {
     "editor.defaultFormatter": "NomicFoundation.hardhat-solidity"
-  }
+  },
+  "todohighlight.defaultStyle": {
+    "color": "default",
+    "isWholeLine": true
+  },
+  "todohighlight.keywords": [
+    {
+      "text": "REVIEW:",
+      "backgroundColor": "#3DBBF244",
+      "overviewRulerColor": "#3DBBF2"
+    },
+    {
+      "text": "IMPROVE:",
+      "backgroundColor": "#7e57c244",
+      "overviewRulerColor": "#7e57c2"
+    },
+    {
+      "text": "OBS:",
+      "backgroundColor": "#4caf5044",
+      "overviewRulerColor": "#4caf50"
+    },
+    {
+      "text": "WARNING:",
+      "backgroundColor": "#F3AA2B40",
+      "overviewRulerColor": "#F3AA2B"
+    },
+    {
+      "text": "ERROR:",
+      "backgroundColor": "#f443363f",
+      "overviewRulerColor": "#f44336"
+    }
+  ]
 }
