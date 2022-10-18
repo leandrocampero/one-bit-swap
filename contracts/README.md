@@ -1,10 +1,17 @@
-# Sample Hardhat Project
+# One-Bit-Swap: Contratos Inteligentes
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+## Comandos utilizados
 
-Try running some of the following tasks:
+Anteponiendo siempre `yarn workspace contracts run`
 
-```shell
+| Tarea a realizar              | Comando        |
+| ----------------------------- | -------------- |
+| Iniciar nodo local            | `node`         |
+| Compilar contratos            | `compile`      |
+| Desplegar contrato localmente | `deploy:local` |
+| Ejecutar pruebas              | `test`         |
+
+```bash
 npx hardhat help
 npx hardhat test
 REPORT_GAS=true npx hardhat test
