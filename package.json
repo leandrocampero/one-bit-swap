@@ -9,5 +9,6 @@
   "workspaces": [
     "client",
     "contracts"
-  ]
+  ],
+  "packageManager": "yarn@3.2.4"
 }

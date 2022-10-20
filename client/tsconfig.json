@@ -22,7 +22,8 @@
       "@models/*": ["lib/models/*"],
       "@services/*": ["services/*"],
       "@styles/*": ["styles/*"],
-      "@utils/*": ["utils/*"]
+      "@utils/*": ["utils/*"],
+      "@contracts/*": ["../contracts/artifacts/contracts"]
     },
     "incremental": true
   },
