@@ -10,3 +10,4 @@ cache
 artifacts/build-info/**
 artifacts/hardhat/**
 artifacts/contracts/**/*.*.json
+contracts/artifacts/**

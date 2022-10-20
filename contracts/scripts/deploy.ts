@@ -1,9 +1,7 @@
 import { ethers } from 'hardhat'
 
 async function main() {
-  const Plataforma = await ethers.getContractFactory(
-    'contracts/Plataforma.sol:Plataforma'
-  )
+  const Plataforma = await ethers.getContractFactory('Plataforma')
   const despliegue = await Plataforma.deploy()
 
   await despliegue.deployed()
