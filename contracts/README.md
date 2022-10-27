@@ -12,6 +12,16 @@ npx hardhat run scripts/deploy.ts
 
 ---
 
+## Archivo de variables de entorno
+
+```conf
+TESTNET_PRIVATE_KEY=privateKey
+MAINNET_PRIVATE_KEY=privateKey
+POLYGON_API_KEY=apikey
+```
+
+---
+
 ## Scripts utilizados
 
 ```bash

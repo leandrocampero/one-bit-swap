@@ -8,7 +8,16 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "hardhat": "npx hardhat"
+    "hardhat": "npx hardhat",
+    "compile": "npx hardhat compile",
+    "help": "npx hardhat help",
+    "test": "npx hardhat test",
+    "node": "npx hardhat node",
+    "deploy:local": "npx hardhat run scripts/deploy.ts --network localhost",
+    "deploy:test": "npx hardhat run scripts/deploy.ts --network polygonMumbai",
+    "deploy:main": "npx hardhat run scripts/deploy.ts --network polygon",
+    "verify:test": "npx hardhat run scripts/verify.ts --network polygonMumbai",
+    "verify:main": "npx hardhat run scripts/verify.ts --network polygon"
   },
   "devDependencies": {
     "@ethersproject/abi": "^5.7.0",
