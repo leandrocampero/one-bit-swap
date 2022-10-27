@@ -6,5 +6,8 @@
   "repository": "https://github.com/leandrocampero/one-bit-swap",
   "author": "Campero, L. - Roman, J. E. - Sas, E. J.",
   "license": "MIT",
-  "private": true
+  "private": true,
+  "scripts": {
+    "hardhat": "npx hardhat"
+  }
 }
