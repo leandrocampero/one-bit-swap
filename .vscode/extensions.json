@@ -4,6 +4,7 @@
     "esbenp.prettier-vscode",
     "dbaeumer.vscode-eslint",
     "editorconfig.editorconfig",
-    "vscodeshift.mui-snippets"
+    "vscodeshift.mui-snippets",
+    "NomicFoundation.hardhat-solidity"
   ]
 }
