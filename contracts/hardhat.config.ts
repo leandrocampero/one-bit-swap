@@ -4,6 +4,9 @@ import { HardhatUserConfig } from 'hardhat/config'
 
 dotenv.config()
 
+const { TESTNET_PRIVATE_KEY, MAINNET_PRIVATE_KEY, POLYGON_API_KEY } =
+  process.env
+
 const config: HardhatUserConfig = {
   solidity: {
     version: '0.8.17',
@@ -18,16 +21,16 @@ const config: HardhatUserConfig = {
     polygonMumbai: {
       url: 'https://rpc-mumbai.matic.today',
       chainId: 80001,
-      accounts: [`${process.env.TESTNET_PRIVATE_KEY}`],
+      accounts: [`0x${TESTNET_PRIVATE_KEY}`],
     },
     polygon: {
       url: 'https://polygon-rpc.com/',
       chainId: 137,
-      accounts: [`${process.env.MAINNET_PRIVATE_KEY}`],
+      accounts: [`0x${MAINNET_PRIVATE_KEY}`],
     },
   },
   etherscan: {
-    apiKey: process.env.POLYGON_API_KEY,
+    apiKey: `${POLYGON_API_KEY}`,
   },
 }
 
