@@ -1,0 +1,10 @@
+{
+  "name": "contracts",
+  "version": "1.0.0",
+  "description": "Repositorio de contratos inteligentes para compilar y desplegar como parte de la plataforma",
+  "main": "index.js",
+  "repository": "https://github.com/leandrocampero/one-bit-swap",
+  "author": "Campero, L. - Roman, J. E. - Sas, E. J.",
+  "license": "MIT",
+  "private": true
+}
