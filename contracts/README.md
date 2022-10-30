@@ -34,12 +34,15 @@ POLYGON_API_KEY=apikey
 
 ```bash
 cd contracts/
-yarn init # Copiar los datos del archivo package.json
+yarn init # y luego copiar los datos del archivo package.json
 cd ..
 yarn workspace contracts run hardhat
 # Crear nuevo proyecto con Typescript, agregar gitignore
 # No instalar los paquetes que ofrece porque lo hace con npm
 # Se lo hace manual con yarn a continuación
 yarn workspace contracts add --dev @nomicfoundation/hardhat-toolbox @nomicfoundation/hardhat-network-helpers @nomicfoundation/hardhat-chai-matchers @nomiclabs/hardhat-ethers @nomiclabs/hardhat-etherscan chai ethers hardhat-gas-reporter solidity-coverage @typechain/hardhat typechain @typechain/ethers-v5 @ethersproject/abi @ethersproject/providers @types/mocha mocha ts-node hardhat
+
 yarn workspace contracts add dotenv # para ejecutar variables de entorno
+
+yarn workspace contracts add @openzeppelin/contracts @chainlink/contracts # para utilzar las interfaces de contratos de token ERC20 y el oraculo
 ```

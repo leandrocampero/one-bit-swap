@@ -8,6 +8,7 @@ typechain-types
 #Hardhat files
 cache
 artifacts/build-info/**
+artifacts/@openzeppelin/**
 artifacts/hardhat/**
 artifacts/contracts/**/*.*.json
 
