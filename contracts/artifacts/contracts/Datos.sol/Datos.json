@@ -1,0 +1,120 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "Datos",
+  "sourceName": "contracts/Datos.sol",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "archivoOrdenes",
+      "outputs": [
+        {
+          "internalType": "Datos.ContadorOrdenes",
+          "name": "cantidadTotal",
+          "type": "uint256"
+        },
+        {
+          "internalType": "Datos.ContadorOrdenes",
+          "name": "cantidadActivas",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "ultimaOrdenActiva",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "_string",
+          "type": "string"
+        }
+      ],
+      "name": "emptyString",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "plataforma",
+      "outputs": [
+        {
+          "internalType": "enum Datos.EstadoGeneral",
+          "name": "estado",
+          "type": "uint8"
+        },
+        {
+          "internalType": "address",
+          "name": "propietario",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "montoMinimoUSD",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "name": "tokensMap",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "ticker",
+          "type": "string"
+        },
+        {
+          "internalType": "address",
+          "name": "contrato",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "oraculo",
+          "type": "address"
+        },
+        {
+          "internalType": "uint8",
+          "name": "decimales",
+          "type": "uint8"
+        },
+        {
+          "internalType": "enum Datos.EstadoGeneral",
+          "name": "estado",
+          "type": "uint8"
+        },
+        {
+          "internalType": "bool",
+          "name": "existe",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

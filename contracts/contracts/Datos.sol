@@ -95,6 +95,14 @@ abstract contract Datos {
 
   /****************************************************************************/
 
+  modifier plataformaActiva() {
+    require(
+      plataforma.estado == EstadoGeneral.ACTIVO,
+      "La plataforma se encuentra inactiva"
+    );
+    _;
+  }
+
   modifier soloPropietario() {
     require(
       msg.sender == plataforma.propietario,
@@ -105,7 +113,8 @@ abstract contract Datos {
 
   modifier soloAdministrador() {
     require(
-      billeterasMap[msg.sender].rol == RolBilletera.ADMINISTRADOR,
+      billeterasMap[msg.sender].rol == RolBilletera.ADMINISTRADOR ||
+        msg.sender == plataforma.propietario,
       "Solo pueden acceder administradores"
     );
     _;
