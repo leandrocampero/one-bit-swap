@@ -9,6 +9,7 @@ typechain-types
 cache
 artifacts/build-info/**
 artifacts/@openzeppelin/**
+artifacts/@chainlink/**
 artifacts/hardhat/**
 artifacts/contracts/**/*.*.json
 

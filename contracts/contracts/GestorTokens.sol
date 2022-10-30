@@ -3,6 +3,7 @@ pragma solidity ^0.8.9;
 
 import "./Datos.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
 contract GestorTokens is Datos {
   /**
@@ -72,6 +73,37 @@ contract GestorTokens is Datos {
     tokensMap[ticker].estado = EstadoGeneral.ACTIVO;
     tokensMap[ticker].existe = true;
 
+    tokensArray.push(ticker);
+
     return true;
+  }
+
+  function consultarCotizacion(string memory _ticker)
+    public
+    view
+    returns (int256 precio)
+  {
+    require(tokensMap[_ticker].existe, "El token ingresado no esta registrado");
+
+    AggregatorV3Interface oraculo = AggregatorV3Interface(
+      tokensMap[_ticker].oraculo
+    );
+    (
+      ,
+      int256 price, // valor en usd
+      ,
+      ,
+
+    ) = oraculo.latestRoundData();
+
+    precio = price;
+
+    // IMPROVE: usar este código para controlar el monto mínimo
+    // require(
+    //   (uint256(_amount) * uint256(price)) /
+    //     10**uint256(nativeTokenParams.decimals) >=
+    //     platformContract.minWithdrawUsd,
+    //   "Amount in usd must be greater than the min"
+    // );
   }
 }
