@@ -1,3 +1,4 @@
+import CrearOrden from '@components/Ordenes/crearOrden'
 import { Box, Grid } from '@mui/material'
 import { grey } from '@mui/material/colors'
 import styles from '@styles/layout.module.scss'
@@ -9,6 +10,7 @@ const sxProps = {
   borderRadius: 2,
   backgroundColor: grey[400],
 }
+
 export default function Home() {
   return (
     <Grid container>
@@ -23,6 +25,7 @@ export default function Home() {
       <Grid item xs={4}>
         <Box sx={sxProps} className={styles.base}>
           <h1>Ordenes compra/Venta e intercambio</h1>
+          <CrearOrden />
         </Box>
       </Grid>
     </Grid>
