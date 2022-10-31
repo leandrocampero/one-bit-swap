@@ -23,5 +23,12 @@ contract Plataforma is Datos, GestorTokens {
       0xA6FA4fB5f76172d178d61B04b0ecd319C5d1C0aa,
       0x0715A7794a1dc8e42615F059dD6e406A6594651A
     ); // ETH
+
+    nuevoToken(
+      0xd393b1E02dA9831Ff419e22eA105aAe4c47E1253,
+      0x0FCAa9c899EC5A91eBc3D5Dd869De833b06fB046
+    ); // DAI
+
+    suspenderToken("DAI");
   }
 }
