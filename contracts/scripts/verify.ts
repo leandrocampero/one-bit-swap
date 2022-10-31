@@ -2,7 +2,7 @@ import hre from 'hardhat'
 
 export async function main() {
   await hre.run('verify:verify', {
-    address: '0xA685C22cE840C8C82717F6107571f9E64E623939',
+    address: '0x94aD8E3501Bc56dDdeA3cd5558B31FDd3885192A',
     constructorArguments: [5],
     contract: 'contracts/Plataforma.sol:Plataforma',
   })
