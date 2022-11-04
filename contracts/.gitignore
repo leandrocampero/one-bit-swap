@@ -2,14 +2,12 @@ node_modules
 .env
 coverage
 coverage.json
-typechain
-typechain-types
+**/@openzeppelin/**
+**/@chainlink/**
 
 #Hardhat files
 cache
 artifacts/build-info/**
-artifacts/@openzeppelin/**
-artifacts/@chainlink/**
 artifacts/hardhat/**
 artifacts/contracts/**/*.*.json
 
