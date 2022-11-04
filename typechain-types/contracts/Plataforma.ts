@@ -50,7 +50,7 @@ export declare namespace Datos {
   };
 }
 
-export interface GestorTokensInterface extends utils.Interface {
+export interface PlataformaInterface extends utils.Interface {
   functions: {
     "activarToken(string)": FunctionFragment;
     "archivoOrdenes()": FunctionFragment;
@@ -154,12 +154,12 @@ export interface GestorTokensInterface extends utils.Interface {
   events: {};
 }
 
-export interface GestorTokens extends BaseContract {
+export interface Plataforma extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: GestorTokensInterface;
+  interface: PlataformaInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
@@ -207,7 +207,7 @@ export interface GestorTokens extends BaseContract {
     ): Promise<[boolean]>;
 
     listarTokens(
-      _soloActivos: PromiseOrValue<boolean>,
+      _incluirSuspendidos: PromiseOrValue<boolean>,
       overrides?: CallOverrides
     ): Promise<[Datos.TokenStructOutput[]]>;
 
@@ -279,7 +279,7 @@ export interface GestorTokens extends BaseContract {
   ): Promise<boolean>;
 
   listarTokens(
-    _soloActivos: PromiseOrValue<boolean>,
+    _incluirSuspendidos: PromiseOrValue<boolean>,
     overrides?: CallOverrides
   ): Promise<Datos.TokenStructOutput[]>;
 
@@ -351,7 +351,7 @@ export interface GestorTokens extends BaseContract {
     ): Promise<boolean>;
 
     listarTokens(
-      _soloActivos: PromiseOrValue<boolean>,
+      _incluirSuspendidos: PromiseOrValue<boolean>,
       overrides?: CallOverrides
     ): Promise<Datos.TokenStructOutput[]>;
 
@@ -418,7 +418,7 @@ export interface GestorTokens extends BaseContract {
     ): Promise<BigNumber>;
 
     listarTokens(
-      _soloActivos: PromiseOrValue<boolean>,
+      _incluirSuspendidos: PromiseOrValue<boolean>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -466,7 +466,7 @@ export interface GestorTokens extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     listarTokens(
-      _soloActivos: PromiseOrValue<boolean>,
+      _incluirSuspendidos: PromiseOrValue<boolean>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

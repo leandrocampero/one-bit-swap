@@ -1,15 +1,15 @@
 {
   "baseUrl": ".",
   "compilerOptions": {
-    "target": "es5",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
+    "target": "esnext",
+    "module": "commonjs",
     "esModuleInterop": true,
-    "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
@@ -20,12 +20,18 @@
       "@lib/*": ["lib/*"],
       "@managers/*": ["lib/managers/*"],
       "@models/*": ["lib/models/*"],
-      "@services/*": ["services/*"],
       "@styles/*": ["styles/*"],
-      "@utils/*": ["utils/*"]
+      "@artifacts/*": ["artifacts/contracts/*"],
+      "@typechain/*": ["typechain-types/*"]
     },
     "incremental": true
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    "scripts",
+    "contracts",
+    "artifacts",
+    "typechain-types"
+  ]
 }
