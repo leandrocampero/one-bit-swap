@@ -5,6 +5,7 @@
     "dbaeumer.vscode-eslint",
     "editorconfig.editorconfig",
     "vscodeshift.mui-snippets",
-    "NomicFoundation.hardhat-solidity"
+    "nomicfoundation.hardhat-solidity",
+    "wayou.vscode-todo-highlight"
   ]
 }

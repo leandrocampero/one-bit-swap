@@ -37,6 +37,11 @@
       "text": "ERROR:",
       "backgroundColor": "#f443363f",
       "overviewRulerColor": "#f44336"
+    },
+    {
+      "text": "* @",
+      "backgroundColor": "#18ffff20",
+      "overviewRulerColor": "#18ffff"
     }
   ]
 }
