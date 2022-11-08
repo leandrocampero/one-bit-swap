@@ -32,6 +32,9 @@ const config: HardhatUserConfig = {
   etherscan: {
     apiKey: `${POLYGON_API_KEY}`,
   },
+  paths: {
+    tests: './contracts/test',
+  },
 }
 
 export default config
