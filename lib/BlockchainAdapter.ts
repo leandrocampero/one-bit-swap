@@ -1,8 +1,12 @@
 import Plataforma from '@artifacts/Plataforma.sol/Plataforma.json'
 import { Mensajes } from '@lib/constants/error'
+import Billeteras from '@models/Billeteras'
 import { Datos } from '@typechain/contracts/GestorTokens'
 import { Plataforma as PlataformaInterface } from '@typechain/contracts/Plataforma'
 import { ethers } from 'ethers'
+import { listaTodasOrdenes, listaTokens } from './../testModels/modelos'
+import Tokens from './models/Tokens'
+import { Estados, EstadosOrdenes, TiposOrdenes } from './types.d'
 export default class BlockchainAdapter {
   private static _gestor: BlockchainAdapter
   private _provider: ethers.providers.Web3Provider | null
@@ -63,5 +67,70 @@ export default class BlockchainAdapter {
     return (await this._contract.listarTokens(
       incluirSuspendidos
     )) as Datos.TokenStruct[]
+  }
+
+  // todo: falta agregar los parametros de entrada
+  public BuscarTokens(ticker: string) {
+    // todo: aqui hay que llamar al contrato
+    const data = listaTokens.filter((t) => {
+      return ticker != '' ? t.ticker == ticker : true
+    })
+    return data
+  }
+
+  public BuscarOrdenes(
+    billetera?: Billeteras,
+    tipo?: TiposOrdenes,
+    tokenCompra?: Tokens,
+    tokenVenta?: Tokens,
+    montoCompra?: bigint,
+    montoVenta?: bigint,
+    estado?: EstadosOrdenes,
+    fechaInicio?: string,
+    fechaFin?: string
+  ) {
+    // todo: aqui hay que llamar al contrato
+    const data = listaTodasOrdenes.filter((o) => {
+      return o.estado == estado
+    })
+    return data
+  }
+
+  public CancelarOrden(idOrden: string): boolean {
+    console.log('Orden con el id: ' + idOrden)
+    return true
+  }
+
+  public EjecutarOrden(
+    tipo: TiposOrdenes,
+    idOrden: string,
+    comprador: Billeteras
+  ): boolean {
+    console.log(
+      `Orden del tipo: ${tipo} con el id: ${idOrden} por el usuario: ${comprador.direccion}`
+    )
+    return true
+  }
+
+  public static ActivarToken(ticker: string): boolean {
+    // modificar para traer de la blockchain
+    for (const token of listaTokens) {
+      if (token.ticker == ticker) {
+        token.estado = Estados.activo
+        return true
+      }
+    }
+    return false
+  }
+
+  public static SuspenderToken(ticker: string): boolean {
+    // modificar para traer de la blockchain
+    for (const token of listaTokens) {
+      if (token.ticker == ticker) {
+        token.estado = Estados.suspendido
+        return true
+      }
+    }
+    return false
   }
 }
