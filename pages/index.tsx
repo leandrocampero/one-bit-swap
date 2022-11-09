@@ -2,6 +2,7 @@ import CrearOrden from '@components/Ordenes/crearOrden'
 import { Box, Grid } from '@mui/material'
 import { grey } from '@mui/material/colors'
 import styles from '@styles/layout.module.scss'
+import ContractConnect from '../components/ContractConnect'
 
 const sxProps = {
   mx: 2,
@@ -19,7 +20,7 @@ export default function Home() {
           {/* <Componente del gsus> */}
           <h1>Ordenes Abiertas y demas</h1>
 
-          {/* </Componente del gsus> */}
+          <ContractConnect />
         </Box>
       </Grid>
       <Grid item xs={4}>

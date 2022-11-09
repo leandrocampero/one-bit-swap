@@ -33,5 +33,6 @@
     "contracts",
     "artifacts",
     "typechain-types"
-  ]
+  ],
+  "files": ["./hardhat.config.ts"]
 }
