@@ -20,3 +20,9 @@ export enum RolesBilleteras {
   administrador = 1,
   propietario = 2,
 }
+
+export declare global {
+  interface Window {
+    ethereum: any
+  }
+}

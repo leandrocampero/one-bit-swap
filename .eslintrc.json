@@ -32,6 +32,7 @@
       "always",
       { "exceptAfterOverload": true, "exceptAfterSingleLine": true }
     ],
+    "@typescript-eslint/no-non-null-assertion": "off",
     "prettier/prettier": "error"
   }
 }
