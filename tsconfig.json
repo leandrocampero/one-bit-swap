@@ -26,13 +26,7 @@
     },
     "incremental": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
-  "exclude": [
-    "node_modules",
-    "scripts",
-    "contracts",
-    "artifacts",
-    "typechain-types"
-  ],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "lib/types.d"],
+  "exclude": ["node_modules", "scripts", "contracts", "plugin/ethers.ts"],
   "files": ["./hardhat.config.ts"]
 }

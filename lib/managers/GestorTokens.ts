@@ -2,9 +2,18 @@ import IGestor from '../Interfaces/IGestor'
 import Tokens from '../models/Tokens'
 export default class GestorTokens implements IGestor<Tokens> {
   private _tokens: Array<Tokens>
+  private static _gestor: GestorTokens
 
-  constructor() {
+  private constructor() {
     this._tokens = []
+  }
+
+  public static instanciar(): GestorTokens {
+    if (!this._gestor) {
+      GestorTokens._gestor = new GestorTokens()
+    }
+
+    return GestorTokens._gestor
   }
 
   nuevo(obj: Tokens): boolean {
