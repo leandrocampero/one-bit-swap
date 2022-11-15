@@ -8,9 +8,10 @@
   "license": "MIT",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npx hardhat compile && next build",
     "start": "next start",
     "lint": "next lint",
+    "export": "next export",
     "hardhat": "npx hardhat",
     "compile": "npx hardhat compile",
     "help": "npx hardhat help",
