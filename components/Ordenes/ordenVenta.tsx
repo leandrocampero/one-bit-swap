@@ -63,7 +63,8 @@ export default function OrdenVenta(props: any) {
         variant="outlined"
       >
         <OutlinedInput
-          id="outlined-adornment-monto"
+          id="outlined-adornment-monto-venta"
+          type="number"
           value={ventaMonto}
           onChange={handleChange2}
           endAdornment={
@@ -72,6 +73,7 @@ export default function OrdenVenta(props: any) {
           aria-describedby="outlined-monto-helper-text"
           inputProps={{
             'aria-label': 'monto',
+            min: 0,
           }}
         />
       </FormControl>

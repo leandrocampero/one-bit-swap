@@ -27,20 +27,16 @@ function TabPanel(props: TabPanelProps) {
 
 export const VentaMontoContext = React.createContext<any>({})
 export const VentaTokenContext = React.createContext<any>({})
-
 export const CompraMontoContext = React.createContext<any>({})
 export const CompraTokenContext = React.createContext<any>({})
 
 export default function CrearOrden() {
   const labelVenta = 'Token a Entregar (Vender)'
   const labelCompra = 'Token a Recibir (Comprar)'
-
   const [valueTab, setValueTab] = useState(0)
-
-  const [compraMonto, setCompraMonto] = React.useState(0)
+  const [compraMonto, setCompraMonto] = React.useState<number>()
   const [compraToken, setCompraToken] = React.useState('USDT')
-
-  const [ventaMonto, setVentaMonto] = React.useState(0)
+  const [ventaMonto, setVentaMonto] = React.useState<number>()
   const [ventaToken, setVentaToken] = React.useState('USDT')
 
   const montoCompraVenta = () => {

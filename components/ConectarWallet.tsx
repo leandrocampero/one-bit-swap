@@ -1,11 +1,14 @@
 // https://docs.metamask.io/guide/ethereum-provider.html#using-the-provider
+import GestorBilleteras from '@lib/managers/GestorBilleteras'
+import { RolesBilleteras } from '@lib/types.d'
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet'
 import LogoutIcon from '@mui/icons-material/Logout'
+import SettingsIcon from '@mui/icons-material/Settings'
 import { Button, Menu, MenuItem, MenuProps, styled } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import { ethers } from 'ethers'
-import React, { SetStateAction, useEffect, useState } from 'react'
-import ModalError from './ModalError'
+import Link from 'next/link'
+import React, { useEffect, useState } from 'react'
 
 const StyledMenu = styled((props: MenuProps) => (
   <Menu
@@ -50,6 +53,8 @@ const StyledMenu = styled((props: MenuProps) => (
   },
 }))
 
+const rol = RolesBilleteras.administrador
+
 export default function ConectarWallet() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
@@ -60,26 +65,28 @@ export default function ConectarWallet() {
     setAnchorEl(null)
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [errorMessage, setErrorMessage] = useState('')
   const [address, setAddress] = useState('')
   const [addressRecortada, setAddressRecortada] = useState('')
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [provider, setProvider] = useState<ethers.providers.Web3Provider>()
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [signer, setSigner] = useState<ethers.Signer>()
+  const [logueado, setLogueado] = useState<boolean>(false)
 
-  const connectWalletHandler = () => {
+  const gBilletera = new GestorBilleteras()
+
+  async function connectToMetamask() {
     if (window.ethereum && window.ethereum.isMetaMask) {
-      window.ethereum
-        .request({ method: 'eth_requestAccounts' })
-        .then((result: any[]) => {
-          accountChangedHandler(result[0])
-          console.log('result[0]', result[0])
-        })
-        .catch((error: { message: SetStateAction<string> }) => {
-          setErrorMessage(error.message)
-        })
+      try {
+        const provider = new ethers.providers.Web3Provider(
+          window.ethereum,
+          'any'
+        )
+        const address = await provider.send('eth_requestAccounts', [])
+        accountChangedHandler(address[0])
+        setSigner(provider.getSigner())
+      } catch (error) {
+        console.log(error)
+      }
     } else {
       setErrorMessage('Please install MetaMask browser extension to interact')
       console.log('errorMessage', errorMessage)
@@ -87,40 +94,39 @@ export default function ConectarWallet() {
   }
 
   // update account, will cause component re-render
-  const accountChangedHandler = (newAccount: string) => {
-    setAddress(newAccount)
+  function accountChangedHandler(newAccount: string) {
+    console.log('newAccount', newAccount)
+    const wallet = gBilletera.nuevo(newAccount)
+    setAddress(wallet.direccion)
+    console.log(address)
     const cadena1 =
-      newAccount.slice(0, 5) + '..' + newAccount.slice(newAccount.length - 4)
+      newAccount.toString().slice(0, 5) +
+      '..' +
+      newAccount.toString().slice(newAccount.length - 4)
     setAddressRecortada(cadena1)
     localStorage.setItem('wallet', JSON.stringify(newAccount))
     updateEthers()
   }
 
-  const chainChangedHandler = () => {
-    // reload the page to avoid any errors with chain change mid use of application
+  function chainChangedHandler() {
     window.location.reload()
   }
 
-  const cerrarSesion = () => {
+  function cerrarSesion() {
     localStorage.removeItem('wallet')
-    setAddress('')
+    const wallet = gBilletera.nuevo('')
+    setAddress(wallet.direccion)
     handleClose()
   }
 
-  // listen for account changes
   if (typeof window !== 'undefined') {
-    console.log('hola')
     if (typeof window.ethereum !== 'undefined') {
-      console.log('hola1')
-      // Client-side-only code
       window.ethereum.on('accountsChanged', accountChangedHandler)
-
       window.ethereum.on('chainChanged', chainChangedHandler)
-
       window.ethereum.on('disconnect', cerrarSesion)
     }
   }
-  const updateEthers = async () => {
+  async function updateEthers() {
     const tempProvider = new ethers.providers.Web3Provider(window.ethereum)
     setProvider(tempProvider)
 
@@ -139,9 +145,8 @@ export default function ConectarWallet() {
 
   return (
     <div>
-      {errorMessage.length ? <ModalError /> : null}
       {!address.length ? (
-        <Button variant="contained" onClick={connectWalletHandler}>
+        <Button variant="contained" onClick={connectToMetamask}>
           Conectar Wallet
         </Button>
       ) : (
@@ -168,6 +173,14 @@ export default function ConectarWallet() {
             open={open}
             onClose={handleClose}
           >
+            {rol != 0 ? (
+              <Link href="configuracion">
+                <MenuItem disableRipple>
+                  <SettingsIcon />
+                  Configuracion
+                </MenuItem>
+              </Link>
+            ) : null}
             <MenuItem onClick={cerrarSesion} disableRipple>
               <LogoutIcon />
               Desconectar Billetera

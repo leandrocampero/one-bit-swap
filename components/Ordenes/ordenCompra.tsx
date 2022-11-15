@@ -60,7 +60,8 @@ export default function OrdenCompra(props: any) {
       {!props.intercambio && (
         <FormControl fullWidth sx={{ m: 1, width: '97%' }} variant="outlined">
           <OutlinedInput
-            id="outlined-adornment-monto"
+            id="outlined-adornment-monto-compra"
+            type="number"
             value={compraMonto}
             onChange={handleChange2}
             endAdornment={
@@ -69,6 +70,7 @@ export default function OrdenCompra(props: any) {
             aria-describedby="outlined-monto-helper-text"
             inputProps={{
               'aria-label': 'monto',
+              min: 0,
             }}
           />
         </FormControl>

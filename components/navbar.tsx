@@ -11,7 +11,7 @@ import ConectarWallet from './ConectarWallet'
 
 export default function Navbar() {
   return (
-    <Box sx={{ flexGrow: 1 }}>
+    <Box sx={{ flexGrow: 1, mb: 5 }}>
       <AppBar position="fixed">
         <Toolbar>
           <Container maxWidth="lg">
