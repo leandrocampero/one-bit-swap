@@ -1,6 +1,5 @@
-import IGestor from '../Interfaces/IGestor'
 import Tokens from '../models/Tokens'
-export default class GestorTokens implements IGestor<Tokens> {
+export default class GestorTokens {
   private _tokens: Array<Tokens>
   private static _gestor: GestorTokens
 

@@ -1,6 +1,5 @@
-import IGestor from '../Interfaces/IGestor'
 import Ordenes from '../models/Ordenes'
-export default class GestorOrdenes implements IGestor<Ordenes> {
+export default class GestorOrdenes {
   private _ordenes: Array<Ordenes>
 
   constructor() {

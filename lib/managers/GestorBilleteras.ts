@@ -1,16 +1,16 @@
 import Billeteras from '@models/Billeteras'
-import IGestor from '../Interfaces/IGestor'
 
-export default class GestorBilleteras implements IGestor<Billeteras> {
+export default class GestorBilleteras {
   private _billeteras: Array<Billeteras>
 
   constructor() {
     this._billeteras = []
   }
 
-  nuevo(obj: Billeteras): boolean {
+  nuevo(direccion: string): Billeteras {
+    const obj = new Billeteras(direccion)
     this._billeteras.concat([obj])
-    return true
+    return obj
   }
 
   modificar(obj: Billeteras): boolean {
