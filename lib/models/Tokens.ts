@@ -1,4 +1,5 @@
-import { Estados } from '../types'
+import { BlockchainAdapter } from '@lib/BlockchainAdapter'
+import { Estados } from '../types.d'
 export default class Tokens {
   private _ticker: string
   private _contrato: string
@@ -17,6 +18,10 @@ export default class Tokens {
     this._oraculo = oraculo
     this._decimales = decimales
     this._estado = Estados.activo
+  }
+
+  public Activar(): string {
+    return BlockchainAdapter.ActivarToken(this._ticker)
   }
 
   public get ticker(): string {
@@ -53,5 +58,10 @@ export default class Tokens {
 
   public get estado(): Estados {
     return this._estado
+  }
+
+  // todo: borrar
+  public set estado(value: Estados) {
+    this._estado = value
   }
 }

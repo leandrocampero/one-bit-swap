@@ -1,3 +1,4 @@
+import { RolesBilleteras } from '@lib/types.d'
 import Billeteras from '@models/Billeteras'
 
 export default class GestorBilleteras {
@@ -20,5 +21,17 @@ export default class GestorBilleteras {
 
   buscar(): Billeteras[] {
     return this._billeteras
+  }
+
+  /**
+   * Verifica si una billetera tiene rol Propietario o Administrador
+   * Devuelve el rol que posee la billetera en cuestion, en caso de no tener
+   * un rol o poseer un rol incorrecto, devuelve 1 (rol de Usuario)
+   */
+  verificarRol(billetera: Billeteras | undefined): RolesBilleteras {
+    return billetera?.rol == RolesBilleteras.administrador ||
+      billetera?.rol == RolesBilleteras.propietario
+      ? billetera?.rol
+      : RolesBilleteras.usuario
   }
 }
