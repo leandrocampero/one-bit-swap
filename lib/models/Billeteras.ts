@@ -10,6 +10,10 @@ export default class Billeteras {
     this._estado = Estados.activo
   }
 
+  public Activar(): string {
+    return BlockchainAdapter.ActivarToken(this._ticker)
+  }
+
   public get direccion(): string {
     return this._direccion
   }
@@ -30,6 +34,7 @@ export default class Billeteras {
     return this._estado
   }
 
+  // todo: auxliar luego borrar
   public set estado(value: Estados) {
     this._estado = value
   }

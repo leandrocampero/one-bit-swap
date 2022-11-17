@@ -4,7 +4,7 @@ import Billeteras from '@models/Billeteras'
 import { Datos } from '@typechain/contracts/GestorTokens'
 import { Plataforma as PlataformaInterface } from '@typechain/contracts/Plataforma'
 import { ethers } from 'ethers'
-import { listaTodasOrdenes, listaTokens } from './../testModels/modelos'
+import { listaTodasOrdenes, listaTokens } from '../scripts/modelos'
 import Tokens from './models/Tokens'
 import { Estados, EstadosOrdenes, TiposOrdenes } from './types.d'
 export default class BlockchainAdapter {
