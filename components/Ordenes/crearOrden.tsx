@@ -1,7 +1,7 @@
 import { Box, Button, Tab, Tabs, Typography } from '@mui/material'
 import React, { useState } from 'react'
-import OrdenCompra from './ordenCompra'
-import OrdenVenta from './ordenVenta'
+import OrdenCompra from './OrdenCompra'
+import OrdenVenta from './OrdenVenta'
 
 interface TabPanelProps {
   children?: React.ReactNode
