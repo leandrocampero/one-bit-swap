@@ -4,8 +4,12 @@ import { HardhatUserConfig } from 'hardhat/config'
 
 dotenv.config()
 
-const { TESTNET_PRIVATE_KEY, MAINNET_PRIVATE_KEY, POLYGON_API_KEY } =
-  process.env
+const {
+  TESTNET_PRIVATE_KEY,
+  MAINNET_PRIVATE_KEY,
+  POLYGON_API_KEY,
+  ALCHEMY_API_KEY,
+} = process.env
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -19,7 +23,7 @@ const config: HardhatUserConfig = {
   defaultNetwork: 'polygonMumbai',
   networks: {
     polygonMumbai: {
-      url: 'https://rpc-mumbai.matic.today',
+      url: `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
       chainId: 80001,
       accounts: [`0x${TESTNET_PRIVATE_KEY}`],
     },
@@ -27,6 +31,17 @@ const config: HardhatUserConfig = {
       url: 'https://polygon-rpc.com/',
       chainId: 137,
       accounts: [`0x${MAINNET_PRIVATE_KEY}`],
+    },
+    hardhat: {
+      forking: {
+        url: `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
+        //blockNumber: 29234537,
+      },
+      allowUnlimitedContractSize: true,
+    },
+    localhost: {
+      url: 'http://127.0.0.1:8545/',
+      allowUnlimitedContractSize: true,
     },
   },
   etherscan: {
