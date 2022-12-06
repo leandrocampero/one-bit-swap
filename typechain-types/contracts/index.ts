@@ -3,5 +3,7 @@
 /* eslint-disable */
 export type { Datos } from "./Datos";
 export type { ERC20Mock } from "./ERC20Mock";
+export type { GestorBilleteras } from "./GestorBilleteras";
+export type { GestorOrdenes } from "./GestorOrdenes";
 export type { GestorTokens } from "./GestorTokens";
 export type { Plataforma } from "./Plataforma";

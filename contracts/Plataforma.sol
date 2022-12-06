@@ -3,11 +3,13 @@ pragma solidity ^0.8.9;
 
 import "./Datos.sol";
 import "./GestorTokens.sol";
+import "./GestorBilleteras.sol";
+import "./GestorOrdenes.sol";
 
 // Uncomment this line to use console.log
 // import "hardhat/console.sol";
 
-contract Plataforma is Datos, GestorTokens {
+contract Plataforma is Datos, GestorTokens, GestorBilleteras, GestorOrdenes {
   constructor(uint _montoMinimo) {
     plataforma.propietario = msg.sender;
     plataforma.montoMinimoUSD = _montoMinimo;
@@ -22,7 +24,7 @@ contract Plataforma is Datos, GestorTokens {
     nuevoToken(
       0xA6FA4fB5f76172d178d61B04b0ecd319C5d1C0aa,
       0x0715A7794a1dc8e42615F059dD6e406A6594651A
-    ); // ETH
+    ); // WETH
 
     nuevoToken(
       0xd393b1E02dA9831Ff419e22eA105aAe4c47E1253,

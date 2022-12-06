@@ -37,6 +37,14 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ERC20Mock__factory>;
     getContractFactory(
+      name: "GestorBilleteras",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.GestorBilleteras__factory>;
+    getContractFactory(
+      name: "GestorOrdenes",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.GestorOrdenes__factory>;
+    getContractFactory(
       name: "GestorTokens",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.GestorTokens__factory>;
@@ -75,6 +83,16 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.ERC20Mock>;
+    getContractAt(
+      name: "GestorBilleteras",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.GestorBilleteras>;
+    getContractAt(
+      name: "GestorOrdenes",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.GestorOrdenes>;
     getContractAt(
       name: "GestorTokens",
       address: string,

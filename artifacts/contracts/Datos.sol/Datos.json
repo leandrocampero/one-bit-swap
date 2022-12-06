@@ -4,27 +4,99 @@
   "sourceName": "contracts/Datos.sol",
   "abi": [
     {
-      "inputs": [],
-      "name": "archivoOrdenes",
-      "outputs": [
+      "anonymous": false,
+      "inputs": [
         {
-          "internalType": "Datos.ContadorOrdenes",
-          "name": "cantidadTotal",
-          "type": "uint256"
-        },
-        {
-          "internalType": "Datos.ContadorOrdenes",
-          "name": "cantidadActivas",
-          "type": "uint256"
-        },
-        {
-          "internalType": "string",
-          "name": "ultimaOrdenActiva",
-          "type": "string"
+          "components": [
+            {
+              "internalType": "bytes32",
+              "name": "idOrden",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "siguienteOrdenActiva",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "anteriorOrdenActiva",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "siguienteOrdenGemela",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "anteriorOrdenGemela",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "address",
+              "name": "vendedor",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "comprador",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "montoVenta",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "montoCompra",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "fechaCreacion",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "fechaFinalizacion",
+              "type": "uint256"
+            },
+            {
+              "internalType": "enum Datos.EstadoOrden",
+              "name": "estado",
+              "type": "uint8"
+            },
+            {
+              "internalType": "enum Datos.TipoOrden",
+              "name": "tipo",
+              "type": "uint8"
+            },
+            {
+              "internalType": "bool",
+              "name": "existe",
+              "type": "bool"
+            },
+            {
+              "internalType": "string",
+              "name": "tokenCompra",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "tokenVenta",
+              "type": "string"
+            }
+          ],
+          "indexed": false,
+          "internalType": "struct Datos.Orden",
+          "name": "respuesta",
+          "type": "tuple"
         }
       ],
-      "stateMutability": "view",
-      "type": "function"
+      "name": "NuevaOrden",
+      "type": "event"
     },
     {
       "inputs": [
@@ -43,6 +115,29 @@
         }
       ],
       "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "ordenes",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "cantidadTotal",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "cantidadActivas",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "ultimaOrdenActiva",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -76,7 +171,7 @@
           "type": "string"
         }
       ],
-      "name": "tokensMap",
+      "name": "tokensRegistrados",
       "outputs": [
         {
           "internalType": "string",

@@ -7,6 +7,8 @@ import type {
   BigNumberish,
   BytesLike,
   CallOverrides,
+  ContractTransaction,
+  Overrides,
   PopulatedTransaction,
   Signer,
   utils,
@@ -80,27 +82,87 @@ export declare namespace Datos {
     tokenCompra: string;
     tokenVenta: string;
   };
+
+  export type BilleteraStruct = {
+    direccion: PromiseOrValue<string>;
+    indiceAdmin: PromiseOrValue<BigNumberish>;
+    indiceBloqueado: PromiseOrValue<BigNumberish>;
+    rol: PromiseOrValue<BigNumberish>;
+    estado: PromiseOrValue<BigNumberish>;
+    existe: PromiseOrValue<boolean>;
+    ordenes: PromiseOrValue<string>[];
+  };
+
+  export type BilleteraStructOutput = [
+    string,
+    BigNumber,
+    BigNumber,
+    number,
+    number,
+    boolean,
+    string[]
+  ] & {
+    direccion: string;
+    indiceAdmin: BigNumber;
+    indiceBloqueado: BigNumber;
+    rol: number;
+    estado: number;
+    existe: boolean;
+    ordenes: string[];
+  };
 }
 
-export interface DatosInterface extends utils.Interface {
+export interface GestorBilleterasInterface extends utils.Interface {
   functions: {
+    "bloquearBilletera(address)": FunctionFragment;
+    "desbloquearBilletera(address)": FunctionFragment;
     "emptyString(string)": FunctionFragment;
+    "hacerAdministrador(address)": FunctionFragment;
+    "listarAdministradores()": FunctionFragment;
+    "listarBilleterasBloqueadas()": FunctionFragment;
     "ordenes()": FunctionFragment;
     "plataforma()": FunctionFragment;
+    "quitarAdministrador(address)": FunctionFragment;
     "tokensRegistrados(string)": FunctionFragment;
   };
 
   getFunction(
     nameOrSignatureOrTopic:
+      | "bloquearBilletera"
+      | "desbloquearBilletera"
       | "emptyString"
+      | "hacerAdministrador"
+      | "listarAdministradores"
+      | "listarBilleterasBloqueadas"
       | "ordenes"
       | "plataforma"
+      | "quitarAdministrador"
       | "tokensRegistrados"
   ): FunctionFragment;
 
   encodeFunctionData(
+    functionFragment: "bloquearBilletera",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "desbloquearBilletera",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
     functionFragment: "emptyString",
     values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "hacerAdministrador",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "listarAdministradores",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "listarBilleterasBloqueadas",
+    values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "ordenes", values?: undefined): string;
   encodeFunctionData(
@@ -108,16 +170,44 @@ export interface DatosInterface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "quitarAdministrador",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
     functionFragment: "tokensRegistrados",
     values: [PromiseOrValue<string>]
   ): string;
 
   decodeFunctionResult(
+    functionFragment: "bloquearBilletera",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "desbloquearBilletera",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "emptyString",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "hacerAdministrador",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "listarAdministradores",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "listarBilleterasBloqueadas",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "ordenes", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "plataforma", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "quitarAdministrador",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "tokensRegistrados",
     data: BytesLike
@@ -140,12 +230,12 @@ export type NuevaOrdenEvent = TypedEvent<
 
 export type NuevaOrdenEventFilter = TypedEventFilter<NuevaOrdenEvent>;
 
-export interface Datos extends BaseContract {
+export interface GestorBilleteras extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: DatosInterface;
+  interface: GestorBilleterasInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
@@ -167,10 +257,33 @@ export interface Datos extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
+    bloquearBilletera(
+      _billetera: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    desbloquearBilletera(
+      _billetera: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     emptyString(
       _string: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
+
+    hacerAdministrador(
+      _billetera: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    listarAdministradores(
+      overrides?: CallOverrides
+    ): Promise<[Datos.BilleteraStructOutput[]]>;
+
+    listarBilleterasBloqueadas(
+      overrides?: CallOverrides
+    ): Promise<[Datos.BilleteraStructOutput[]]>;
 
     ordenes(
       overrides?: CallOverrides
@@ -192,6 +305,11 @@ export interface Datos extends BaseContract {
       }
     >;
 
+    quitarAdministrador(
+      _billetera: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     tokensRegistrados(
       arg0: PromiseOrValue<string>,
       overrides?: CallOverrides
@@ -207,10 +325,33 @@ export interface Datos extends BaseContract {
     >;
   };
 
+  bloquearBilletera(
+    _billetera: PromiseOrValue<string>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  desbloquearBilletera(
+    _billetera: PromiseOrValue<string>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   emptyString(
     _string: PromiseOrValue<string>,
     overrides?: CallOverrides
   ): Promise<boolean>;
+
+  hacerAdministrador(
+    _billetera: PromiseOrValue<string>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  listarAdministradores(
+    overrides?: CallOverrides
+  ): Promise<Datos.BilleteraStructOutput[]>;
+
+  listarBilleterasBloqueadas(
+    overrides?: CallOverrides
+  ): Promise<Datos.BilleteraStructOutput[]>;
 
   ordenes(
     overrides?: CallOverrides
@@ -232,6 +373,11 @@ export interface Datos extends BaseContract {
     }
   >;
 
+  quitarAdministrador(
+    _billetera: PromiseOrValue<string>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   tokensRegistrados(
     arg0: PromiseOrValue<string>,
     overrides?: CallOverrides
@@ -247,10 +393,33 @@ export interface Datos extends BaseContract {
   >;
 
   callStatic: {
+    bloquearBilletera(
+      _billetera: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
+    desbloquearBilletera(
+      _billetera: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
     emptyString(
       _string: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<boolean>;
+
+    hacerAdministrador(
+      _billetera: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
+    listarAdministradores(
+      overrides?: CallOverrides
+    ): Promise<Datos.BilleteraStructOutput[]>;
+
+    listarBilleterasBloqueadas(
+      overrides?: CallOverrides
+    ): Promise<Datos.BilleteraStructOutput[]>;
 
     ordenes(
       overrides?: CallOverrides
@@ -271,6 +440,11 @@ export interface Datos extends BaseContract {
         montoMinimoUSD: BigNumber;
       }
     >;
+
+    quitarAdministrador(
+      _billetera: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
 
     tokensRegistrados(
       arg0: PromiseOrValue<string>,
@@ -293,14 +467,38 @@ export interface Datos extends BaseContract {
   };
 
   estimateGas: {
+    bloquearBilletera(
+      _billetera: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    desbloquearBilletera(
+      _billetera: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     emptyString(
       _string: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    hacerAdministrador(
+      _billetera: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    listarAdministradores(overrides?: CallOverrides): Promise<BigNumber>;
+
+    listarBilleterasBloqueadas(overrides?: CallOverrides): Promise<BigNumber>;
+
     ordenes(overrides?: CallOverrides): Promise<BigNumber>;
 
     plataforma(overrides?: CallOverrides): Promise<BigNumber>;
+
+    quitarAdministrador(
+      _billetera: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
 
     tokensRegistrados(
       arg0: PromiseOrValue<string>,
@@ -309,14 +507,42 @@ export interface Datos extends BaseContract {
   };
 
   populateTransaction: {
+    bloquearBilletera(
+      _billetera: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    desbloquearBilletera(
+      _billetera: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
     emptyString(
       _string: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    hacerAdministrador(
+      _billetera: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    listarAdministradores(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    listarBilleterasBloqueadas(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     ordenes(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     plataforma(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    quitarAdministrador(
+      _billetera: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
 
     tokensRegistrados(
       arg0: PromiseOrValue<string>,
