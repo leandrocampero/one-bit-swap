@@ -33,6 +33,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Datos__factory>;
     getContractFactory(
+      name: "ERC20Mock",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ERC20Mock__factory>;
+    getContractFactory(
       name: "GestorTokens",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.GestorTokens__factory>;
@@ -40,10 +44,6 @@ declare module "hardhat/types/runtime" {
       name: "Plataforma",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Plataforma__factory>;
-    getContractFactory(
-      name: "Pruebas",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.Pruebas__factory>;
 
     getContractAt(
       name: "AggregatorV3Interface",
@@ -71,6 +71,11 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.Datos>;
     getContractAt(
+      name: "ERC20Mock",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ERC20Mock>;
+    getContractAt(
       name: "GestorTokens",
       address: string,
       signer?: ethers.Signer
@@ -80,11 +85,6 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.Plataforma>;
-    getContractAt(
-      name: "Pruebas",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.Pruebas>;
 
     // default types
     getContractFactory(
