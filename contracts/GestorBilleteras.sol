@@ -3,7 +3,7 @@ pragma solidity ^0.8.9;
 
 import "./Datos.sol";
 
-// import "hardhat/console.sol";
+//import "hardhat/console.sol";
 
 contract GestorBilleteras is Datos {
   /**
@@ -36,26 +36,25 @@ contract GestorBilleteras is Datos {
    * @return modificado indica si la operación fué exitosa o no
    * @dev si la billetera no existe, la registra con rol administrador
    */
-  function hacerAdministrador(address _billetera)
-    public
-    soloPropietario
-    returns (bool modificado)
-  {
+  function hacerAdministrador(
+    address _billetera
+  ) public soloPropietario returns (bool modificado) {
     modificado = false;
     uint256 size;
 
     assembly {
       size := extcodesize(_billetera)
     }
-    require(size > 0, "La billetera es invalida");
+    require(size == 0, "La billetera es invalida");
     require(
       _billetera != address(0),
       "La direccion de la billetera no puede ser cero"
     );
 
-    if (billeterasRegistradas[_billetera].rol == RolBilletera.ADMINISTRADOR) {
-      return modificado;
-    }
+    require(
+      billeterasRegistradas[_billetera].rol != RolBilletera.ADMINISTRADOR,
+      "La billetera ya tiene rol de administrador"
+    );
 
     billeterasRegistradas[_billetera].rol = RolBilletera.ADMINISTRADOR;
 
@@ -81,18 +80,16 @@ contract GestorBilleteras is Datos {
    * @return modificado indica si la operación fué exitosa o no
    * @dev se debe controlar que la billetera exista, sino no tiene sentido quitar rol
    */
-  function quitarAdministrador(address _billetera)
-    public
-    soloPropietario
-    returns (bool modificado)
-  {
+  function quitarAdministrador(
+    address _billetera
+  ) public soloPropietario returns (bool modificado) {
     modificado = false;
     uint256 size;
 
     assembly {
       size := extcodesize(_billetera)
     }
-    require(size > 0, "La billetera es invalida");
+    require(size == 0, "La billetera es invalida");
     require(
       _billetera != address(0),
       "La direccion de la billetera no puede ser cero"
@@ -100,9 +97,10 @@ contract GestorBilleteras is Datos {
 
     require(billeterasRegistradas[_billetera].existe, "La billetera no existe");
 
-    if (billeterasRegistradas[_billetera].rol == RolBilletera.USUARIO) {
-      return modificado;
-    }
+    require(
+      billeterasRegistradas[_billetera].rol == RolBilletera.ADMINISTRADOR,
+      "La billetera no tiene rol administrador"
+    );
 
     billeterasRegistradas[_billetera].rol = RolBilletera.USUARIO;
     uint index = billeterasRegistradas[_billetera].indiceAdmin;
@@ -156,26 +154,25 @@ contract GestorBilleteras is Datos {
    * @return modificado indica si la operación fué exitosa o no
    * @dev si la billetera no existe, la registra bloqueada con rol usuario
    */
-  function bloquearBilletera(address _billetera)
-    public
-    soloAdministrador
-    returns (bool modificado)
-  {
+  function bloquearBilletera(
+    address _billetera
+  ) public soloAdministrador returns (bool modificado) {
     modificado = false;
     uint256 size;
 
     assembly {
       size := extcodesize(_billetera)
     }
-    require(size > 0, "La billetera es invalida");
+    require(size == 0, "La billetera es invalida");
     require(
       _billetera != address(0),
       "La direccion de la billetera no puede ser cero"
     );
 
-    if (billeterasRegistradas[_billetera].estado == EstadoGeneral.SUSPENDIDO) {
-      return modificado;
-    }
+    require(
+      billeterasRegistradas[_billetera].estado == EstadoGeneral.ACTIVO,
+      "La billetera ya se encuentra bloqueada"
+    );
 
     billeterasRegistradas[_billetera].estado = EstadoGeneral.SUSPENDIDO;
 
@@ -201,18 +198,16 @@ contract GestorBilleteras is Datos {
    * @return modificado indica si la operación fué exitosa o no
    * @dev se debe controlar que la billetera exista, sino no tiene sentido desbloquear
    */
-  function desbloquearBilletera(address _billetera)
-    public
-    soloAdministrador
-    returns (bool modificado)
-  {
+  function desbloquearBilletera(
+    address _billetera
+  ) public soloAdministrador returns (bool modificado) {
     modificado = false;
     uint256 size;
 
     assembly {
       size := extcodesize(_billetera)
     }
-    require(size > 0, "La billetera es invalida");
+    require(size == 0, "La billetera es invalida");
     require(
       _billetera != address(0),
       "La direccion de la billetera no puede ser cero"
@@ -220,9 +215,10 @@ contract GestorBilleteras is Datos {
 
     require(billeterasRegistradas[_billetera].existe, "La billetera no existe");
 
-    if (billeterasRegistradas[_billetera].estado == EstadoGeneral.ACTIVO) {
-      return modificado;
-    }
+    require(
+      billeterasRegistradas[_billetera].estado == EstadoGeneral.SUSPENDIDO,
+      "La billetera ya se encuentra activa"
+    );
 
     billeterasRegistradas[_billetera].estado = EstadoGeneral.ACTIVO;
     uint index = billeterasRegistradas[_billetera].indiceBloqueado;

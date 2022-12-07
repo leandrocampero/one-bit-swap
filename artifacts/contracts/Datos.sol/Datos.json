@@ -99,6 +99,101 @@
       "type": "event"
     },
     {
+      "anonymous": false,
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "direccion",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "indiceAdmin",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "indiceBloqueado",
+              "type": "uint256"
+            },
+            {
+              "internalType": "enum Datos.RolBilletera",
+              "name": "rol",
+              "type": "uint8"
+            },
+            {
+              "internalType": "enum Datos.EstadoGeneral",
+              "name": "estado",
+              "type": "uint8"
+            },
+            {
+              "internalType": "bool",
+              "name": "existe",
+              "type": "bool"
+            },
+            {
+              "internalType": "string[]",
+              "name": "ordenes",
+              "type": "string[]"
+            }
+          ],
+          "indexed": false,
+          "internalType": "struct Datos.Billetera",
+          "name": "respuesta",
+          "type": "tuple"
+        }
+      ],
+      "name": "NuevoAdministrador",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "ticker",
+              "type": "string"
+            },
+            {
+              "internalType": "address",
+              "name": "contrato",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "oraculo",
+              "type": "address"
+            },
+            {
+              "internalType": "uint8",
+              "name": "decimales",
+              "type": "uint8"
+            },
+            {
+              "internalType": "enum Datos.EstadoGeneral",
+              "name": "estado",
+              "type": "uint8"
+            },
+            {
+              "internalType": "bool",
+              "name": "existe",
+              "type": "bool"
+            }
+          ],
+          "indexed": false,
+          "internalType": "struct Datos.Token",
+          "name": "respuesta",
+          "type": "tuple"
+        }
+      ],
+      "name": "NuevoToken",
+      "type": "event"
+    },
+    {
       "inputs": [
         {
           "internalType": "string",

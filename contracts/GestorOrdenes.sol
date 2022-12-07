@@ -6,7 +6,7 @@ import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "./Datos.sol";
 import "./GestorTokens.sol";
 
-import "hardhat/console.sol";
+//import "hardhat/console.sol";
 
 contract GestorOrdenes is Datos, GestorTokens {
   /**
@@ -60,14 +60,13 @@ contract GestorOrdenes is Datos, GestorTokens {
     uint256 _montoCompra,
     uint256 _montoVenta,
     TipoOrden _tipo
-  ) public returns (bool creada, Orden memory) {
+  )
+    public
+    plataformaActiva
+    billeteraActiva
+    returns (bool creada, Orden memory)
+  {
     bytes32 idOrdenAux;
-
-    // Plataforma activa
-    require(
-      plataforma.estado == EstadoGeneral.ACTIVO,
-      "La plataforma se encuentra inactiva"
-    );
 
     // Ningún campo vacío o 0
     require(
@@ -98,32 +97,35 @@ contract GestorOrdenes is Datos, GestorTokens {
       "Uno o ambos tokens se encuentran inactivos para operar"
     );
 
-    // Billetera activa
-    require(
-      (billeterasRegistradas[msg.sender].existe &&
-        billeterasRegistradas[msg.sender].estado == EstadoGeneral.ACTIVO) ||
-        !billeterasRegistradas[msg.sender].existe,
-      "Billetera bloqueada"
-    );
-
     // Monto mínimo (equivalente en USD)
-    int256 cotizacion = consultarCotizacion(_tokenVenta);
+    uint256 montoUSD;
+    {
+      // OBS: nuevo scope para evitar errores de pila demasiado profunda
+      (int256 cotizacion, uint256 decimalesCotizacion) = consultarCotizacion(
+        _tokenVenta
+      );
+      uint256 decimalesToken = tokensRegistrados[_tokenVenta].decimales;
+
+      montoUSD =
+        (uint256(_montoVenta) * uint256(cotizacion)) /
+        10 ** (decimalesToken + decimalesCotizacion);
+    }
+
     require(
-      (uint256(_montoVenta) * uint256(cotizacion)) /
-        10 ** uint256(tokensRegistrados[_tokenVenta].decimales) >=
-        plataforma.montoMinimoUSD,
+      montoUSD >= plataforma.montoMinimoUSD,
       "El monto a intercambiar es inferior al minimo aceptable en USD"
     );
 
     // Saldo suficiente para la transferencia
+    uint256 monto;
     ERC20 contratoToken = ERC20(tokensRegistrados[_tokenVenta].contrato);
-    uint256 saldo = contratoToken.balanceOf(msg.sender);
-    require(saldo >= _montoVenta, "Saldo de token insuficiente para cambiar");
+    monto = contratoToken.balanceOf(msg.sender);
+    require(monto >= _montoVenta, "Saldo de token insuficiente para cambiar");
 
     // Credito aprobado suficiente
-    uint256 credito = contratoToken.allowance(msg.sender, address(this));
+    monto = contratoToken.allowance(msg.sender, address(this));
     require(
-      credito >= _montoVenta,
+      monto >= _montoVenta,
       "Saldo aprobado insuficiente para transferir"
     );
 
@@ -208,21 +210,22 @@ contract GestorOrdenes is Datos, GestorTokens {
     return (creada, ordenNueva);
   }
 
-  function ejecutarOrden(bytes32 _idOrden) public returns (bool exito) {
-    // Comprador activo
+  function ejecutarOrden(
+    bytes32 _idOrden
+  ) public plataformaActiva billeteraActiva returns (bool exito) {
+    Orden storage ordenEjecutada = ordenes.archivo[_idOrden];
+
+    // Comprador diferente a vendedor
     require(
-      (billeterasRegistradas[msg.sender].existe &&
-        billeterasRegistradas[msg.sender].estado == EstadoGeneral.ACTIVO) ||
-        !billeterasRegistradas[msg.sender].existe,
-      "Billetera bloqueada"
+      msg.sender != ordenEjecutada.vendedor,
+      "El creador de la orden no puede ejecutar la misma"
     );
 
     // Vendedor activo
-    Orden storage ordenEjecutada = ordenes.archivo[_idOrden];
     require(
       billeterasRegistradas[ordenEjecutada.vendedor].estado ==
         EstadoGeneral.ACTIVO,
-      "Billetera bloqueada"
+      "La orden se encuentra bloqueada y no se puede ejecutar"
     );
 
     // Orden activa
@@ -233,22 +236,42 @@ contract GestorOrdenes is Datos, GestorTokens {
 
     /**************************************************************************/
 
-    int256 precioTokenVenta;
-    int256 precioTokenCompra;
-
     if (ordenEjecutada.tipo == TipoOrden.INTERCAMBIO) {
-      precioTokenVenta = consultarCotizacion(ordenEjecutada.tokenVenta);
-      precioTokenCompra = consultarCotizacion(ordenEjecutada.tokenCompra);
+      (
+        int256 precioTokenVenta,
+        uint8 decimalesPrecioTokenVenta
+      ) = consultarCotizacion(ordenEjecutada.tokenVenta);
+
+      (
+        int256 precioTokenCompra,
+        uint8 decimalesPrecioTokenCompra
+      ) = consultarCotizacion(ordenEjecutada.tokenCompra);
 
       require(
         precioTokenCompra != 0 && precioTokenVenta != 0,
         "No se pudo obtener datos de cotizacion"
       );
 
-      uint256 relacion = (uint256(precioTokenVenta) *
-        ordenEjecutada.montoVenta) / uint256(precioTokenCompra);
+      uint256 exponenteDecimales;
+      {
+        uint256 decimalesTokenVenta = tokensRegistrados[
+          ordenEjecutada.tokenVenta
+        ].decimales;
+        uint256 decimalesTokenCompra = tokensRegistrados[
+          ordenEjecutada.tokenCompra
+        ].decimales;
 
-      ordenEjecutada.montoCompra = relacion;
+        exponenteDecimales =
+          decimalesTokenCompra +
+          decimalesPrecioTokenCompra -
+          decimalesTokenVenta -
+          decimalesPrecioTokenVenta;
+      }
+
+      ordenEjecutada.montoCompra =
+        ((ordenEjecutada.montoVenta * uint256(precioTokenVenta)) /
+          uint256(precioTokenCompra)) *
+        10 ** exponenteDecimales;
     }
 
     /**************************************************************************/
@@ -381,6 +404,12 @@ contract GestorOrdenes is Datos, GestorTokens {
   function cancelarOrden(bytes32 _idOrden) public returns (bool exito) {
     Orden storage ordenCancelada = ordenes.archivo[_idOrden];
 
+    // Solo el creador/vendedor puede cancelar su orden
+    require(
+      msg.sender == ordenCancelada.vendedor,
+      "Solo el creador de la orden puede cancelar misma"
+    );
+
     // Orden activa
     require(
       ordenCancelada.estado == EstadoOrden.ACTIVA,
@@ -482,20 +511,17 @@ contract GestorOrdenes is Datos, GestorTokens {
     string memory _tokenVenta,
     uint256 _montoCompra,
     uint256 _montoVenta
-  ) public view returns (bytes32 idOrden) {
+  ) public view returns (Orden memory orden) {
     bytes32 grupoHashGuardado = keccak256(
       abi.encode(_tokenVenta, _tokenCompra, _montoVenta, _montoCompra) // OBS: Orden para consultar (Gemela)
     );
 
     MapGrupoOrdenHash storage listaGemelas = ordenes.grupos[grupoHashGuardado];
-    Orden storage ordenCabeceraGrupo;
 
     if (listaGemelas.existe) {
-      ordenCabeceraGrupo = ordenes.archivo[listaGemelas.idOrdenCabecera];
-      idOrden = ordenCabeceraGrupo.idOrden;
+      orden = ordenes.archivo[listaGemelas.idOrdenCabecera];
     }
-
-    return idOrden;
+    return orden;
   }
 
   function buscarOrden(bytes32 _idOrden) public view returns (Orden memory) {

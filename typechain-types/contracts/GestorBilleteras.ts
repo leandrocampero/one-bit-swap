@@ -110,6 +110,31 @@ export declare namespace Datos {
     existe: boolean;
     ordenes: string[];
   };
+
+  export type TokenStruct = {
+    ticker: PromiseOrValue<string>;
+    contrato: PromiseOrValue<string>;
+    oraculo: PromiseOrValue<string>;
+    decimales: PromiseOrValue<BigNumberish>;
+    estado: PromiseOrValue<BigNumberish>;
+    existe: PromiseOrValue<boolean>;
+  };
+
+  export type TokenStructOutput = [
+    string,
+    string,
+    string,
+    number,
+    number,
+    boolean
+  ] & {
+    ticker: string;
+    contrato: string;
+    oraculo: string;
+    decimales: number;
+    estado: number;
+    existe: boolean;
+  };
 }
 
 export interface GestorBilleterasInterface extends utils.Interface {
@@ -215,9 +240,13 @@ export interface GestorBilleterasInterface extends utils.Interface {
 
   events: {
     "NuevaOrden(tuple)": EventFragment;
+    "NuevoAdministrador(tuple)": EventFragment;
+    "NuevoToken(tuple)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "NuevaOrden"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "NuevoAdministrador"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "NuevoToken"): EventFragment;
 }
 
 export interface NuevaOrdenEventObject {
@@ -229,6 +258,27 @@ export type NuevaOrdenEvent = TypedEvent<
 >;
 
 export type NuevaOrdenEventFilter = TypedEventFilter<NuevaOrdenEvent>;
+
+export interface NuevoAdministradorEventObject {
+  respuesta: Datos.BilleteraStructOutput;
+}
+export type NuevoAdministradorEvent = TypedEvent<
+  [Datos.BilleteraStructOutput],
+  NuevoAdministradorEventObject
+>;
+
+export type NuevoAdministradorEventFilter =
+  TypedEventFilter<NuevoAdministradorEvent>;
+
+export interface NuevoTokenEventObject {
+  respuesta: Datos.TokenStructOutput;
+}
+export type NuevoTokenEvent = TypedEvent<
+  [Datos.TokenStructOutput],
+  NuevoTokenEventObject
+>;
+
+export type NuevoTokenEventFilter = TypedEventFilter<NuevoTokenEvent>;
 
 export interface GestorBilleteras extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -464,6 +514,14 @@ export interface GestorBilleteras extends BaseContract {
   filters: {
     "NuevaOrden(tuple)"(respuesta?: null): NuevaOrdenEventFilter;
     NuevaOrden(respuesta?: null): NuevaOrdenEventFilter;
+
+    "NuevoAdministrador(tuple)"(
+      respuesta?: null
+    ): NuevoAdministradorEventFilter;
+    NuevoAdministrador(respuesta?: null): NuevoAdministradorEventFilter;
+
+    "NuevoToken(tuple)"(respuesta?: null): NuevoTokenEventFilter;
+    NuevoToken(respuesta?: null): NuevoTokenEventFilter;
   };
 
   estimateGas: {

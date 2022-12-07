@@ -85,6 +85,8 @@ abstract contract Datos {
   /****************************************************************************/
 
   event NuevaOrden(Orden respuesta);
+  event NuevoAdministrador(Billetera respuesta);
+  event NuevoToken(Token respuesta);
 
   /****************************************************************************/
 
@@ -111,6 +113,7 @@ abstract contract Datos {
 
   mapping(string => Token) public tokensRegistrados; // OBS: ticker -> Token
   string[] tokensListado; // IMPROVE: posiblemente haya que mejorarlo, pero como no es primordial el ordenamiento para este array, queda así momentaneamente
+  uint tokensCantidadActivos;
 
   mapping(address => Billetera) billeterasRegistradas; // REVIEW: Se decide hacer un archivo de billeteras porque se necesita tanto buscarlas para interactuar con ellas como listarlas
   address[] billeterasBloqueadas; // IMPROVE: Se podría mejorar haciendo también una lista enlazada para un pagínado filtrado. Pero queda como actualización
@@ -146,9 +149,10 @@ abstract contract Datos {
 
   modifier billeteraActiva() {
     require(
-      billeterasRegistradas[msg.sender].existe &&
-        billeterasRegistradas[msg.sender].estado == EstadoGeneral.ACTIVO,
-      "La billetera esta suspendida o no existe"
+      (billeterasRegistradas[msg.sender].existe &&
+        billeterasRegistradas[msg.sender].estado == EstadoGeneral.ACTIVO) ||
+        !billeterasRegistradas[msg.sender].existe,
+      "La billetera esta bloqueada"
     );
     _;
   }

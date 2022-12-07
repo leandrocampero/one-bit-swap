@@ -18,7 +18,7 @@ contract GestorTokens is Datos {
     bool _incluirSuspendidos
   ) public view returns (Token[] memory) {
     Token memory token;
-    Token[] memory resultado = new Token[](tokensListado.length); // IMPROVE: sería más óptimo tener la cantidad exacta de elementos activos
+    Token[] memory resultado = new Token[](tokensCantidadActivos);
     uint indiceResultado = 0;
 
     for (uint index = 0; index < tokensListado.length; index++) {
@@ -77,6 +77,8 @@ contract GestorTokens is Datos {
     tokensRegistrados[ticker].existe = true;
 
     tokensListado.push(ticker);
+    tokensCantidadActivos++;
+    emit NuevoToken(tokensRegistrados[ticker]);
 
     return true;
   }
@@ -129,6 +131,7 @@ contract GestorTokens is Datos {
     );
 
     tokensRegistrados[_ticker].estado = EstadoGeneral.SUSPENDIDO;
+    tokensCantidadActivos--;
     resultado = true;
   }
 
@@ -148,6 +151,7 @@ contract GestorTokens is Datos {
     );
 
     tokensRegistrados[_ticker].estado = EstadoGeneral.ACTIVO;
+    tokensCantidadActivos++;
     resultado = true;
   }
 
@@ -155,10 +159,11 @@ contract GestorTokens is Datos {
    * @notice consultar la cotización del token en base al ticker
    * @param _ticker nombre del token a buscar (único en la blockchain)
    * @return precio precio del token en base al oráculo
+   * @return decimales cantidad de decimales de la cotización
    */
   function consultarCotizacion(
     string memory _ticker
-  ) public view returns (int256 precio) {
+  ) public view returns (int256 precio, uint8 decimales) {
     require(
       tokensRegistrados[_ticker].existe,
       "El token ingresado no esta registrado"
@@ -169,12 +174,11 @@ contract GestorTokens is Datos {
     );
     (
       ,
-      int256 price, // valor en usd (depende del token)
+      precio, // valor en usd (depende del token)
       ,
       ,
 
     ) = oraculo.latestRoundData();
-
-    precio = price;
+    decimales = oraculo.decimals();
   }
 }

@@ -11,15 +11,106 @@ import {
   Plataforma__factory,
 } from '../../typechain-types/'
 
-describe('Plataforma', function () {
-  let propietario: SignerWithAddress
-  let usuario: SignerWithAddress
+const ORACULO_USDT = '0x92C09849638959196E976289418e5973CC96d645'
+const ORACULO_LINK = '0x12162c3E810393dEC01362aBf156D7ecf6159528'
+
+const CONTRATO_MATIC = '0x0000000000000000000000000000000000001010'
+const ORACULO_MATIC = '0xd0D5e3DB44DE05E9F294BB0a3bEEaF030DE24Ada'
+
+const CONTRATO_WETH = '0xA6FA4fB5f76172d178d61B04b0ecd319C5d1C0aa'
+const ORACULO_WETH = '0x0715A7794a1dc8e42615F059dD6e406A6594651A'
+
+const CONTRATO_DAI = '0xd393b1E02dA9831Ff419e22eA105aAe4c47E1253'
+const ORACULO_DAI = '0x0FCAa9c899EC5A91eBc3D5Dd869De833b06fB046'
+
+function formatArrayBilleteras(
+  listado: Datos.BilleteraStructOutput[]
+): Datos.BilleteraStruct[] {
+  return listado.map(
+    ({ direccion, estado, existe, indiceAdmin, indiceBloqueado, rol }) => ({
+      direccion,
+      estado,
+      rol,
+      existe,
+      indiceAdmin: indiceAdmin.toString(),
+      indiceBloqueado: indiceBloqueado.toString(),
+    })
+  ) as Datos.BilleteraStruct[]
+}
+
+function formatArrayTokens(
+  listado: Datos.TokenStructOutput[]
+): Datos.TokenStruct[] {
+  return listado.map(
+    ({ ticker, contrato, oraculo, decimales, estado, existe }) => ({
+      ticker,
+      contrato,
+      oraculo,
+      decimales,
+      estado,
+      existe,
+    })
+  )
+}
+
+function formatArrayOrdenes(
+  listado: Datos.OrdenStructOutput[]
+): Datos.OrdenStruct[] {
+  return listado.map(
+    ({
+      idOrden,
+      siguienteOrdenActiva,
+      anteriorOrdenActiva,
+      siguienteOrdenGemela,
+      anteriorOrdenGemela,
+      vendedor,
+      comprador,
+      montoVenta,
+      montoCompra,
+      fechaCreacion,
+      fechaFinalizacion,
+      estado,
+      tipo,
+      existe,
+      tokenCompra,
+      tokenVenta,
+    }) => ({
+      idOrden,
+      siguienteOrdenActiva,
+      anteriorOrdenActiva,
+      siguienteOrdenGemela,
+      anteriorOrdenGemela,
+      vendedor,
+      comprador,
+      montoVenta: montoVenta.toString(),
+      montoCompra: montoCompra.toString(),
+      fechaCreacion: new Date(fechaCreacion.toNumber() * 1000).toLocaleString(),
+      fechaFinalizacion: fechaFinalizacion.eq(0)
+        ? '-'
+        : new Date(fechaFinalizacion.toNumber() * 1000).toLocaleString(),
+      estado,
+      tipo,
+      existe,
+      tokenCompra,
+      tokenVenta,
+    })
+  )
+}
+
+describe('OneBitSwap', function () {
+  let propietario: SignerWithAddress,
+    administrador: SignerWithAddress,
+    usuario: SignerWithAddress,
+    bloqueado: SignerWithAddress,
+    comprador: SignerWithAddress,
+    vendedor: SignerWithAddress
+
   let plataforma: Plataforma
-  let tokenVenta: ERC20Mock
-  let tokenCompra: ERC20Mock
+  let tokenVenta: ERC20Mock, tokenCompra: ERC20Mock
 
   before(async function () {
-    ;[propietario, usuario] = await ethers.getSigners()
+    ;[propietario, administrador, usuario, bloqueado, comprador, vendedor] =
+      await ethers.getSigners()
 
     const PlataformaFactory = (await ethers.getContractFactory(
       'contracts/Plataforma.sol:Plataforma'
@@ -33,384 +124,327 @@ describe('Plataforma', function () {
     tokenVenta = (await ERC20Factory.deploy(
       'USDT Token Mock',
       'USDT',
-      propietario.address,
-      ethers.utils.parseEther('10000')
+      vendedor.address,
+      ethers.utils.parseEther('100000')
     )) as ERC20Mock
 
     tokenCompra = (await ERC20Factory.deploy(
       'LINK Token Mock',
       'LINK',
-      usuario.address,
-      ethers.utils.parseEther('10000')
+      comprador.address,
+      ethers.utils.parseEther('100000')
     )) as ERC20Mock
 
     console.table({
       propietario: propietario.address,
+      administrador: administrador.address,
       usuario: usuario.address,
+      bloqueado: bloqueado.address,
+      comprador: comprador.address,
+      vendedor: vendedor.address,
       tokenVenta: tokenVenta.address,
       tokenCompra: tokenCompra.address,
     })
+  })
 
-    console.table({
-      allowance: (
-        await tokenVenta.allowance(usuario.address, plataforma.address)
-      ).toString(),
-      balanceOf: (await tokenVenta.balanceOf(propietario.address)).toString(),
-      symbol: await tokenVenta.symbol(),
-      decimals: await tokenVenta.decimals(),
-      name: await tokenVenta.name(),
+  describe('Plataforma', function () {
+    it('¿Está activa?', async function () {
+      const estado = await plataforma.plataforma()
+
+      expect(estado.estado == 0).to.be.true
+    })
+
+    it('Desactivar', async function () {
+      await expect(plataforma.bloquearPlataforma()).not.to.be.reverted
+    })
+
+    it('No debería cambiar el monto mínimo a U$D 7', async function () {
+      await expect(plataforma.establecerMontoMinimo(7)).to.be.revertedWith(
+        'La plataforma se encuentra inactiva'
+      )
+    })
+
+    it('Activar nuevamente', async function () {
+      await expect(plataforma.desbloquearPlataforma()).not.to.be.reverted
+    })
+
+    it('Ahora podría cambiar el monto mínimo a U$D 8', async function () {
+      await plataforma.establecerMontoMinimo(8)
+
+      const estado = await plataforma.plataforma()
+
+      expect(estado.montoMinimoUSD.eq(BigNumber.from(8))).to.be.true
+    })
+  })
+
+  describe('Billeteras', function () {
+    it('Agregar administrador', async function () {
+      await expect(plataforma.hacerAdministrador(administrador.address)).not.to
+        .be.reverted
+    })
+
+    it('Como administrador, no debería poder agregar a otro', async function () {
+      await expect(
+        plataforma.connect(administrador).hacerAdministrador(usuario.address)
+      ).to.be.revertedWith('Solo el propietario puede acceder')
+    })
+
+    it('Como administrador podría cambiar el monto mínimo a U$D 5', async function () {
+      await expect(plataforma.connect(administrador).establecerMontoMinimo(5))
+        .not.to.be.reverted
+    })
+
+    it('Agregar otro administrador', async function () {
+      await expect(plataforma.hacerAdministrador(usuario.address)).not.to.be
+        .reverted
+    })
+
+    it('Debería haber 2 admistradores guardados', async function () {
+      const administradores = await plataforma.listarAdministradores()
+
+      expect(administradores.length).to.eq(2)
+    })
+
+    it('Quitar rol al último administrador agregado', async function () {
+      const administradores = await plataforma.listarAdministradores()
+
+      await expect(plataforma.quitarAdministrador(administradores[1].direccion))
+        .not.to.be.reverted
+    })
+
+    it('Bloquear billetera genérica', async function () {
+      await expect(plataforma.bloquearBilletera(usuario.address)).not.to.be
+        .reverted
+    })
+
+    it('Debería haber solo una billetera bloqueada', async function () {
+      const bloqueados = await plataforma.listarBilleterasBloqueadas()
+
+      expect(bloqueados.length).to.eq(1)
+    })
+
+    it('Desbloquear billetera', async function () {
+      await expect(plataforma.desbloquearBilletera(usuario.address)).not.to.be
+        .reverted
     })
   })
 
   describe('Tokens', function () {
-    it('Agregar dos tokens', async function () {
+    it('Como usuario, no debería poder agregar tokens nuevos', async function () {
       await expect(
-        plataforma.nuevoToken(
-          tokenVenta.address,
-          '0x92C09849638959196E976289418e5973CC96d645',
-          { gasLimit: 5000000 }
-        )
-      ).not.to.be.reverted
-
-      await expect(
-        plataforma.nuevoToken(
-          tokenCompra.address,
-          '0x12162c3E810393dEC01362aBf156D7ecf6159528',
-          { gasLimit: 5000000 }
-        )
-      ).not.to.be.reverted
-
-      // const recibo = await plataforma.listarTokens(true)
-      // console.log(recibo)
+        plataforma.connect(usuario).nuevoToken(CONTRATO_DAI, ORACULO_DAI)
+      ).to.be.revertedWith('Solo pueden acceder administradores')
     })
 
-    it('Debería retornar la cotización', async function () {
-      const recibo = await plataforma.consultarCotizacion('MATIC')
+    it('Agregar 5 nuevos tokens', async function () {
+      await expect(
+        plataforma.nuevoToken(tokenVenta.address, ORACULO_USDT)
+      ).to.emit(plataforma, 'NuevoToken')
+      await expect(
+        plataforma.nuevoToken(tokenCompra.address, ORACULO_LINK)
+      ).to.emit(plataforma, 'NuevoToken')
 
-      expect(recibo.toNumber()).not.to.equal(0)
+      await expect(
+        plataforma.nuevoToken(CONTRATO_MATIC, ORACULO_MATIC)
+      ).to.emit(plataforma, 'NuevoToken')
+      await expect(plataforma.nuevoToken(CONTRATO_WETH, CONTRATO_WETH)).to.emit(
+        plataforma,
+        'NuevoToken'
+      )
+      await expect(plataforma.nuevoToken(CONTRATO_DAI, ORACULO_DAI)).to.emit(
+        plataforma,
+        'NuevoToken'
+      )
+
+      const tokens = await plataforma.listarTokens(true)
+
+      expect(tokens.length).to.eq(5)
+    })
+
+    it('Suspender el token con ticker DAI', async function () {
+      await expect(plataforma.suspenderToken('DAI')).not.to.be.reverted
+    })
+
+    it('La cantidad de tokens activos debería ser 4', async function () {
+      const tokens = await plataforma.listarTokens(false)
+
+      expect(tokens.length).to.eq(4)
+    })
+
+    it('Modificar el oráculo de WETH por uno válido', async function () {
+      await expect(plataforma.modifcarOraculo('WETH', ORACULO_WETH)).not.to.be
+        .reverted
+    })
+
+    it('El mismo oráculo debería retronar una cotización en USD distinta de cero', async function () {
+      const cotizacion = await plataforma.consultarCotizacion('WETH')
+
+      expect(cotizacion.precio.gt(0)).to.be.true
+    })
+
+    it('Activar DAI', async function () {
+      await expect(plataforma.activarToken('DAI')).not.to.be.reverted
     })
   })
 
   describe('Ordenes', function () {
-    it('Crear 4 ordenes', async function () {
-      expect(
-        await tokenVenta.approve(
-          plataforma.address,
-          ethers.utils.parseEther('10000')
-        )
+    it('Crear 3 ordenes de compra-venta', async function () {
+      await expect(
+        tokenVenta
+          .connect(vendedor)
+          .approve(plataforma.address, ethers.utils.parseEther('100000'))
+      ).to.emit(tokenVenta, 'Approval')
+
+      // LINK/USDT
+      await expect(
+        plataforma
+          .connect(vendedor)
+          .nuevaOrden(
+            tokenCompra.symbol(),
+            tokenVenta.symbol(),
+            ethers.utils.parseEther('300'),
+            ethers.utils.parseEther('100'),
+            0
+          )
+      ).to.emit(plataforma, 'NuevaOrden')
+
+      // LINK/USDT
+      await expect(
+        plataforma
+          .connect(vendedor)
+          .nuevaOrden(
+            tokenCompra.symbol(),
+            tokenVenta.symbol(),
+            ethers.utils.parseEther('456'),
+            ethers.utils.parseEther('89'),
+            0
+          )
+      ).to.emit(plataforma, 'NuevaOrden')
+
+      // LINK/USDT
+      await expect(
+        plataforma
+          .connect(vendedor)
+          .nuevaOrden(
+            tokenCompra.symbol(),
+            tokenVenta.symbol(),
+            ethers.utils.parseEther('840'),
+            ethers.utils.parseEther('125'),
+            0
+          )
+      ).to.emit(plataforma, 'NuevaOrden')
+    })
+
+    it('Crear 2 ordenes de intercambio idénticas (gemelas)', async function () {
+      await expect(
+        plataforma
+          .connect(vendedor)
+          .nuevaOrden(
+            tokenCompra.symbol(),
+            tokenVenta.symbol(),
+            ethers.utils.parseEther('0'),
+            ethers.utils.parseEther('1200'),
+            1
+          )
+      ).to.emit(plataforma, 'NuevaOrden')
+
+      await expect(
+        plataforma
+          .connect(vendedor)
+          .nuevaOrden(
+            tokenCompra.symbol(),
+            tokenVenta.symbol(),
+            ethers.utils.parseEther('0'),
+            ethers.utils.parseEther('1200'),
+            1
+          )
+      ).to.emit(plataforma, 'NuevaOrden')
+    })
+
+    it('Antes de crear una cuarta orden de compra-venta, verificar si ya existe una espejo', async function () {
+      const gemela = await plataforma.buscarOrdenGemela(
+        tokenVenta.symbol(),
+        tokenCompra.symbol(),
+        ethers.utils.parseEther('1200'),
+        ethers.utils.parseEther('0')
+      )
+
+      expect(gemela.existe).to.be.true
+    })
+
+    it('El total de órdenes activas debería ser 5', async function () {
+      const ordenes = await plataforma.listarOrdenesActivas(
+        ethers.constants.HashZero,
+        5
+      )
+
+      expect(ordenes.length).to.eq(5)
+    })
+
+    it('Ejecutar una orden de intercambio y comprobar la transferencia de fondos', async function () {
+      /**
+       * TODO: hay que controlar que los que ejecutan sean diferentes a los vendedores
+       * y que solo pueden cancelar los dueños de las ordenes
+       */
+      await expect(
+        tokenCompra
+          .connect(comprador)
+          .approve(plataforma.address, ethers.utils.parseEther('100000'))
+      ).to.emit(tokenCompra, 'Approval')
+
+      const ordenEjecutada = await plataforma.buscarOrdenGemela(
+        tokenVenta.symbol(),
+        tokenCompra.symbol(),
+        ethers.utils.parseEther('1200'),
+        ethers.utils.parseEther('0')
+      )
+
+      await expect(
+        plataforma.connect(comprador).ejecutarOrden(ordenEjecutada.idOrden)
       ).not.to.be.reverted
 
-      await expect(
-        await plataforma.nuevaOrden(
-          'LINK',
-          'USDT',
-          ethers.utils.parseEther('200'),
-          ethers.utils.parseEther('15'),
-          0
-        )
-      ).to.emit(plataforma, 'NuevaOrden')
+      const saldoVendedor = await tokenCompra.balanceOf(vendedor.address)
+      const saldoComprador = await tokenVenta.balanceOf(comprador.address)
 
-      await expect(
-        await plataforma.nuevaOrden(
-          'LINK',
-          'USDT',
-          ethers.utils.parseEther('0'),
-          ethers.utils.parseEther('200'),
-          1
-        )
-      ).to.emit(plataforma, 'NuevaOrden')
+      expect(saldoVendedor.gt(ordenEjecutada.montoCompra)).to.be.true
+      expect(saldoComprador.eq(ordenEjecutada.montoVenta)).to.be.true
+    })
 
-      await expect(
-        await plataforma.nuevaOrden(
-          'LINK',
-          'USDT',
-          ethers.utils.parseEther('0'),
-          ethers.utils.parseEther('200'),
-          1
-        )
-      ).to.emit(plataforma, 'NuevaOrden')
-
-      await expect(
-        await plataforma.nuevaOrden(
-          'LINK',
-          'USDT',
-          ethers.utils.parseEther('0'),
-          ethers.utils.parseEther('200'),
-          1
-        )
-      ).to.emit(plataforma, 'NuevaOrden')
-
-      const archivo = await plataforma.ordenes()
-
-      expect(archivo.cantidadActivas).to.equal(4)
-
-      const ordenGemela = BigNumber.from(
-        await plataforma.buscarOrdenGemela(
-          'USDT',
-          'LINK',
-          ethers.utils.parseEther('200'),
-          ethers.utils.parseEther('0')
-        )
+    it('Cancelar una orden de compra-venta y comprobar la devolución de fondos', async function () {
+      const ordenCancelada = await plataforma.buscarOrdenGemela(
+        tokenVenta.symbol(),
+        tokenCompra.symbol(),
+        ethers.utils.parseEther('100'),
+        ethers.utils.parseEther('300')
       )
 
-      expect(ordenGemela.isZero()).not.to.be.true
-    })
+      const saldoPrevio = await tokenVenta.balanceOf(vendedor.address)
 
-    it('Comprobar saldo de los tokens del contrato', async function () {
-      const saldo = await tokenVenta.balanceOf(plataforma.address)
-
-      expect(saldo.isZero()).not.to.be.true
-    })
-
-    it('Ejecutar orden', async function () {
-      let ordenesActivas = (
-        (await plataforma.listarOrdenesActivas(
-          ethers.constants.HashZero,
-          10
-        )) as Datos.OrdenStruct[]
-      ).map((orden) => ({
-        idOrden: orden.idOrden,
-        siguienteOrdenActiva: orden.siguienteOrdenActiva,
-        anteriorOrdenActiva: orden.anteriorOrdenActiva,
-        siguienteOrdenGemela: orden.siguienteOrdenGemela,
-        anteriorOrdenGemela: orden.anteriorOrdenGemela,
-        vendedor: orden.vendedor,
-        comprador: orden.comprador,
-        montoVenta: orden.montoVenta.toString(),
-        montoCompra: orden.montoCompra.toString(),
-        fechaCreacion: new Date(
-          (orden.fechaCreacion as BigNumber).toNumber() * 1000
-        ),
-        fechaFinalizacion: new Date(
-          (orden.fechaFinalizacion as BigNumber).toNumber() * 1000
-        ),
-        estado: orden.estado,
-        tipo: orden.tipo,
-        existe: orden.existe,
-        tokenCompra: orden.tokenCompra,
-        tokenVenta: orden.tokenVenta,
-      }))
-
-      expect(
-        await tokenCompra
-          .connect(usuario)
-          .approve(plataforma.address, ethers.utils.parseEther('10000'))
+      await expect(
+        plataforma.connect(vendedor).cancelarOrden(ordenCancelada.idOrden)
       ).not.to.be.reverted
 
-      const transaccion = await plataforma
-        .connect(usuario)
-        .ejecutarOrden(ordenesActivas[1].idOrden)
+      const saldoResultante = await tokenVenta.balanceOf(vendedor.address)
 
-      transaccion.wait()
-
-      const aux = (await plataforma.buscarOrden(
-        ordenesActivas[1].idOrden
-      )) as Datos.OrdenStruct
-      const ordenEjecutada = {
-        idOrden: aux.idOrden,
-        siguienteOrdenActiva: aux.siguienteOrdenActiva,
-        anteriorOrdenActiva: aux.anteriorOrdenActiva,
-        siguienteOrdenGemela: aux.siguienteOrdenGemela,
-        anteriorOrdenGemela: aux.anteriorOrdenGemela,
-        vendedor: aux.vendedor,
-        comprador: aux.comprador,
-        montoVenta: aux.montoVenta.toString(),
-        montoCompra: aux.montoCompra.toString(),
-        fechaCreacion: new Date(
-          (aux.fechaCreacion as BigNumber).toNumber() * 1000 -
-            1000 * 3 * 60 * 60
-        ),
-        fechaFinalizacion: new Date(
-          (aux.fechaFinalizacion as BigNumber).toNumber() * 1000 -
-            1000 * 3 * 60 * 60
-        ),
-        estado: aux.estado,
-        tipo: aux.tipo,
-        existe: aux.existe,
-        tokenCompra: aux.tokenCompra,
-        tokenVenta: aux.tokenVenta,
-      }
-
-      const saldoVendedor = await tokenCompra.balanceOf(propietario.address)
-      const saldoComprador = await tokenVenta.balanceOf(usuario.address)
-
-      expect(saldoVendedor.eq(ordenEjecutada.montoCompra.toString())).to.be.true
-      expect(saldoComprador.eq(ordenEjecutada.montoVenta.toString())).to.be.true
-
-      ordenesActivas = (
-        (await plataforma.listarOrdenesActivas(
-          ethers.constants.HashZero,
-          10
-        )) as Datos.OrdenStruct[]
-      ).map((orden) => ({
-        idOrden: orden.idOrden,
-        siguienteOrdenActiva: orden.siguienteOrdenActiva,
-        anteriorOrdenActiva: orden.anteriorOrdenActiva,
-        siguienteOrdenGemela: orden.siguienteOrdenGemela,
-        anteriorOrdenGemela: orden.anteriorOrdenGemela,
-        vendedor: orden.vendedor,
-        comprador: orden.comprador,
-        montoVenta: orden.montoVenta.toString(),
-        montoCompra: orden.montoCompra.toString(),
-        fechaCreacion: new Date(
-          (orden.fechaCreacion as BigNumber).toNumber() * 1000
-        ),
-        fechaFinalizacion: new Date(
-          (orden.fechaFinalizacion as BigNumber).toNumber() * 1000
-        ),
-        estado: orden.estado,
-        tipo: orden.tipo,
-        existe: orden.existe,
-        tokenCompra: orden.tokenCompra,
-        tokenVenta: orden.tokenVenta,
-      }))
+      expect(saldoPrevio.add(ordenCancelada.montoVenta).eq(saldoResultante)).to
+        .be.true
     })
 
-    it('Cancelar orden', async function () {
-      console.log(
-        '****************** ORDENES ACTIVAS (PRE EJECUCIÓN) ******************'
+    it('Ahora el total de ordenes activas debería ser 3', async function () {
+      const ordenes = await plataforma.listarOrdenesActivas(
+        ethers.constants.HashZero,
+        5
       )
 
-      let ordenesActivas = (
-        (await plataforma.listarOrdenesActivas(
-          ethers.constants.HashZero,
-          10
-        )) as Datos.OrdenStruct[]
-      ).map((orden) => ({
-        idOrden: orden.idOrden,
-        siguienteOrdenActiva: orden.siguienteOrdenActiva,
-        anteriorOrdenActiva: orden.anteriorOrdenActiva,
-        siguienteOrdenGemela: orden.siguienteOrdenGemela,
-        anteriorOrdenGemela: orden.anteriorOrdenGemela,
-        vendedor: orden.vendedor,
-        comprador: orden.comprador,
-        montoVenta: orden.montoVenta.toString(),
-        montoCompra: orden.montoCompra.toString(),
-        fechaCreacion: new Date(
-          (orden.fechaCreacion as BigNumber).toNumber() * 1000
-        ),
-        fechaFinalizacion: new Date(
-          (orden.fechaFinalizacion as BigNumber).toNumber() * 1000
-        ),
-        estado: orden.estado,
-        tipo: orden.tipo,
-        existe: orden.existe,
-        tokenCompra: orden.tokenCompra,
-        tokenVenta: orden.tokenVenta,
-      }))
+      expect(ordenes.length).to.eq(3)
+    })
 
-      console.log(ordenesActivas)
+    it('Listar mis ordenes ordenadas historicamente', async function () {
+      let ordenes = await plataforma.listarMisOrdenes()
+      expect(ordenes.length).to.eq(0)
 
-      const transaccion = await plataforma.cancelarOrden(
-        ordenesActivas[1].idOrden
-      )
-
-      transaccion.wait()
-
-      const aux = (await plataforma.buscarOrden(
-        ordenesActivas[1].idOrden
-      )) as Datos.OrdenStruct
-      const ordenCancelada = {
-        idOrden: aux.idOrden,
-        siguienteOrdenActiva: aux.siguienteOrdenActiva,
-        anteriorOrdenActiva: aux.anteriorOrdenActiva,
-        siguienteOrdenGemela: aux.siguienteOrdenGemela,
-        anteriorOrdenGemela: aux.anteriorOrdenGemela,
-        vendedor: aux.vendedor,
-        comprador: aux.comprador,
-        montoVenta: aux.montoVenta.toString(),
-        montoCompra: aux.montoCompra.toString(),
-        fechaCreacion: new Date(
-          (aux.fechaCreacion as BigNumber).toNumber() * 1000 -
-            1000 * 3 * 60 * 60
-        ),
-        fechaFinalizacion: new Date(
-          (aux.fechaFinalizacion as BigNumber).toNumber() * 1000 -
-            1000 * 3 * 60 * 60
-        ),
-        estado: aux.estado,
-        tipo: aux.tipo,
-        existe: aux.existe,
-        tokenCompra: aux.tokenCompra,
-        tokenVenta: aux.tokenVenta,
-      }
-
-      console.log('ORDEN CANCELADA:', ordenCancelada)
-      console.log(
-        '****************** ORDENES ACTIVAS (POST EJECUCIÓN) ******************'
-      )
-
-      expect(ordenCancelada.estado == 2).to.be.true
-
-      ordenesActivas = (
-        (await plataforma.listarOrdenesActivas(
-          ethers.constants.HashZero,
-          10
-        )) as Datos.OrdenStruct[]
-      ).map((orden) => ({
-        idOrden: orden.idOrden,
-        siguienteOrdenActiva: orden.siguienteOrdenActiva,
-        anteriorOrdenActiva: orden.anteriorOrdenActiva,
-        siguienteOrdenGemela: orden.siguienteOrdenGemela,
-        anteriorOrdenGemela: orden.anteriorOrdenGemela,
-        vendedor: orden.vendedor,
-        comprador: orden.comprador,
-        montoVenta: orden.montoVenta.toString(),
-        montoCompra: orden.montoCompra.toString(),
-        fechaCreacion: new Date(
-          (orden.fechaCreacion as BigNumber).toNumber() * 1000
-        ),
-        fechaFinalizacion: new Date(
-          (orden.fechaFinalizacion as BigNumber).toNumber() * 1000
-        ),
-        estado: orden.estado,
-        tipo: orden.tipo,
-        existe: orden.existe,
-        tokenCompra: orden.tokenCompra,
-        tokenVenta: orden.tokenVenta,
-      }))
-
-      console.log(ordenesActivas)
-
-      const archivo = await plataforma.ordenes()
-
-      expect(archivo.cantidadActivas).to.equal(2)
-
-      console.log('****************** MIS ORDENES ******************')
-
-      const misOrdenes = (
-        (await plataforma.listarMisOrdenes()) as Datos.OrdenStruct[]
-      ).map((orden) => ({
-        idOrden: orden.idOrden,
-        siguienteOrdenActiva: orden.siguienteOrdenActiva,
-        anteriorOrdenActiva: orden.anteriorOrdenActiva,
-        siguienteOrdenGemela: orden.siguienteOrdenGemela,
-        anteriorOrdenGemela: orden.anteriorOrdenGemela,
-        vendedor: orden.vendedor,
-        comprador: orden.comprador,
-        montoVenta: orden.montoVenta.toString(),
-        montoCompra: orden.montoCompra.toString(),
-        fechaCreacion: new Date(
-          (orden.fechaCreacion as BigNumber).toNumber() * 1000
-        ),
-        fechaFinalizacion: new Date(
-          (orden.fechaFinalizacion as BigNumber).toNumber() * 1000
-        ),
-        estado: orden.estado,
-        tipo: orden.tipo,
-        existe: orden.existe,
-        tokenCompra: orden.tokenCompra,
-        tokenVenta: orden.tokenVenta,
-      }))
-      console.log(misOrdenes)
+      ordenes = await plataforma.connect(vendedor).listarMisOrdenes()
+      expect(ordenes.length).to.eq(5)
     })
   })
 })
-
-/**
- * Nueva orden: Numero 1 - 0x82a940ca16d30332bb6b7c0087a5ac6f33a5b145978f9ef97160fd290e0f91bf
- * Nueva orden: Numero 2 - 0xfb2c787579f601a85ddc11b2ce1bd27057fa937270e3b7db51e2030b042576db
- * Nueva orden: Numero 3 - 0x135f0adc5eb7c18dea2bdc6bc002bd13bd4083ce12c8c101cb6c87e341a7e345
- * Nueva orden: Numero 4 - 0x63ac83890bda99ccfbe503bda8158ff0101a26116f7d19cfacc527073776b490
- * Orden Ejecutada: 0x135f0adc5eb7c18dea2bdc6bc002bd13bd4083ce12c8c101cb6c87e341a7e345
- */

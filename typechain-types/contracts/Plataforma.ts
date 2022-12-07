@@ -141,13 +141,16 @@ export interface PlataformaInterface extends utils.Interface {
   functions: {
     "activarToken(string)": FunctionFragment;
     "bloquearBilletera(address)": FunctionFragment;
+    "bloquearPlataforma()": FunctionFragment;
     "buscarOrden(bytes32)": FunctionFragment;
     "buscarOrdenGemela(string,string,uint256,uint256)": FunctionFragment;
     "cancelarOrden(bytes32)": FunctionFragment;
     "consultarCotizacion(string)": FunctionFragment;
     "desbloquearBilletera(address)": FunctionFragment;
+    "desbloquearPlataforma()": FunctionFragment;
     "ejecutarOrden(bytes32)": FunctionFragment;
     "emptyString(string)": FunctionFragment;
+    "establecerMontoMinimo(uint256)": FunctionFragment;
     "hacerAdministrador(address)": FunctionFragment;
     "listarAdministradores()": FunctionFragment;
     "listarBilleterasBloqueadas()": FunctionFragment;
@@ -168,13 +171,16 @@ export interface PlataformaInterface extends utils.Interface {
     nameOrSignatureOrTopic:
       | "activarToken"
       | "bloquearBilletera"
+      | "bloquearPlataforma"
       | "buscarOrden"
       | "buscarOrdenGemela"
       | "cancelarOrden"
       | "consultarCotizacion"
       | "desbloquearBilletera"
+      | "desbloquearPlataforma"
       | "ejecutarOrden"
       | "emptyString"
+      | "establecerMontoMinimo"
       | "hacerAdministrador"
       | "listarAdministradores"
       | "listarBilleterasBloqueadas"
@@ -198,6 +204,10 @@ export interface PlataformaInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "bloquearBilletera",
     values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "bloquearPlataforma",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "buscarOrden",
@@ -225,12 +235,20 @@ export interface PlataformaInterface extends utils.Interface {
     values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
+    functionFragment: "desbloquearPlataforma",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "ejecutarOrden",
     values: [PromiseOrValue<BytesLike>]
   ): string;
   encodeFunctionData(
     functionFragment: "emptyString",
     values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "establecerMontoMinimo",
+    values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
     functionFragment: "hacerAdministrador",
@@ -301,6 +319,10 @@ export interface PlataformaInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "bloquearPlataforma",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "buscarOrden",
     data: BytesLike
   ): Result;
@@ -321,11 +343,19 @@ export interface PlataformaInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "desbloquearPlataforma",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "ejecutarOrden",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "emptyString",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "establecerMontoMinimo",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -375,9 +405,13 @@ export interface PlataformaInterface extends utils.Interface {
 
   events: {
     "NuevaOrden(tuple)": EventFragment;
+    "NuevoAdministrador(tuple)": EventFragment;
+    "NuevoToken(tuple)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "NuevaOrden"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "NuevoAdministrador"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "NuevoToken"): EventFragment;
 }
 
 export interface NuevaOrdenEventObject {
@@ -389,6 +423,27 @@ export type NuevaOrdenEvent = TypedEvent<
 >;
 
 export type NuevaOrdenEventFilter = TypedEventFilter<NuevaOrdenEvent>;
+
+export interface NuevoAdministradorEventObject {
+  respuesta: Datos.BilleteraStructOutput;
+}
+export type NuevoAdministradorEvent = TypedEvent<
+  [Datos.BilleteraStructOutput],
+  NuevoAdministradorEventObject
+>;
+
+export type NuevoAdministradorEventFilter =
+  TypedEventFilter<NuevoAdministradorEvent>;
+
+export interface NuevoTokenEventObject {
+  respuesta: Datos.TokenStructOutput;
+}
+export type NuevoTokenEvent = TypedEvent<
+  [Datos.TokenStructOutput],
+  NuevoTokenEventObject
+>;
+
+export type NuevoTokenEventFilter = TypedEventFilter<NuevoTokenEvent>;
 
 export interface Plataforma extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -427,6 +482,10 @@ export interface Plataforma extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    bloquearPlataforma(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     buscarOrden(
       _idOrden: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
@@ -438,7 +497,7 @@ export interface Plataforma extends BaseContract {
       _montoCompra: PromiseOrValue<BigNumberish>,
       _montoVenta: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
-    ): Promise<[string] & { idOrden: string }>;
+    ): Promise<[Datos.OrdenStructOutput] & { orden: Datos.OrdenStructOutput }>;
 
     cancelarOrden(
       _idOrden: PromiseOrValue<BytesLike>,
@@ -448,10 +507,14 @@ export interface Plataforma extends BaseContract {
     consultarCotizacion(
       _ticker: PromiseOrValue<string>,
       overrides?: CallOverrides
-    ): Promise<[BigNumber] & { precio: BigNumber }>;
+    ): Promise<[BigNumber, number] & { precio: BigNumber; decimales: number }>;
 
     desbloquearBilletera(
       _billetera: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    desbloquearPlataforma(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -464,6 +527,11 @@ export interface Plataforma extends BaseContract {
       _string: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
+
+    establecerMontoMinimo(
+      _monto: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
 
     hacerAdministrador(
       _billetera: PromiseOrValue<string>,
@@ -569,6 +637,10 @@ export interface Plataforma extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
+  bloquearPlataforma(
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   buscarOrden(
     _idOrden: PromiseOrValue<BytesLike>,
     overrides?: CallOverrides
@@ -580,7 +652,7 @@ export interface Plataforma extends BaseContract {
     _montoCompra: PromiseOrValue<BigNumberish>,
     _montoVenta: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
-  ): Promise<string>;
+  ): Promise<Datos.OrdenStructOutput>;
 
   cancelarOrden(
     _idOrden: PromiseOrValue<BytesLike>,
@@ -590,10 +662,14 @@ export interface Plataforma extends BaseContract {
   consultarCotizacion(
     _ticker: PromiseOrValue<string>,
     overrides?: CallOverrides
-  ): Promise<BigNumber>;
+  ): Promise<[BigNumber, number] & { precio: BigNumber; decimales: number }>;
 
   desbloquearBilletera(
     _billetera: PromiseOrValue<string>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  desbloquearPlataforma(
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -606,6 +682,11 @@ export interface Plataforma extends BaseContract {
     _string: PromiseOrValue<string>,
     overrides?: CallOverrides
   ): Promise<boolean>;
+
+  establecerMontoMinimo(
+    _monto: PromiseOrValue<BigNumberish>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
   hacerAdministrador(
     _billetera: PromiseOrValue<string>,
@@ -711,6 +792,8 @@ export interface Plataforma extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
+    bloquearPlataforma(overrides?: CallOverrides): Promise<boolean>;
+
     buscarOrden(
       _idOrden: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
@@ -722,7 +805,7 @@ export interface Plataforma extends BaseContract {
       _montoCompra: PromiseOrValue<BigNumberish>,
       _montoVenta: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
-    ): Promise<string>;
+    ): Promise<Datos.OrdenStructOutput>;
 
     cancelarOrden(
       _idOrden: PromiseOrValue<BytesLike>,
@@ -732,12 +815,14 @@ export interface Plataforma extends BaseContract {
     consultarCotizacion(
       _ticker: PromiseOrValue<string>,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<[BigNumber, number] & { precio: BigNumber; decimales: number }>;
 
     desbloquearBilletera(
       _billetera: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<boolean>;
+
+    desbloquearPlataforma(overrides?: CallOverrides): Promise<boolean>;
 
     ejecutarOrden(
       _idOrden: PromiseOrValue<BytesLike>,
@@ -746,6 +831,11 @@ export interface Plataforma extends BaseContract {
 
     emptyString(
       _string: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
+    establecerMontoMinimo(
+      _monto: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
@@ -846,6 +936,14 @@ export interface Plataforma extends BaseContract {
   filters: {
     "NuevaOrden(tuple)"(respuesta?: null): NuevaOrdenEventFilter;
     NuevaOrden(respuesta?: null): NuevaOrdenEventFilter;
+
+    "NuevoAdministrador(tuple)"(
+      respuesta?: null
+    ): NuevoAdministradorEventFilter;
+    NuevoAdministrador(respuesta?: null): NuevoAdministradorEventFilter;
+
+    "NuevoToken(tuple)"(respuesta?: null): NuevoTokenEventFilter;
+    NuevoToken(respuesta?: null): NuevoTokenEventFilter;
   };
 
   estimateGas: {
@@ -856,6 +954,10 @@ export interface Plataforma extends BaseContract {
 
     bloquearBilletera(
       _billetera: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    bloquearPlataforma(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -887,6 +989,10 @@ export interface Plataforma extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
+    desbloquearPlataforma(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     ejecutarOrden(
       _idOrden: PromiseOrValue<BytesLike>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -895,6 +1001,11 @@ export interface Plataforma extends BaseContract {
     emptyString(
       _string: PromiseOrValue<string>,
       overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    establecerMontoMinimo(
+      _monto: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     hacerAdministrador(
@@ -971,6 +1082,10 @@ export interface Plataforma extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
+    bloquearPlataforma(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
     buscarOrden(
       _idOrden: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
@@ -999,6 +1114,10 @@ export interface Plataforma extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
+    desbloquearPlataforma(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
     ejecutarOrden(
       _idOrden: PromiseOrValue<BytesLike>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -1007,6 +1126,11 @@ export interface Plataforma extends BaseContract {
     emptyString(
       _string: PromiseOrValue<string>,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    establecerMontoMinimo(
+      _monto: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     hacerAdministrador(
