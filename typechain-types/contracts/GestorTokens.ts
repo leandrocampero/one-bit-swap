@@ -13,7 +13,11 @@ import type {
   Signer,
   utils,
 } from "ethers";
-import type { FunctionFragment, Result } from "@ethersproject/abi";
+import type {
+  FunctionFragment,
+  Result,
+  EventFragment,
+} from "@ethersproject/abi";
 import type { Listener, Provider } from "@ethersproject/providers";
 import type {
   TypedEventFilter,
@@ -24,6 +28,89 @@ import type {
 } from "../common";
 
 export declare namespace Datos {
+  export type OrdenStruct = {
+    idOrden: PromiseOrValue<BytesLike>;
+    siguienteOrdenActiva: PromiseOrValue<BytesLike>;
+    anteriorOrdenActiva: PromiseOrValue<BytesLike>;
+    siguienteOrdenGemela: PromiseOrValue<BytesLike>;
+    anteriorOrdenGemela: PromiseOrValue<BytesLike>;
+    vendedor: PromiseOrValue<string>;
+    comprador: PromiseOrValue<string>;
+    montoVenta: PromiseOrValue<BigNumberish>;
+    montoCompra: PromiseOrValue<BigNumberish>;
+    fechaCreacion: PromiseOrValue<BigNumberish>;
+    fechaFinalizacion: PromiseOrValue<BigNumberish>;
+    estado: PromiseOrValue<BigNumberish>;
+    tipo: PromiseOrValue<BigNumberish>;
+    existe: PromiseOrValue<boolean>;
+    tokenCompra: PromiseOrValue<string>;
+    tokenVenta: PromiseOrValue<string>;
+  };
+
+  export type OrdenStructOutput = [
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    BigNumber,
+    BigNumber,
+    BigNumber,
+    BigNumber,
+    number,
+    number,
+    boolean,
+    string,
+    string
+  ] & {
+    idOrden: string;
+    siguienteOrdenActiva: string;
+    anteriorOrdenActiva: string;
+    siguienteOrdenGemela: string;
+    anteriorOrdenGemela: string;
+    vendedor: string;
+    comprador: string;
+    montoVenta: BigNumber;
+    montoCompra: BigNumber;
+    fechaCreacion: BigNumber;
+    fechaFinalizacion: BigNumber;
+    estado: number;
+    tipo: number;
+    existe: boolean;
+    tokenCompra: string;
+    tokenVenta: string;
+  };
+
+  export type BilleteraStruct = {
+    direccion: PromiseOrValue<string>;
+    indiceAdmin: PromiseOrValue<BigNumberish>;
+    indiceBloqueado: PromiseOrValue<BigNumberish>;
+    rol: PromiseOrValue<BigNumberish>;
+    estado: PromiseOrValue<BigNumberish>;
+    existe: PromiseOrValue<boolean>;
+    ordenes: PromiseOrValue<string>[];
+  };
+
+  export type BilleteraStructOutput = [
+    string,
+    BigNumber,
+    BigNumber,
+    number,
+    number,
+    boolean,
+    string[]
+  ] & {
+    direccion: string;
+    indiceAdmin: BigNumber;
+    indiceBloqueado: BigNumber;
+    rol: number;
+    estado: number;
+    existe: boolean;
+    ordenes: string[];
+  };
+
   export type TokenStruct = {
     ticker: PromiseOrValue<string>;
     contrato: PromiseOrValue<string>;
@@ -53,38 +140,34 @@ export declare namespace Datos {
 export interface GestorTokensInterface extends utils.Interface {
   functions: {
     "activarToken(string)": FunctionFragment;
-    "archivoOrdenes()": FunctionFragment;
     "consultarCotizacion(string)": FunctionFragment;
     "emptyString(string)": FunctionFragment;
     "listarTokens(bool)": FunctionFragment;
     "modifcarOraculo(string,address)": FunctionFragment;
     "nuevoToken(address,address)": FunctionFragment;
+    "ordenes()": FunctionFragment;
     "plataforma()": FunctionFragment;
     "suspenderToken(string)": FunctionFragment;
-    "tokensMap(string)": FunctionFragment;
+    "tokensRegistrados(string)": FunctionFragment;
   };
 
   getFunction(
     nameOrSignatureOrTopic:
       | "activarToken"
-      | "archivoOrdenes"
       | "consultarCotizacion"
       | "emptyString"
       | "listarTokens"
       | "modifcarOraculo"
       | "nuevoToken"
+      | "ordenes"
       | "plataforma"
       | "suspenderToken"
-      | "tokensMap"
+      | "tokensRegistrados"
   ): FunctionFragment;
 
   encodeFunctionData(
     functionFragment: "activarToken",
     values: [PromiseOrValue<string>]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "archivoOrdenes",
-    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "consultarCotizacion",
@@ -106,6 +189,7 @@ export interface GestorTokensInterface extends utils.Interface {
     functionFragment: "nuevoToken",
     values: [PromiseOrValue<string>, PromiseOrValue<string>]
   ): string;
+  encodeFunctionData(functionFragment: "ordenes", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "plataforma",
     values?: undefined
@@ -115,16 +199,12 @@ export interface GestorTokensInterface extends utils.Interface {
     values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
-    functionFragment: "tokensMap",
+    functionFragment: "tokensRegistrados",
     values: [PromiseOrValue<string>]
   ): string;
 
   decodeFunctionResult(
     functionFragment: "activarToken",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "archivoOrdenes",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -144,15 +224,58 @@ export interface GestorTokensInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "nuevoToken", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "ordenes", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "plataforma", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "suspenderToken",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "tokensMap", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "tokensRegistrados",
+    data: BytesLike
+  ): Result;
 
-  events: {};
+  events: {
+    "NuevaOrden(tuple)": EventFragment;
+    "NuevoAdministrador(tuple)": EventFragment;
+    "NuevoToken(tuple)": EventFragment;
+  };
+
+  getEvent(nameOrSignatureOrTopic: "NuevaOrden"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "NuevoAdministrador"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "NuevoToken"): EventFragment;
 }
+
+export interface NuevaOrdenEventObject {
+  respuesta: Datos.OrdenStructOutput;
+}
+export type NuevaOrdenEvent = TypedEvent<
+  [Datos.OrdenStructOutput],
+  NuevaOrdenEventObject
+>;
+
+export type NuevaOrdenEventFilter = TypedEventFilter<NuevaOrdenEvent>;
+
+export interface NuevoAdministradorEventObject {
+  respuesta: Datos.BilleteraStructOutput;
+}
+export type NuevoAdministradorEvent = TypedEvent<
+  [Datos.BilleteraStructOutput],
+  NuevoAdministradorEventObject
+>;
+
+export type NuevoAdministradorEventFilter =
+  TypedEventFilter<NuevoAdministradorEvent>;
+
+export interface NuevoTokenEventObject {
+  respuesta: Datos.TokenStructOutput;
+}
+export type NuevoTokenEvent = TypedEvent<
+  [Datos.TokenStructOutput],
+  NuevoTokenEventObject
+>;
+
+export type NuevoTokenEventFilter = TypedEventFilter<NuevoTokenEvent>;
 
 export interface GestorTokens extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -186,20 +309,10 @@ export interface GestorTokens extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
-    archivoOrdenes(
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, string] & {
-        cantidadTotal: BigNumber;
-        cantidadActivas: BigNumber;
-        ultimaOrdenActiva: string;
-      }
-    >;
-
     consultarCotizacion(
       _ticker: PromiseOrValue<string>,
       overrides?: CallOverrides
-    ): Promise<[BigNumber] & { precio: BigNumber }>;
+    ): Promise<[BigNumber, number] & { precio: BigNumber; decimales: number }>;
 
     emptyString(
       _string: PromiseOrValue<string>,
@@ -223,6 +336,16 @@ export interface GestorTokens extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    ordenes(
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, string] & {
+        cantidadTotal: BigNumber;
+        cantidadActivas: BigNumber;
+        ultimaOrdenActiva: string;
+      }
+    >;
+
     plataforma(
       overrides?: CallOverrides
     ): Promise<
@@ -238,7 +361,7 @@ export interface GestorTokens extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
-    tokensMap(
+    tokensRegistrados(
       arg0: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<
@@ -258,20 +381,10 @@ export interface GestorTokens extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
-  archivoOrdenes(
-    overrides?: CallOverrides
-  ): Promise<
-    [BigNumber, BigNumber, string] & {
-      cantidadTotal: BigNumber;
-      cantidadActivas: BigNumber;
-      ultimaOrdenActiva: string;
-    }
-  >;
-
   consultarCotizacion(
     _ticker: PromiseOrValue<string>,
     overrides?: CallOverrides
-  ): Promise<BigNumber>;
+  ): Promise<[BigNumber, number] & { precio: BigNumber; decimales: number }>;
 
   emptyString(
     _string: PromiseOrValue<string>,
@@ -295,6 +408,16 @@ export interface GestorTokens extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
+  ordenes(
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, BigNumber, string] & {
+      cantidadTotal: BigNumber;
+      cantidadActivas: BigNumber;
+      ultimaOrdenActiva: string;
+    }
+  >;
+
   plataforma(
     overrides?: CallOverrides
   ): Promise<
@@ -310,7 +433,7 @@ export interface GestorTokens extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
-  tokensMap(
+  tokensRegistrados(
     arg0: PromiseOrValue<string>,
     overrides?: CallOverrides
   ): Promise<
@@ -330,20 +453,10 @@ export interface GestorTokens extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    archivoOrdenes(
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, string] & {
-        cantidadTotal: BigNumber;
-        cantidadActivas: BigNumber;
-        ultimaOrdenActiva: string;
-      }
-    >;
-
     consultarCotizacion(
       _ticker: PromiseOrValue<string>,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<[BigNumber, number] & { precio: BigNumber; decimales: number }>;
 
     emptyString(
       _string: PromiseOrValue<string>,
@@ -367,6 +480,16 @@ export interface GestorTokens extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
+    ordenes(
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, string] & {
+        cantidadTotal: BigNumber;
+        cantidadActivas: BigNumber;
+        ultimaOrdenActiva: string;
+      }
+    >;
+
     plataforma(
       overrides?: CallOverrides
     ): Promise<
@@ -382,7 +505,7 @@ export interface GestorTokens extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    tokensMap(
+    tokensRegistrados(
       arg0: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<
@@ -397,15 +520,24 @@ export interface GestorTokens extends BaseContract {
     >;
   };
 
-  filters: {};
+  filters: {
+    "NuevaOrden(tuple)"(respuesta?: null): NuevaOrdenEventFilter;
+    NuevaOrden(respuesta?: null): NuevaOrdenEventFilter;
+
+    "NuevoAdministrador(tuple)"(
+      respuesta?: null
+    ): NuevoAdministradorEventFilter;
+    NuevoAdministrador(respuesta?: null): NuevoAdministradorEventFilter;
+
+    "NuevoToken(tuple)"(respuesta?: null): NuevoTokenEventFilter;
+    NuevoToken(respuesta?: null): NuevoTokenEventFilter;
+  };
 
   estimateGas: {
     activarToken(
       _ticker: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
-
-    archivoOrdenes(overrides?: CallOverrides): Promise<BigNumber>;
 
     consultarCotizacion(
       _ticker: PromiseOrValue<string>,
@@ -434,6 +566,8 @@ export interface GestorTokens extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
+    ordenes(overrides?: CallOverrides): Promise<BigNumber>;
+
     plataforma(overrides?: CallOverrides): Promise<BigNumber>;
 
     suspenderToken(
@@ -441,7 +575,7 @@ export interface GestorTokens extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
-    tokensMap(
+    tokensRegistrados(
       arg0: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -453,8 +587,6 @@ export interface GestorTokens extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
-    archivoOrdenes(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     consultarCotizacion(
       _ticker: PromiseOrValue<string>,
       overrides?: CallOverrides
@@ -482,6 +614,8 @@ export interface GestorTokens extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
+    ordenes(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     plataforma(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     suspenderToken(
@@ -489,7 +623,7 @@ export interface GestorTokens extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
-    tokensMap(
+    tokensRegistrados(
       arg0: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;

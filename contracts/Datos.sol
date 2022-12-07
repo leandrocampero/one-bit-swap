@@ -4,7 +4,6 @@ pragma solidity ^0.8.9;
 abstract contract Datos {
   enum EstadoOrden {
     ACTIVA,
-    BLOQUEADA,
     CANCELADA,
     FINALIZADA
   }
@@ -37,60 +36,87 @@ abstract contract Datos {
 
   struct Billetera {
     address direccion;
-    string[] ordenes;
+    uint256 indiceAdmin;
+    uint256 indiceBloqueado;
     RolBilletera rol;
     EstadoGeneral estado;
     bool existe;
+    string[] ordenes;
   }
 
+  struct MapBilletera {
+    Billetera billetera;
+    mapping(address => string[]) ordenes;
+  }
+
+  // IMPROVE: ¿Se puede asociar una librería con métodos de pila y fila?
+  // IMPROVE: pushActiva, popActiva, queueGemela, dequeueGemela
   struct Orden {
-    string idOrden;
+    bytes32 idOrden;
+    bytes32 siguienteOrdenActiva; // OBS: Implementa una PILA
+    bytes32 anteriorOrdenActiva;
+    bytes32 siguienteOrdenGemela; // OBS: Implementa una FILA
+    bytes32 anteriorOrdenGemela;
     address vendedor;
     address comprador;
-    Token tokenVenta;
-    Token tokenCompra;
     uint256 montoVenta;
     uint256 montoCompra;
     uint256 fechaCreacion;
-    uint256 fechaEjecucion;
-    uint256 fechaCaducidad;
+    uint256 fechaFinalizacion;
     EstadoOrden estado;
     TipoOrden tipo;
-    uint indice;
-    string siguienteOrden;
-    string anteriorOrden;
     bool existe;
+    string tokenCompra;
+    string tokenVenta;
+  }
+
+  struct MapGrupoOrdenHash {
+    bool existe;
+    bytes32 idOrdenCabecera;
+    bytes32 idOrdenFinal;
   }
 
   struct Plataforma {
     EstadoGeneral estado;
     address propietario;
-    uint montoMinimoUSD;
+    uint256 montoMinimoUSD;
   }
 
   /****************************************************************************/
 
-  type ContadorOrdenes is uint;
+  event NuevaOrden(Orden respuesta);
+  event NuevoAdministrador(Billetera respuesta);
+  event NuevoToken(Token respuesta);
+
+  /****************************************************************************/
 
   struct ArchivoOrdenes {
-    mapping(string => Orden) ordenes; // OBS: idOrden -> Orden
-    ContadorOrdenes cantidadTotal;
-    ContadorOrdenes cantidadActivas;
-    string ultimaOrdenActiva; // OBS: para implementar la lista enlazada, este es el punto de inicio
+    mapping(bytes32 => Orden) archivo; // OBS: idOrden -> Orden
+    mapping(address => bytes32[]) porBilletera;
+    mapping(bytes32 => MapGrupoOrdenHash) grupos; // OBS: hashOrden -> idOrden (referencia al primer nodo en la fila)
+    uint cantidadTotal;
+    uint cantidadActivas;
+    bytes32 ultimaOrdenActiva; // OBS: referencia el tope de la pila
+  }
+
+  struct ArchivoBilleteras {
+    mapping(address => MapBilletera) archivo;
+    address[] bloqueadas;
+    address[] administradores;
   }
 
   /****************************************************************************/
 
   Plataforma public plataforma;
 
-  ArchivoOrdenes public archivoOrdenes;
+  ArchivoOrdenes public ordenes;
 
-  mapping(string => Token) public tokensMap; // OBS: ticker -> Token
-  string[] tokensArray; // IMPROVE: posiblemente haya que mejorarlo
-  // IMPROVE: pero como no es primordial el ordenamiento para este array, queda así momentaneamente
+  mapping(string => Token) public tokensRegistrados; // OBS: ticker -> Token
+  string[] tokensListado; // IMPROVE: posiblemente haya que mejorarlo, pero como no es primordial el ordenamiento para este array, queda así momentaneamente
+  uint tokensCantidadActivos;
 
-  mapping(address => Billetera) billeterasMap;
-  address[] billeterasBloqueadas;
+  mapping(address => Billetera) billeterasRegistradas; // REVIEW: Se decide hacer un archivo de billeteras porque se necesita tanto buscarlas para interactuar con ellas como listarlas
+  address[] billeterasBloqueadas; // IMPROVE: Se podría mejorar haciendo también una lista enlazada para un pagínado filtrado. Pero queda como actualización
   address[] billeterasAdministradores;
 
   /****************************************************************************/
@@ -113,7 +139,8 @@ abstract contract Datos {
 
   modifier soloAdministrador() {
     require(
-      billeterasMap[msg.sender].rol == RolBilletera.ADMINISTRADOR ||
+      (billeterasRegistradas[msg.sender].existe &&
+        billeterasRegistradas[msg.sender].rol == RolBilletera.ADMINISTRADOR) ||
         msg.sender == plataforma.propietario,
       "Solo pueden acceder administradores"
     );
@@ -122,9 +149,10 @@ abstract contract Datos {
 
   modifier billeteraActiva() {
     require(
-      billeterasMap[msg.sender].existe &&
-        billeterasMap[msg.sender].estado == EstadoGeneral.ACTIVO,
-      "La billetera esta suspendida o no existe"
+      (billeterasRegistradas[msg.sender].existe &&
+        billeterasRegistradas[msg.sender].estado == EstadoGeneral.ACTIVO) ||
+        !billeterasRegistradas[msg.sender].existe,
+      "La billetera esta bloqueada"
     );
     _;
   }
@@ -136,6 +164,6 @@ abstract contract Datos {
    */
   function emptyString(string memory _string) public pure returns (bool) {
     bytes memory bytesArray = bytes(_string);
-    return bytesArray.length > 0;
+    return bytesArray.length == 0;
   }
 }

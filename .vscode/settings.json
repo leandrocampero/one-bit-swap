@@ -9,39 +9,38 @@
     "editor.defaultFormatter": "NomicFoundation.hardhat-solidity"
   },
   "todohighlight.defaultStyle": {
-    "color": "default",
-    "isWholeLine": true
+    "color": "black"
   },
   "todohighlight.keywords": [
     {
       "text": "REVIEW:",
-      "backgroundColor": "#3DBBF244",
+      "backgroundColor": "#3DBBF2",
       "overviewRulerColor": "#3DBBF2"
     },
     {
+      "text": "UPDATE:",
+      "backgroundColor": "#1de9b6",
+      "overviewRulerColor": "#1de9b6"
+    },
+    {
       "text": "IMPROVE:",
-      "backgroundColor": "#7e57c244",
-      "overviewRulerColor": "#7e57c2"
+      "backgroundColor": "#ba68c8",
+      "overviewRulerColor": "#ba68c8"
     },
     {
       "text": "OBS:",
-      "backgroundColor": "#4caf5044",
+      "backgroundColor": "#4caf50",
       "overviewRulerColor": "#4caf50"
     },
     {
       "text": "WARNING:",
-      "backgroundColor": "#F3AA2B40",
+      "backgroundColor": "#F3AA2B",
       "overviewRulerColor": "#F3AA2B"
     },
     {
       "text": "ERROR:",
-      "backgroundColor": "#f443363f",
+      "backgroundColor": "#f44336",
       "overviewRulerColor": "#f44336"
-    },
-    {
-      "text": "* @",
-      "backgroundColor": "#18ffff20",
-      "overviewRulerColor": "#18ffff"
     }
   ]
 }

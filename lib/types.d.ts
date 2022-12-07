@@ -5,7 +5,6 @@ export enum Estados {
 
 export enum EstadosOrdenes {
   activa = 0,
-  bloqueada = 1,
   cancelada = 2,
   finalizada = 3,
 }
