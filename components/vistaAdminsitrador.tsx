@@ -113,7 +113,7 @@ export default function VistaAdminsitrador() {
   }
 
   return (
-    <>
+    <div>
       <Tabs
         value={getTabValue}
         onChange={handleTabChange}
@@ -183,6 +183,6 @@ export default function VistaAdminsitrador() {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
-    </>
+    </div>
   )
 }

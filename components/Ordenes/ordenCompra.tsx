@@ -7,7 +7,7 @@ import {
   TextField,
 } from '@mui/material'
 import React from 'react'
-import { CompraMontoContext, CompraTokenContext } from './crearOrden'
+import { CompraMontoContext, CompraTokenContext } from './CrearOrden'
 
 const currencies = ['USDT', 'BNB', 'ETH']
 

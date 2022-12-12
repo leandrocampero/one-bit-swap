@@ -1,3 +1,4 @@
+import VistaAdminsitrador from '@components/VistaAdminsitrador'
 import { Box, Grid } from '@mui/material'
 import { grey } from '@mui/material/colors'
 import styles from '@styles/layout.module.scss'
@@ -13,15 +14,9 @@ const sxProps = {
 export default function configuracion() {
   return (
     <Grid container>
-      <Grid item xs={2}>
+      <Grid item xs={12}>
         <Box sx={sxProps} className={styles.base}>
-          {/* <Componente del gsus> */}
-          <h1>Gestionar ...</h1>
-        </Box>
-      </Grid>
-      <Grid item xs={10}>
-        <Box sx={sxProps} className={styles.base}>
-          <h1>Tablita</h1>
+          <VistaAdminsitrador />
         </Box>
       </Grid>
     </Grid>

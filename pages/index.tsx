@@ -1,10 +1,10 @@
-import CrearOrden from '@components/Ordenes/crearOrden'
-import VistaAdminsitrador from '@components/vistaAdminsitrador'
+import ContractConnect from '@components/ContractConnect'
+import ListaOrdenes from '@components/ListaOrdenes'
+import CrearOrden from '@components/Ordenes/CrearOrden'
 import { Box, Grid } from '@mui/material'
 import { grey } from '@mui/material/colors'
 import styles from '@styles/layout.module.scss'
-import ContractConnect from '../components/ContractConnect'
-import ListaOrdenes from '../components/ListaOrdenes'
+
 const sxProps = {
   mx: 2,
   my: 5,
@@ -18,10 +18,8 @@ export default function Home() {
     <Grid container>
       <Grid item xs={8}>
         <Box sx={sxProps} className={styles.base}>
-          {/* <Componente del gsus> */}
           <h1>Ordenes Abiertas y demas</h1>
-          <ListaOrdenes></ListaOrdenes>
-          <VistaAdminsitrador></VistaAdminsitrador>
+          <ListaOrdenes />
           <ContractConnect />
         </Box>
       </Grid>
