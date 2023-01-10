@@ -4,7 +4,6 @@ import { expect } from 'chai'
 import { BigNumber } from 'ethers'
 import { ethers } from 'hardhat'
 import {
-  Datos,
   ERC20Mock,
   ERC20Mock__factory,
   Plataforma,
@@ -22,80 +21,6 @@ const ORACULO_WETH = '0x0715A7794a1dc8e42615F059dD6e406A6594651A'
 
 const CONTRATO_DAI = '0xd393b1E02dA9831Ff419e22eA105aAe4c47E1253'
 const ORACULO_DAI = '0x0FCAa9c899EC5A91eBc3D5Dd869De833b06fB046'
-
-function formatArrayBilleteras(
-  listado: Datos.BilleteraStructOutput[]
-): Datos.BilleteraStruct[] {
-  return listado.map(
-    ({ direccion, estado, existe, indiceAdmin, indiceBloqueado, rol }) => ({
-      direccion,
-      estado,
-      rol,
-      existe,
-      indiceAdmin: indiceAdmin.toString(),
-      indiceBloqueado: indiceBloqueado.toString(),
-    })
-  ) as Datos.BilleteraStruct[]
-}
-
-function formatArrayTokens(
-  listado: Datos.TokenStructOutput[]
-): Datos.TokenStruct[] {
-  return listado.map(
-    ({ ticker, contrato, oraculo, decimales, estado, existe }) => ({
-      ticker,
-      contrato,
-      oraculo,
-      decimales,
-      estado,
-      existe,
-    })
-  )
-}
-
-function formatArrayOrdenes(
-  listado: Datos.OrdenStructOutput[]
-): Datos.OrdenStruct[] {
-  return listado.map(
-    ({
-      idOrden,
-      siguienteOrdenActiva,
-      anteriorOrdenActiva,
-      siguienteOrdenGemela,
-      anteriorOrdenGemela,
-      vendedor,
-      comprador,
-      montoVenta,
-      montoCompra,
-      fechaCreacion,
-      fechaFinalizacion,
-      estado,
-      tipo,
-      existe,
-      tokenCompra,
-      tokenVenta,
-    }) => ({
-      idOrden,
-      siguienteOrdenActiva,
-      anteriorOrdenActiva,
-      siguienteOrdenGemela,
-      anteriorOrdenGemela,
-      vendedor,
-      comprador,
-      montoVenta: montoVenta.toString(),
-      montoCompra: montoCompra.toString(),
-      fechaCreacion: new Date(fechaCreacion.toNumber() * 1000).toLocaleString(),
-      fechaFinalizacion: fechaFinalizacion.eq(0)
-        ? '-'
-        : new Date(fechaFinalizacion.toNumber() * 1000).toLocaleString(),
-      estado,
-      tipo,
-      existe,
-      tokenCompra,
-      tokenVenta,
-    })
-  )
-}
 
 describe('OneBitSwap', function () {
   let propietario: SignerWithAddress,
