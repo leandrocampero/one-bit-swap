@@ -81,3 +81,9 @@ export declare global {
     ethereum: any
   }
 }
+
+export interface Session {
+  chainId: number
+  address: string
+  date: number
+}
