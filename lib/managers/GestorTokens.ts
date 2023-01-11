@@ -3,7 +3,7 @@ export default class GestorTokens {
   private _tokens: Array<Tokens>
   private static _gestor: GestorTokens
 
-  private constructor() {
+  constructor() {
     this._tokens = []
   }
 

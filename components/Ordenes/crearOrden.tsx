@@ -37,7 +37,7 @@ export default function CrearOrden() {
   const [compraMonto, setCompraMonto] = React.useState<number>()
   const [compraToken, setCompraToken] = React.useState('USDT')
   const [ventaMonto, setVentaMonto] = React.useState<number>()
-  const [ventaToken, setVentaToken] = React.useState('USDT')
+  const [ventaToken, setVentaToken] = React.useState('BNB')
 
   const montoCompraVenta = () => {
     if (!ventaMonto) {

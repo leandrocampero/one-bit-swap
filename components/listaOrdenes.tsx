@@ -1,5 +1,6 @@
 import BlockchainAdapter from '@lib/BlockchainAdapter'
 import GestorBilleteras from '@lib/managers/GestorBilleteras'
+import GestorTokens from '@lib/managers/GestorTokens'
 import Billeteras from '@lib/models/Billeteras'
 import Ordenes from '@lib/models/Ordenes'
 import Tokens from '@lib/models/Tokens'
@@ -11,11 +12,13 @@ import {
   TipoColumna,
   TiposOrdenes,
 } from '@lib/types.d'
+import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange'
 import {
   Autocomplete,
   Box,
   Button,
   ButtonGroup,
+  Grid,
   MenuItem,
   Paper,
   Select,
@@ -32,7 +35,7 @@ import {
   TextField,
 } from '@mui/material'
 import { useEffect, useState } from 'react'
-import { b1 } from '../scripts/modelos'
+import { b1, tUSDT } from '../scripts/modelos'
 
 export default function ListaOrdenes() {
   const [getTokens, setTokens] = useState(Array<Tokens>)
@@ -41,16 +44,18 @@ export default function ListaOrdenes() {
   const [getBilleteraUsuario, setBilleteraUsuario] = useState(b1)
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
-  const [getTokenVenta, setTokenVenta] = useState(undefined)
-  const [getTokenCompra, setTokenCompra] = useState(undefined)
   const [getTipoOrden, setTipoOrden] = useState(TiposOrdenes.todas)
   const [getMontoVenta, setMontoVenta] = useState(BigInt(0))
   const [getMontoCompra, setMontoCompra] = useState(BigInt(0))
   const [getFechaInicio, setFechaInicio] = useState(undefined)
   const [getFechaFin, setFechaFin] = useState(undefined)
+  const [filtrar, setFiltrar] = useState(false)
 
   const adapter = new BlockchainAdapter()
   const gestorBilletera = new GestorBilleteras()
+  const gTokens = GestorTokens.instanciar()
+  const [getTokenVenta, setTokenVenta] = useState<Tokens>(tUSDT)
+  const [getTokenCompra, setTokenCompra] = useState<Tokens>(tUSDT)
 
   const handleChangeTokenButton = (event: React.SyntheticEvent) => {
     const aux = getTokenVenta
@@ -58,18 +63,13 @@ export default function ListaOrdenes() {
     setTokenCompra(aux)
   }
 
+  const handleChangeSelect = (event: SelectChangeEvent) => {
+    setTipoOrden(event.target.value as TiposOrdenes)
+  }
+
   const handleChangeTokenVenta = (event: React.SyntheticEvent, value: any) => {
     console.log(value)
     setTokenVenta(value)
-  }
-
-  const handleChangeTokenCompra = (event: React.SyntheticEvent, value: any) => {
-    console.log(value)
-    setTokenCompra(value)
-  }
-
-  const handleChangeSelect = (event: SelectChangeEvent) => {
-    setTipoOrden(event.target.value as TiposOrdenes)
   }
 
   const handleTabChange = (
@@ -169,6 +169,7 @@ export default function ListaOrdenes() {
   useEffect(() => {
     try {
       inicializar()
+      console.log('getTokens', getTokens)
     } catch (e) {
       console.log(e)
     }
@@ -212,6 +213,7 @@ export default function ListaOrdenes() {
         textColor="secondary"
         indicatorColor="secondary"
         aria-label="secondary tabs example"
+        sx={{ mb: 2 }}
       >
         <Tab value={NavMenu.ordenesAbiertas} label={NavMenu.ordenesAbiertas} />
         {gestorBilletera.verificarRol(getBilleteraUsuario) >= 1 && (
@@ -221,116 +223,153 @@ export default function ListaOrdenes() {
           <Tab value={NavMenu.miHistorial} label={NavMenu.miHistorial} />
         )}
       </Tabs>
-      <Autocomplete
-        id="token-select-venta"
-        sx={{ width: 300 }}
-        options={getTokens}
-        getOptionDisabled={(option) =>
-          option === getTokenCompra ||
-          (option.estado == Estados.suspendido &&
-            getTabValue != NavMenu.miHistorial)
-        }
-        value={getTokenVenta}
-        onChange={handleChangeTokenVenta}
-        autoHighlight
-        getOptionLabel={(option: any) => option.ticker}
-        renderOption={(props, option) => (
-          <Box
-            component="li"
-            sx={{ '& > img': { mr: 2, flexShrink: 0 } }}
-            {...props}
-          >
-            <img
-              loading="lazy"
-              width="20"
-              src={`https://aux3.iconspalace.com/uploads/673308030241043147.png`}
-              srcSet={`https://aux3.iconspalace.com/uploads/673308030241043147.png 2x`}
-              alt=""
-            />
-            {option.ticker}
-          </Box>
-        )}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            label="Token a Cambiar"
-            inputProps={{
-              ...params.inputProps,
-              autoComplete: 'new-password', // disable autocomplete and autofill
+
+      <Grid container rowSpacing={2}>
+        <Grid item>
+          <Autocomplete
+            id="token-select-venta"
+            sx={{ width: 300 }}
+            options={getTokens}
+            getOptionDisabled={(option) =>
+              option === getTokenCompra ||
+              (option.estado == Estados.suspendido &&
+                getTabValue != NavMenu.miHistorial)
+            }
+            value={getTokenVenta}
+            onChange={(event: any, newValue: Tokens | null) => {
+              setTokenVenta(newValue)
             }}
+            autoHighlight
+            getOptionLabel={(option: any) => option.ticker}
+            renderOption={(props, option) => (
+              <Box
+                component="li"
+                sx={{ '& > img': { mr: 2, flexShrink: 0 } }}
+                {...props}
+              >
+                {/*  <img
+                  loading="lazy"
+                  width="20"
+                  src={`https://aux3.iconspalace.com/uploads/673308030241043147.png`}
+                  srcSet={`https://aux3.iconspalace.com/uploads/673308030241043147.png 2x`}
+                  alt=""
+                /> */}
+                {option.ticker}
+              </Box>
+            )}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Token a Cambiar"
+                inputProps={{
+                  ...params.inputProps,
+                  autoComplete: 'new-password', // disable autocomplete and autofill
+                }}
+              />
+            )}
           />
-        )}
-      />
-      <Button variant="contained" onClick={handleChangeTokenButton}>
-        Cambiar
-      </Button>
-      {/*aqui deberia ir un boton de intercambio o una imagen de dos flechitas*/}
-      <Autocomplete
-        id="token-select-compra"
-        sx={{ width: 300 }}
-        options={getTokens}
-        getOptionDisabled={(option) =>
-          option === getTokenVenta ||
-          (option.estado == Estados.suspendido &&
-            getTabValue != NavMenu.miHistorial)
-        }
-        value={getTokenCompra}
-        onChange={handleChangeTokenCompra}
-        autoHighlight
-        getOptionLabel={(option: any) => option.ticker}
-        renderOption={(props, option) => (
-          <Box
-            component="li"
-            sx={{ '& > img': { mr: 2, flexShrink: 0 } }}
-            {...props}
-          >
-            <img
-              loading="lazy"
-              width="20"
-              src={`https://aux3.iconspalace.com/uploads/673308030241043147.png`}
-              srcSet={`https://aux3.iconspalace.com/uploads/673308030241043147.png 2x`}
-              alt=""
-            />
-            {option.ticker}
-          </Box>
-        )}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            label="Token a Recibir"
-            inputProps={{
-              ...params.inputProps,
-              autoComplete: 'new-password', // disable autocomplete and autofill
+        </Grid>
+        <Grid item sx={{ mt: 1, px: 2 }}>
+          <Button variant="contained" onClick={handleChangeTokenButton}>
+            <CurrencyExchangeIcon />
+          </Button>
+        </Grid>
+        <Grid item>
+          <Autocomplete
+            id="token-select-compra"
+            sx={{ width: 300 }}
+            options={getTokens}
+            value={getTokenCompra}
+            onChange={(event: any, newValue: Tokens | null) => {
+              setTokenCompra(newValue)
             }}
+            getOptionDisabled={(option) =>
+              option === getTokenVenta ||
+              (option.estado == Estados.suspendido &&
+                getTabValue != NavMenu.miHistorial)
+            }
+            autoHighlight
+            getOptionLabel={(option: any) => option.ticker}
+            renderOption={(props, option) => (
+              <Box
+                component="li"
+                sx={{ '& > img': { mr: 2, flexShrink: 0 } }}
+                {...props}
+              >
+                {/*   <img
+                  loading="lazy"
+                  width="20"
+                  src={`https://aux3.iconspalace.com/uploads/673308030241043147.png`}
+                  srcSet={`https://aux3.iconspalace.com/uploads/673308030241043147.png 2x`}
+                  alt=""
+                /> */}
+                {option.ticker}
+              </Box>
+            )}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Token a Recibir"
+                inputProps={{
+                  ...params.inputProps,
+                  autoComplete: 'new-password', // disable autocomplete and autofill
+                }}
+              />
+            )}
           />
-        )}
-      />
-      <TextField
-        id="txt-monto-venta"
-        label="Monto de Venta"
-        variant="outlined"
-        value={getMontoVenta}
-        onChange={(e) => setMontoVenta(BigInt(e.target.value))}
-      />
-      <TextField
-        id="txt-monto-compra"
-        label="Monto de Compra"
-        variant="outlined"
-        value={getMontoCompra}
-        onChange={(e) => setMontoCompra(BigInt(e.target.value))}
-      />
-      <Select
-        labelId="simple-select-label-tipo-orden"
-        id="simple-select-tipo-orden"
-        value={getTipoOrden}
-        label="Tipo Orden"
-        onChange={handleChangeSelect}
-      >
-        <MenuItem value={TiposOrdenes.todas}>Todas</MenuItem>
-        <MenuItem value={TiposOrdenes.compraVenta}>Compra-Venta</MenuItem>
-        <MenuItem value={TiposOrdenes.intercambio}>Intercambio</MenuItem>
-      </Select>
-      <Button variant="contained">Buscar</Button>
+        </Grid>
+        <Grid item sx={{ mt: 1, px: 2 }}>
+          {' '}
+          <Button
+            variant="contained"
+            onClick={() => {
+              setFiltrar(true)
+            }}
+          >
+            {'Filtrar'}
+          </Button>
+        </Grid>
+      </Grid>
+
+      <Grid container>
+        <Grid item>
+          <TextField
+            id="txt-monto-venta"
+            label="Monto de Venta"
+            variant="outlined"
+            type="number"
+            value={getMontoVenta}
+            onChange={(e) => setMontoVenta(BigInt(e.target.value))}
+          />
+        </Grid>
+        <Grid item>
+          <TextField
+            id="txt-monto-compra"
+            label="Monto de Compra"
+            variant="outlined"
+            type="number"
+            value={getMontoCompra}
+            onChange={(e) => setMontoCompra(BigInt(e.target.value))}
+          />
+        </Grid>
+        <Grid item>
+          <Select
+            labelId="simple-select-label-tipo-orden"
+            id="simple-select-tipo-orden"
+            value={getTipoOrden.toString()}
+            label="Tipo Orden"
+            onChange={handleChangeSelect}
+          >
+            <MenuItem value={TiposOrdenes.todas}>Todas</MenuItem>
+            <MenuItem value={TiposOrdenes.compraVenta}>Compra-Venta</MenuItem>
+            <MenuItem value={TiposOrdenes.intercambio}>Intercambio</MenuItem>
+          </Select>
+        </Grid>
+        <Grid item sx={{ mt: 1, px: 2 }}>
+          <Button variant="contained">Buscar</Button>
+        </Grid>
+      </Grid>
+
       {/* Tabla de ordenes */}
       {/* Tipo | Cantidad | Token | Cantidad | Token | Fecha */}
       <Paper sx={{ width: '100%' }}>
@@ -358,33 +397,23 @@ export default function ListaOrdenes() {
                       hover
                       role="checkbox"
                       tabIndex={-1}
-                      key={row.IdOrden + row.Tipo}
+                      key={row.idOrden}
                     >
-                      <TableCell key={row.idOrden} align="left">
-                        {row.idOrden}
-                      </TableCell>
-                      <TableCell key={row.tipo} align="left">
-                        {row.tipo}
-                      </TableCell>
-                      <TableCell
-                        key={row.idOrden + row.tokenVenta.ticker}
-                        align="left"
-                      >
+                      <TableCell align="left">{row.idOrden}</TableCell>
+                      <TableCell align="left">{row.tipo}</TableCell>
+                      <TableCell align="left">
                         {row.montoVenta.toString()}
                       </TableCell>
-                      <TableCell key={row.tokenVenta.ticker} align="left">
+                      <TableCell align="left">
                         {row.tokenVenta.ticker}
                       </TableCell>
-                      <TableCell
-                        key={row.idOrden + row.tokenCompra.ticker}
-                        align="left"
-                      >
+                      <TableCell align="left">
                         {row.montoCompra.toString()}
                       </TableCell>
-                      <TableCell key={row.tokenCompra.ticker} align="left">
+                      <TableCell align="left">
                         {row.tokenCompra.ticker}
                       </TableCell>
-                      <TableCell key={row.idOrden + 'acciones'} align="left">
+                      <TableCell align="left">
                         <ButtonGroup>
                           {row.vendedor.direccion ==
                             getBilleteraUsuario.direccion &&
