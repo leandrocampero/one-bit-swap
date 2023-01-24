@@ -138,16 +138,20 @@ export declare namespace Datos {
 export interface DatosInterface extends utils.Interface {
   functions: {
     "emptyString(string)": FunctionFragment;
+    "expBySquaring(int256,int256)": FunctionFragment;
     "ordenes()": FunctionFragment;
     "plataforma()": FunctionFragment;
+    "safeMulExp(int256,int256)": FunctionFragment;
     "tokensRegistrados(string)": FunctionFragment;
   };
 
   getFunction(
     nameOrSignatureOrTopic:
       | "emptyString"
+      | "expBySquaring"
       | "ordenes"
       | "plataforma"
+      | "safeMulExp"
       | "tokensRegistrados"
   ): FunctionFragment;
 
@@ -155,10 +159,18 @@ export interface DatosInterface extends utils.Interface {
     functionFragment: "emptyString",
     values: [PromiseOrValue<string>]
   ): string;
+  encodeFunctionData(
+    functionFragment: "expBySquaring",
+    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
+  ): string;
   encodeFunctionData(functionFragment: "ordenes", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "plataforma",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "safeMulExp",
+    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
     functionFragment: "tokensRegistrados",
@@ -169,8 +181,13 @@ export interface DatosInterface extends utils.Interface {
     functionFragment: "emptyString",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "expBySquaring",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "ordenes", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "plataforma", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "safeMulExp", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "tokensRegistrados",
     data: BytesLike
@@ -250,6 +267,12 @@ export interface Datos extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
+    expBySquaring(
+      number: PromiseOrValue<BigNumberish>,
+      exponent: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
     ordenes(
       overrides?: CallOverrides
     ): Promise<
@@ -269,6 +292,12 @@ export interface Datos extends BaseContract {
         montoMinimoUSD: BigNumber;
       }
     >;
+
+    safeMulExp(
+      number: PromiseOrValue<BigNumberish>,
+      exponent: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
     tokensRegistrados(
       arg0: PromiseOrValue<string>,
@@ -290,6 +319,12 @@ export interface Datos extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
+  expBySquaring(
+    number: PromiseOrValue<BigNumberish>,
+    exponent: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   ordenes(
     overrides?: CallOverrides
   ): Promise<
@@ -309,6 +344,12 @@ export interface Datos extends BaseContract {
       montoMinimoUSD: BigNumber;
     }
   >;
+
+  safeMulExp(
+    number: PromiseOrValue<BigNumberish>,
+    exponent: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   tokensRegistrados(
     arg0: PromiseOrValue<string>,
@@ -330,6 +371,12 @@ export interface Datos extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
+    expBySquaring(
+      number: PromiseOrValue<BigNumberish>,
+      exponent: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     ordenes(
       overrides?: CallOverrides
     ): Promise<
@@ -349,6 +396,12 @@ export interface Datos extends BaseContract {
         montoMinimoUSD: BigNumber;
       }
     >;
+
+    safeMulExp(
+      number: PromiseOrValue<BigNumberish>,
+      exponent: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     tokensRegistrados(
       arg0: PromiseOrValue<string>,
@@ -384,9 +437,21 @@ export interface Datos extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    expBySquaring(
+      number: PromiseOrValue<BigNumberish>,
+      exponent: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     ordenes(overrides?: CallOverrides): Promise<BigNumber>;
 
     plataforma(overrides?: CallOverrides): Promise<BigNumber>;
+
+    safeMulExp(
+      number: PromiseOrValue<BigNumberish>,
+      exponent: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     tokensRegistrados(
       arg0: PromiseOrValue<string>,
@@ -400,9 +465,21 @@ export interface Datos extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    expBySquaring(
+      number: PromiseOrValue<BigNumberish>,
+      exponent: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     ordenes(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     plataforma(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    safeMulExp(
+      number: PromiseOrValue<BigNumberish>,
+      exponent: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     tokensRegistrados(
       arg0: PromiseOrValue<string>,

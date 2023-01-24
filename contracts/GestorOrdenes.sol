@@ -6,8 +6,6 @@ import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "./Datos.sol";
 import "./GestorTokens.sol";
 
-//import "hardhat/console.sol";
-
 contract GestorOrdenes is Datos, GestorTokens {
   /**
    * @dev si el punto de partida es vacío, arranca por la última orden
@@ -215,6 +213,11 @@ contract GestorOrdenes is Datos, GestorTokens {
   ) public plataformaActiva billeteraActiva returns (bool exito) {
     Orden storage ordenEjecutada = ordenes.archivo[_idOrden];
 
+    require(
+      ordenEjecutada.existe,
+      "La orden a ejecutar no existe o el Id es incorrecto"
+    );
+
     // Comprador diferente a vendedor
     require(
       msg.sender != ordenEjecutada.vendedor,
@@ -252,7 +255,8 @@ contract GestorOrdenes is Datos, GestorTokens {
         "No se pudo obtener datos de cotizacion"
       );
 
-      uint256 exponenteDecimales;
+      int256 exponenteDecimales;
+
       {
         uint256 decimalesTokenVenta = tokensRegistrados[
           ordenEjecutada.tokenVenta
@@ -261,17 +265,23 @@ contract GestorOrdenes is Datos, GestorTokens {
           ordenEjecutada.tokenCompra
         ].decimales;
 
-        exponenteDecimales =
-          decimalesTokenCompra +
-          decimalesPrecioTokenCompra -
-          decimalesTokenVenta -
-          decimalesPrecioTokenVenta;
+        unchecked {
+          exponenteDecimales = int256(
+            decimalesTokenCompra +
+              decimalesPrecioTokenCompra -
+              decimalesTokenVenta -
+              decimalesPrecioTokenVenta
+          );
+        }
       }
 
-      ordenEjecutada.montoCompra =
-        ((ordenEjecutada.montoVenta * uint256(precioTokenVenta)) /
-          uint256(precioTokenCompra)) *
-        10 ** exponenteDecimales;
+      ordenEjecutada.montoCompra = uint256(
+        safeMulExp(
+          (int256(ordenEjecutada.montoVenta) * precioTokenVenta) /
+            precioTokenCompra,
+          exponenteDecimales
+        )
+      );
     }
 
     /**************************************************************************/

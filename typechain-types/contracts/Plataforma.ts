@@ -151,6 +151,7 @@ export interface PlataformaInterface extends utils.Interface {
     "ejecutarOrden(bytes32)": FunctionFragment;
     "emptyString(string)": FunctionFragment;
     "establecerMontoMinimo(uint256)": FunctionFragment;
+    "expBySquaring(int256,int256)": FunctionFragment;
     "hacerAdministrador(address)": FunctionFragment;
     "listarAdministradores()": FunctionFragment;
     "listarBilleterasBloqueadas()": FunctionFragment;
@@ -163,6 +164,7 @@ export interface PlataformaInterface extends utils.Interface {
     "ordenes()": FunctionFragment;
     "plataforma()": FunctionFragment;
     "quitarAdministrador(address)": FunctionFragment;
+    "safeMulExp(int256,int256)": FunctionFragment;
     "suspenderToken(string)": FunctionFragment;
     "tokensRegistrados(string)": FunctionFragment;
   };
@@ -181,6 +183,7 @@ export interface PlataformaInterface extends utils.Interface {
       | "ejecutarOrden"
       | "emptyString"
       | "establecerMontoMinimo"
+      | "expBySquaring"
       | "hacerAdministrador"
       | "listarAdministradores"
       | "listarBilleterasBloqueadas"
@@ -193,6 +196,7 @@ export interface PlataformaInterface extends utils.Interface {
       | "ordenes"
       | "plataforma"
       | "quitarAdministrador"
+      | "safeMulExp"
       | "suspenderToken"
       | "tokensRegistrados"
   ): FunctionFragment;
@@ -251,6 +255,10 @@ export interface PlataformaInterface extends utils.Interface {
     values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
+    functionFragment: "expBySquaring",
+    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
     functionFragment: "hacerAdministrador",
     values: [PromiseOrValue<string>]
   ): string;
@@ -300,6 +308,10 @@ export interface PlataformaInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "quitarAdministrador",
     values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "safeMulExp",
+    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
     functionFragment: "suspenderToken",
@@ -359,6 +371,10 @@ export interface PlataformaInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "expBySquaring",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "hacerAdministrador",
     data: BytesLike
   ): Result;
@@ -394,6 +410,7 @@ export interface PlataformaInterface extends utils.Interface {
     functionFragment: "quitarAdministrador",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "safeMulExp", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "suspenderToken",
     data: BytesLike
@@ -533,6 +550,12 @@ export interface Plataforma extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    expBySquaring(
+      number: PromiseOrValue<BigNumberish>,
+      exponent: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
     hacerAdministrador(
       _billetera: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -606,6 +629,12 @@ export interface Plataforma extends BaseContract {
       _billetera: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
+
+    safeMulExp(
+      number: PromiseOrValue<BigNumberish>,
+      exponent: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
     suspenderToken(
       _ticker: PromiseOrValue<string>,
@@ -688,6 +717,12 @@ export interface Plataforma extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
+  expBySquaring(
+    number: PromiseOrValue<BigNumberish>,
+    exponent: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   hacerAdministrador(
     _billetera: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -761,6 +796,12 @@ export interface Plataforma extends BaseContract {
     _billetera: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
+
+  safeMulExp(
+    number: PromiseOrValue<BigNumberish>,
+    exponent: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   suspenderToken(
     _ticker: PromiseOrValue<string>,
@@ -839,6 +880,12 @@ export interface Plataforma extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
+    expBySquaring(
+      number: PromiseOrValue<BigNumberish>,
+      exponent: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     hacerAdministrador(
       _billetera: PromiseOrValue<string>,
       overrides?: CallOverrides
@@ -912,6 +959,12 @@ export interface Plataforma extends BaseContract {
       _billetera: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<boolean>;
+
+    safeMulExp(
+      number: PromiseOrValue<BigNumberish>,
+      exponent: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     suspenderToken(
       _ticker: PromiseOrValue<string>,
@@ -1008,6 +1061,12 @@ export interface Plataforma extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
+    expBySquaring(
+      number: PromiseOrValue<BigNumberish>,
+      exponent: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     hacerAdministrador(
       _billetera: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -1058,6 +1117,12 @@ export interface Plataforma extends BaseContract {
     quitarAdministrador(
       _billetera: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    safeMulExp(
+      number: PromiseOrValue<BigNumberish>,
+      exponent: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     suspenderToken(
@@ -1133,6 +1198,12 @@ export interface Plataforma extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
+    expBySquaring(
+      number: PromiseOrValue<BigNumberish>,
+      exponent: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     hacerAdministrador(
       _billetera: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -1187,6 +1258,12 @@ export interface Plataforma extends BaseContract {
     quitarAdministrador(
       _billetera: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    safeMulExp(
+      number: PromiseOrValue<BigNumberish>,
+      exponent: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     suspenderToken(

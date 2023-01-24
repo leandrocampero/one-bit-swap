@@ -20,8 +20,8 @@
     "description": "Resaltado para código que tiene un comportamiento que puede devenir en errores"
   },
   "Error": {
-    "prefix": "fix error",
-    "body": ["// FIX ERROR: "],
+    "prefix": "error",
+    "body": ["// ERROR: "],
     "description": "Resaltado para código que tiene errores al ejecutarse y debe repararse"
   }
 }
