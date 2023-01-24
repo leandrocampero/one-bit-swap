@@ -307,10 +307,6 @@ describe('OneBitSwap', function () {
     })
 
     it('Ejecutar una orden de intercambio y comprobar la transferencia de fondos', async function () {
-      /**
-       * TODO: hay que controlar que los que ejecutan sean diferentes a los vendedores
-       * y que solo pueden cancelar los dueños de las ordenes
-       */
       await expect(
         tokenCompra
           .connect(comprador)

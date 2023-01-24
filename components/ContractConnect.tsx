@@ -11,7 +11,7 @@ export default function ContractConnect() {
 
     adapter.iniciar()
 
-    setResultado(await adapter.listarTokens(true))
+    setResultado(await adapter.tokens(true))
   }
 
   return (

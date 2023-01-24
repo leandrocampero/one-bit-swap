@@ -37,6 +37,7 @@ export default class BlockchainAdapter {
   public static instanciar(): BlockchainAdapter {
     if (!this._gestor) {
       BlockchainAdapter._gestor = new BlockchainAdapter()
+      BlockchainAdapter._gestor.iniciar()
     }
 
     return BlockchainAdapter._gestor
@@ -80,42 +81,6 @@ export default class BlockchainAdapter {
       return error
     }
   }
-
-  // /**
-  //  * @function iniciar inicia los elementos de ethers necesarios para interactuar con el contrato
-  //  * @returns {Error | null} devuelve error si no se pudo iniciar y nulo si todo está en orden
-  //  */
-  // public async iniciarPruebas(): Promise<Error | null> {
-  //   if (NODE_ENV != 'test') {
-  //     return Error(ERROR_DESCONOCIDO)
-  //   }
-
-  //   try {
-  //     if (!TEST_LOCAL_PRIVATE_KEY) {
-  //       throw Error(ERROR_TESTING_PRIVATE_KEY)
-  //     }
-
-  //     if (!PLATFORM_CONTRACT_ADDRESS) {
-  //       throw Error(ERROR_NO_CONTRACT_ADDRESS)
-  //     }
-
-  //     this._provider = new ethers.providers.JsonRpcProvider(
-  //       'http://localhost:8545'
-  //     )
-
-  //     this._signer = new ethers.Wallet(TEST_LOCAL_PRIVATE_KEY, this._provider)
-
-  //     this._contract = new ethers.Contract(
-  //       PLATFORM_CONTRACT_ADDRESS,
-  //       Plataforma.abi,
-  //       this._signer
-  //     ) as IPlataforma
-
-  //     return null
-  //   } catch (error: any) {
-  //     return error
-  //   }
-  // }
 
   /**
    * Método para solicitar permisos a la billetera para ver sus datos

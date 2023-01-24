@@ -1,6 +1,6 @@
 import ContractConnect from '@components/ContractConnect'
-import ListaOrdenes from '@components/ListaOrdenes'
-import CrearOrden from '@components/Ordenes/CrearOrden'
+import CrearOrden from '@components/Ordenes/crearOrden'
+import ListaOrdenes from '@components/listaOrdenes'
 import { Box, Grid } from '@mui/material'
 import { grey } from '@mui/material/colors'
 import styles from '@styles/layout.module.scss'
