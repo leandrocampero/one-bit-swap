@@ -142,12 +142,14 @@ export interface GestorBilleterasInterface extends utils.Interface {
     "bloquearBilletera(address)": FunctionFragment;
     "desbloquearBilletera(address)": FunctionFragment;
     "emptyString(string)": FunctionFragment;
+    "expBySquaring(int256,int256)": FunctionFragment;
     "hacerAdministrador(address)": FunctionFragment;
     "listarAdministradores()": FunctionFragment;
     "listarBilleterasBloqueadas()": FunctionFragment;
     "ordenes()": FunctionFragment;
     "plataforma()": FunctionFragment;
     "quitarAdministrador(address)": FunctionFragment;
+    "safeMulExp(int256,int256)": FunctionFragment;
     "tokensRegistrados(string)": FunctionFragment;
   };
 
@@ -156,12 +158,14 @@ export interface GestorBilleterasInterface extends utils.Interface {
       | "bloquearBilletera"
       | "desbloquearBilletera"
       | "emptyString"
+      | "expBySquaring"
       | "hacerAdministrador"
       | "listarAdministradores"
       | "listarBilleterasBloqueadas"
       | "ordenes"
       | "plataforma"
       | "quitarAdministrador"
+      | "safeMulExp"
       | "tokensRegistrados"
   ): FunctionFragment;
 
@@ -176,6 +180,10 @@ export interface GestorBilleterasInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "emptyString",
     values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "expBySquaring",
+    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
     functionFragment: "hacerAdministrador",
@@ -199,6 +207,10 @@ export interface GestorBilleterasInterface extends utils.Interface {
     values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
+    functionFragment: "safeMulExp",
+    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
     functionFragment: "tokensRegistrados",
     values: [PromiseOrValue<string>]
   ): string;
@@ -213,6 +225,10 @@ export interface GestorBilleterasInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "emptyString",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "expBySquaring",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -233,6 +249,7 @@ export interface GestorBilleterasInterface extends utils.Interface {
     functionFragment: "quitarAdministrador",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "safeMulExp", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "tokensRegistrados",
     data: BytesLike
@@ -322,6 +339,12 @@ export interface GestorBilleteras extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
+    expBySquaring(
+      number: PromiseOrValue<BigNumberish>,
+      exponent: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
     hacerAdministrador(
       _billetera: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -360,6 +383,12 @@ export interface GestorBilleteras extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    safeMulExp(
+      number: PromiseOrValue<BigNumberish>,
+      exponent: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
     tokensRegistrados(
       arg0: PromiseOrValue<string>,
       overrides?: CallOverrides
@@ -389,6 +418,12 @@ export interface GestorBilleteras extends BaseContract {
     _string: PromiseOrValue<string>,
     overrides?: CallOverrides
   ): Promise<boolean>;
+
+  expBySquaring(
+    number: PromiseOrValue<BigNumberish>,
+    exponent: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   hacerAdministrador(
     _billetera: PromiseOrValue<string>,
@@ -428,6 +463,12 @@ export interface GestorBilleteras extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
+  safeMulExp(
+    number: PromiseOrValue<BigNumberish>,
+    exponent: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   tokensRegistrados(
     arg0: PromiseOrValue<string>,
     overrides?: CallOverrides
@@ -457,6 +498,12 @@ export interface GestorBilleteras extends BaseContract {
       _string: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<boolean>;
+
+    expBySquaring(
+      number: PromiseOrValue<BigNumberish>,
+      exponent: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     hacerAdministrador(
       _billetera: PromiseOrValue<string>,
@@ -495,6 +542,12 @@ export interface GestorBilleteras extends BaseContract {
       _billetera: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<boolean>;
+
+    safeMulExp(
+      number: PromiseOrValue<BigNumberish>,
+      exponent: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     tokensRegistrados(
       arg0: PromiseOrValue<string>,
@@ -540,6 +593,12 @@ export interface GestorBilleteras extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    expBySquaring(
+      number: PromiseOrValue<BigNumberish>,
+      exponent: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     hacerAdministrador(
       _billetera: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -556,6 +615,12 @@ export interface GestorBilleteras extends BaseContract {
     quitarAdministrador(
       _billetera: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    safeMulExp(
+      number: PromiseOrValue<BigNumberish>,
+      exponent: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     tokensRegistrados(
@@ -580,6 +645,12 @@ export interface GestorBilleteras extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    expBySquaring(
+      number: PromiseOrValue<BigNumberish>,
+      exponent: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     hacerAdministrador(
       _billetera: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -600,6 +671,12 @@ export interface GestorBilleteras extends BaseContract {
     quitarAdministrador(
       _billetera: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    safeMulExp(
+      number: PromiseOrValue<BigNumberish>,
+      exponent: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     tokensRegistrados(

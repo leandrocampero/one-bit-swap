@@ -166,4 +166,34 @@ abstract contract Datos {
     bytes memory bytesArray = bytes(_string);
     return bytesArray.length == 0;
   }
+
+  /**
+   * @notice devuelve el resultado de una multiplicación exponencial decimal (n*10^e) de manera segura
+   * @dev contempla exponentes negativos, además de usar el algoritmo de potencia por cuadrados
+   */
+  function safeMulExp(
+    int256 number,
+    int256 exponent
+  ) public pure returns (int256) {
+    if (exponent == 0) {
+      return number;
+    } else if (exponent > 0) {
+      return number * expBySquaring(10, exponent);
+    } else {
+      return number / expBySquaring(10, -exponent);
+    }
+  }
+
+  function expBySquaring(
+    int256 number,
+    int256 exponent
+  ) public pure returns (int256) {
+    if (exponent == 0) {
+      return 1;
+    } else if (exponent % 2 == 0) {
+      return expBySquaring(number * number, exponent / 2);
+    } else {
+      return number * expBySquaring(number * number, (exponent - 1) / 2);
+    }
+  }
 }

@@ -217,6 +217,30 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [
+      {
+        internalType: "int256",
+        name: "number",
+        type: "int256",
+      },
+      {
+        internalType: "int256",
+        name: "exponent",
+        type: "int256",
+      },
+    ],
+    name: "expBySquaring",
+    outputs: [
+      {
+        internalType: "int256",
+        name: "",
+        type: "int256",
+      },
+    ],
+    stateMutability: "pure",
+    type: "function",
+  },
+  {
     inputs: [],
     name: "ordenes",
     outputs: [
@@ -260,6 +284,30 @@ const _abi = [
       },
     ],
     stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "int256",
+        name: "number",
+        type: "int256",
+      },
+      {
+        internalType: "int256",
+        name: "exponent",
+        type: "int256",
+      },
+    ],
+    name: "safeMulExp",
+    outputs: [
+      {
+        internalType: "int256",
+        name: "",
+        type: "int256",
+      },
+    ],
+    stateMutability: "pure",
     type: "function",
   },
   {
