@@ -7,7 +7,7 @@ import {
   NOMBRE_TOKEN_SESION,
 } from '@lib/constants/mensajes'
 import { TiposOrdenes } from '@lib/types.d'
-import dotenv from 'dotenv'
+
 import { BigNumber, ethers } from 'ethers'
 import { Datos, Plataforma as IPlataforma } from '../typechain-types/'
 import {
@@ -16,7 +16,6 @@ import {
   formatArrayTokens,
 } from './helpers'
 import { Session } from './types'
-dotenv.config()
 
 const { PLATFORM_CONTRACT_ADDRESS } = process.env
 
