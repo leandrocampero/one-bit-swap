@@ -4,7 +4,7 @@ import { RolesBilleteras } from '@lib/types.d'
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet'
 import LogoutIcon from '@mui/icons-material/Logout'
 import SettingsIcon from '@mui/icons-material/Settings'
-import { Button, Menu, MenuItem, MenuProps, styled } from '@mui/material'
+import { Button, Menu, MenuProps, styled } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import { ethers } from 'ethers'
 import Link from 'next/link'
@@ -164,28 +164,33 @@ export default function ConectarWallet() {
             {addressRecortada}
           </Button>
 
-          <StyledMenu
-            id="demo-customized-menu"
-            MenuListProps={{
-              'aria-labelledby': 'demo-customized-button',
-            }}
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleClose}
+          {rol != 0 ? (
+            <Button
+              id="demo-customized-button"
+              aria-controls={open ? 'demo-customized-menu' : undefined}
+              aria-haspopup="true"
+              aria-expanded={open ? 'true' : undefined}
+              variant="contained"
+              disableElevation
+              onClick={handleClick}
+              startIcon={<SettingsIcon />}
+            >
+              <Link href="/configuracion">Configuracion</Link>
+            </Button>
+          ) : null}
+
+          <Button
+            id="demo-customized-button"
+            aria-controls={open ? 'demo-customized-menu' : undefined}
+            aria-haspopup="true"
+            aria-expanded={open ? 'true' : undefined}
+            variant="contained"
+            disableElevation
+            onClick={cerrarSesion}
+            startIcon={<LogoutIcon />}
           >
-            {rol != 0 ? (
-              <Link href="configuracion">
-                <MenuItem disableRipple>
-                  <SettingsIcon />
-                  Configuracion
-                </MenuItem>
-              </Link>
-            ) : null}
-            <MenuItem onClick={cerrarSesion} disableRipple>
-              <LogoutIcon />
-              Desconectar Billetera
-            </MenuItem>
-          </StyledMenu>
+            Desconectar Billetera
+          </Button>
         </>
       )}
     </div>
