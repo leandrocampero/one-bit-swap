@@ -1,0 +1,10 @@
+$base-color: floralwhite;
+
+.base {
+  background-color: $base-color;
+  color: steelblue;
+
+  &:hover {
+    background-color: darken($color: $base-color, $amount: 5%);
+  }
+}
