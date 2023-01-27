@@ -1,12 +1,17 @@
 {
-  "name": "nextjs",
-  "version": "0.1.0",
+  "name": "@one-bit-swap/nextjs",
+  "version": "1.0.0",
+  "description": "Repositorio de aplicación cliente para el proyecto One-Bit-Swap",
+  "main": "index.js",
+  "author": "L. Campero, E. Román, J. Sas",
+  "license": "MIT",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "echo \"Working in progress...\""
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",

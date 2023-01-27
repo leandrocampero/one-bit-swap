@@ -1,0 +1,30 @@
+{
+  "name": "@one-bit-swap/monorepo",
+  "version": "1.0.0",
+  "description": "Monorepo del proyecto de graduación titulado \"Plataforma Descentralizada para Intercambio de Criptomonedas\" para acceder al título de Ingenieros en Computación",
+  "author": "L. Campero, E. Román, J. Sas",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "chain": "yarn workspace @one-bit-swap/hardhat chain",
+    "compile": "yarn workspace @one-bit-swap/hardhat compile",
+    "deploy": "yarn workspace @one-bit-swap/hardhat deploy",
+    "deploy-and-fill": "yarn workspace @one-bit-swap/hardhat fill",
+    "dev": "yarn workspace @one-bit-swap/nextjs dev",
+    "build": "yarn workspace @one-bit-swap/nextjs build",
+    "start": "yarn workspace @one-bit-swap/nextjs start",
+    "test:contracts": "yarn workspace @one-bit-swap/hardhat test",
+    "test:client": "yarn workspace @one-bit-swap/nextjs test"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.49.0",
+    "@typescript-eslint/parser": "^5.49.0",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-import-resolver-typescript": "^3.5.3",
+    "eslint-plugin-prettier": "^4.2.1",
+    "prettier": "^2.8.3"
+  }
+}
