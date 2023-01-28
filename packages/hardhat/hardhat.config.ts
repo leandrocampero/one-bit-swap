@@ -1,5 +1,6 @@
 import '@nomicfoundation/hardhat-toolbox'
 import dotenv from 'dotenv'
+import 'hardhat-abi-exporter'
 import { HardhatUserConfig } from 'hardhat/config'
 
 dotenv.config()
@@ -44,6 +45,13 @@ const config: HardhatUserConfig = {
   },
   paths: {
     tests: './test',
+  },
+  abiExporter: {
+    path: './../nextjs/src/contracts/',
+    runOnCompile: true,
+    clear: true,
+    only: [':Plataforma$', ':ERC20$'],
+    format: 'json',
   },
 }
 

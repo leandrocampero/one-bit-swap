@@ -9,6 +9,7 @@
     "packages/*"
   ],
   "scripts": {
+    "clean": "yarn workspace @one-bit-swap/hardhat clean",
     "chain": "yarn workspace @one-bit-swap/hardhat chain",
     "compile": "yarn workspace @one-bit-swap/hardhat compile",
     "deploy": "yarn workspace @one-bit-swap/hardhat deploy",
