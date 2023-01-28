@@ -1,0 +1,42 @@
+{
+  "name": "@one-bit-swap/nextjs",
+  "version": "1.0.0",
+  "description": "Repositorio de aplicación cliente para el proyecto One-Bit-Swap",
+  "main": "index.js",
+  "author": "L. Campero, E. Román, J. Sas",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "echo \"Working in progress...\""
+  },
+  "dependencies": {
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
+    "@mui/icons-material": "^5.11.0",
+    "@mui/material": "^5.11.6",
+    "@next/font": "13.1.5",
+    "@types/node": "18.11.18",
+    "@types/react": "18.0.27",
+    "@types/react-dom": "18.0.10",
+    "eslint": "8.32.0",
+    "eslint-config-next": "13.1.5",
+    "next": "13.1.5",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "sass": "^1.57.1",
+    "typescript": "4.9.4"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.49.0",
+    "@typescript-eslint/parser": "^5.49.0",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-import-resolver-typescript": "^3.5.3",
+    "eslint-plugin-prettier": "^4.2.1",
+    "ethers": "^5.7.2",
+    "prettier": "^2.8.3"
+  }
+}

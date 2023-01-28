@@ -1,0 +1,1324 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_montoMinimo",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "bytes32",
+            "name": "idOrden",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "siguienteOrdenActiva",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "anteriorOrdenActiva",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "siguienteOrdenGemela",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "anteriorOrdenGemela",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "address",
+            "name": "vendedor",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "comprador",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "montoVenta",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "montoCompra",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "fechaCreacion",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "fechaFinalizacion",
+            "type": "uint256"
+          },
+          {
+            "internalType": "enum Datos.EstadoOrden",
+            "name": "estado",
+            "type": "uint8"
+          },
+          {
+            "internalType": "enum Datos.TipoOrden",
+            "name": "tipo",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bool",
+            "name": "existe",
+            "type": "bool"
+          },
+          {
+            "internalType": "string",
+            "name": "tokenCompra",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "tokenVenta",
+            "type": "string"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct Datos.Orden",
+        "name": "respuesta",
+        "type": "tuple"
+      }
+    ],
+    "name": "NuevaOrden",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "direccion",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "indiceAdmin",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "indiceBloqueado",
+            "type": "uint256"
+          },
+          {
+            "internalType": "enum Datos.RolBilletera",
+            "name": "rol",
+            "type": "uint8"
+          },
+          {
+            "internalType": "enum Datos.EstadoGeneral",
+            "name": "estado",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bool",
+            "name": "existe",
+            "type": "bool"
+          },
+          {
+            "internalType": "string[]",
+            "name": "ordenes",
+            "type": "string[]"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct Datos.Billetera",
+        "name": "respuesta",
+        "type": "tuple"
+      }
+    ],
+    "name": "NuevoAdministrador",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "string",
+            "name": "ticker",
+            "type": "string"
+          },
+          {
+            "internalType": "address",
+            "name": "contrato",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "oraculo",
+            "type": "address"
+          },
+          {
+            "internalType": "uint8",
+            "name": "decimales",
+            "type": "uint8"
+          },
+          {
+            "internalType": "enum Datos.EstadoGeneral",
+            "name": "estado",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bool",
+            "name": "existe",
+            "type": "bool"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct Datos.Token",
+        "name": "respuesta",
+        "type": "tuple"
+      }
+    ],
+    "name": "NuevoToken",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_ticker",
+        "type": "string"
+      }
+    ],
+    "name": "activarToken",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "resultado",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_billetera",
+        "type": "address"
+      }
+    ],
+    "name": "bloquearBilletera",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "modificado",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "bloquearPlataforma",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "_idOrden",
+        "type": "bytes32"
+      }
+    ],
+    "name": "buscarOrden",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "bytes32",
+            "name": "idOrden",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "siguienteOrdenActiva",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "anteriorOrdenActiva",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "siguienteOrdenGemela",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "anteriorOrdenGemela",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "address",
+            "name": "vendedor",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "comprador",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "montoVenta",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "montoCompra",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "fechaCreacion",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "fechaFinalizacion",
+            "type": "uint256"
+          },
+          {
+            "internalType": "enum Datos.EstadoOrden",
+            "name": "estado",
+            "type": "uint8"
+          },
+          {
+            "internalType": "enum Datos.TipoOrden",
+            "name": "tipo",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bool",
+            "name": "existe",
+            "type": "bool"
+          },
+          {
+            "internalType": "string",
+            "name": "tokenCompra",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "tokenVenta",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct Datos.Orden",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_tokenCompra",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_tokenVenta",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_montoCompra",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_montoVenta",
+        "type": "uint256"
+      }
+    ],
+    "name": "buscarOrdenGemela",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "bytes32",
+            "name": "idOrden",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "siguienteOrdenActiva",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "anteriorOrdenActiva",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "siguienteOrdenGemela",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "anteriorOrdenGemela",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "address",
+            "name": "vendedor",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "comprador",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "montoVenta",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "montoCompra",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "fechaCreacion",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "fechaFinalizacion",
+            "type": "uint256"
+          },
+          {
+            "internalType": "enum Datos.EstadoOrden",
+            "name": "estado",
+            "type": "uint8"
+          },
+          {
+            "internalType": "enum Datos.TipoOrden",
+            "name": "tipo",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bool",
+            "name": "existe",
+            "type": "bool"
+          },
+          {
+            "internalType": "string",
+            "name": "tokenCompra",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "tokenVenta",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct Datos.Orden",
+        "name": "orden",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "_idOrden",
+        "type": "bytes32"
+      }
+    ],
+    "name": "cancelarOrden",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "exito",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_ticker",
+        "type": "string"
+      }
+    ],
+    "name": "consultarCotizacion",
+    "outputs": [
+      {
+        "internalType": "int256",
+        "name": "precio",
+        "type": "int256"
+      },
+      {
+        "internalType": "uint8",
+        "name": "decimales",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_billetera",
+        "type": "address"
+      }
+    ],
+    "name": "desbloquearBilletera",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "modificado",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "desbloquearPlataforma",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "_idOrden",
+        "type": "bytes32"
+      }
+    ],
+    "name": "ejecutarOrden",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "exito",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_string",
+        "type": "string"
+      }
+    ],
+    "name": "emptyString",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_monto",
+        "type": "uint256"
+      }
+    ],
+    "name": "establecerMontoMinimo",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "int256",
+        "name": "number",
+        "type": "int256"
+      },
+      {
+        "internalType": "int256",
+        "name": "exponent",
+        "type": "int256"
+      }
+    ],
+    "name": "expBySquaring",
+    "outputs": [
+      {
+        "internalType": "int256",
+        "name": "",
+        "type": "int256"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_billetera",
+        "type": "address"
+      }
+    ],
+    "name": "hacerAdministrador",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "modificado",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "listarAdministradores",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "direccion",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "indiceAdmin",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "indiceBloqueado",
+            "type": "uint256"
+          },
+          {
+            "internalType": "enum Datos.RolBilletera",
+            "name": "rol",
+            "type": "uint8"
+          },
+          {
+            "internalType": "enum Datos.EstadoGeneral",
+            "name": "estado",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bool",
+            "name": "existe",
+            "type": "bool"
+          },
+          {
+            "internalType": "string[]",
+            "name": "ordenes",
+            "type": "string[]"
+          }
+        ],
+        "internalType": "struct Datos.Billetera[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "listarBilleterasBloqueadas",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "direccion",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "indiceAdmin",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "indiceBloqueado",
+            "type": "uint256"
+          },
+          {
+            "internalType": "enum Datos.RolBilletera",
+            "name": "rol",
+            "type": "uint8"
+          },
+          {
+            "internalType": "enum Datos.EstadoGeneral",
+            "name": "estado",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bool",
+            "name": "existe",
+            "type": "bool"
+          },
+          {
+            "internalType": "string[]",
+            "name": "ordenes",
+            "type": "string[]"
+          }
+        ],
+        "internalType": "struct Datos.Billetera[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "listarMisOrdenes",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "bytes32",
+            "name": "idOrden",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "siguienteOrdenActiva",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "anteriorOrdenActiva",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "siguienteOrdenGemela",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "anteriorOrdenGemela",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "address",
+            "name": "vendedor",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "comprador",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "montoVenta",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "montoCompra",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "fechaCreacion",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "fechaFinalizacion",
+            "type": "uint256"
+          },
+          {
+            "internalType": "enum Datos.EstadoOrden",
+            "name": "estado",
+            "type": "uint8"
+          },
+          {
+            "internalType": "enum Datos.TipoOrden",
+            "name": "tipo",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bool",
+            "name": "existe",
+            "type": "bool"
+          },
+          {
+            "internalType": "string",
+            "name": "tokenCompra",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "tokenVenta",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct Datos.Orden[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "_puntoPartida",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_ventana",
+        "type": "uint256"
+      }
+    ],
+    "name": "listarOrdenesActivas",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "bytes32",
+            "name": "idOrden",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "siguienteOrdenActiva",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "anteriorOrdenActiva",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "siguienteOrdenGemela",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "anteriorOrdenGemela",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "address",
+            "name": "vendedor",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "comprador",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "montoVenta",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "montoCompra",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "fechaCreacion",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "fechaFinalizacion",
+            "type": "uint256"
+          },
+          {
+            "internalType": "enum Datos.EstadoOrden",
+            "name": "estado",
+            "type": "uint8"
+          },
+          {
+            "internalType": "enum Datos.TipoOrden",
+            "name": "tipo",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bool",
+            "name": "existe",
+            "type": "bool"
+          },
+          {
+            "internalType": "string",
+            "name": "tokenCompra",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "tokenVenta",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct Datos.Orden[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bool",
+        "name": "_incluirSuspendidos",
+        "type": "bool"
+      }
+    ],
+    "name": "listarTokens",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "string",
+            "name": "ticker",
+            "type": "string"
+          },
+          {
+            "internalType": "address",
+            "name": "contrato",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "oraculo",
+            "type": "address"
+          },
+          {
+            "internalType": "uint8",
+            "name": "decimales",
+            "type": "uint8"
+          },
+          {
+            "internalType": "enum Datos.EstadoGeneral",
+            "name": "estado",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bool",
+            "name": "existe",
+            "type": "bool"
+          }
+        ],
+        "internalType": "struct Datos.Token[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_ticker",
+        "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "_oraculo",
+        "type": "address"
+      }
+    ],
+    "name": "modifcarOraculo",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "resultado",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_tokenCompra",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_tokenVenta",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_montoCompra",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_montoVenta",
+        "type": "uint256"
+      },
+      {
+        "internalType": "enum Datos.TipoOrden",
+        "name": "_tipo",
+        "type": "uint8"
+      }
+    ],
+    "name": "nuevaOrden",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "creada",
+        "type": "bool"
+      },
+      {
+        "components": [
+          {
+            "internalType": "bytes32",
+            "name": "idOrden",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "siguienteOrdenActiva",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "anteriorOrdenActiva",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "siguienteOrdenGemela",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "anteriorOrdenGemela",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "address",
+            "name": "vendedor",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "comprador",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "montoVenta",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "montoCompra",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "fechaCreacion",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "fechaFinalizacion",
+            "type": "uint256"
+          },
+          {
+            "internalType": "enum Datos.EstadoOrden",
+            "name": "estado",
+            "type": "uint8"
+          },
+          {
+            "internalType": "enum Datos.TipoOrden",
+            "name": "tipo",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bool",
+            "name": "existe",
+            "type": "bool"
+          },
+          {
+            "internalType": "string",
+            "name": "tokenCompra",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "tokenVenta",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct Datos.Orden",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_contrato",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_oraculo",
+        "type": "address"
+      }
+    ],
+    "name": "nuevoToken",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "ordenes",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "cantidadTotal",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "cantidadActivas",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "ultimaOrdenActiva",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "plataforma",
+    "outputs": [
+      {
+        "internalType": "enum Datos.EstadoGeneral",
+        "name": "estado",
+        "type": "uint8"
+      },
+      {
+        "internalType": "address",
+        "name": "propietario",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "montoMinimoUSD",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_billetera",
+        "type": "address"
+      }
+    ],
+    "name": "quitarAdministrador",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "modificado",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "int256",
+        "name": "number",
+        "type": "int256"
+      },
+      {
+        "internalType": "int256",
+        "name": "exponent",
+        "type": "int256"
+      }
+    ],
+    "name": "safeMulExp",
+    "outputs": [
+      {
+        "internalType": "int256",
+        "name": "",
+        "type": "int256"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_ticker",
+        "type": "string"
+      }
+    ],
+    "name": "suspenderToken",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "resultado",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "name": "tokensRegistrados",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "ticker",
+        "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "contrato",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "oraculo",
+        "type": "address"
+      },
+      {
+        "internalType": "uint8",
+        "name": "decimales",
+        "type": "uint8"
+      },
+      {
+        "internalType": "enum Datos.EstadoGeneral",
+        "name": "estado",
+        "type": "uint8"
+      },
+      {
+        "internalType": "bool",
+        "name": "existe",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

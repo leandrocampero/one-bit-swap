@@ -1,78 +1,98 @@
 # OneBitSwap
 
-Monorepo del proyecto de graduación titulado "Plataforma Decentralizada para Intercambio de Criptomonedas" para acceder al título de Ingenieros en Computación.
+Monorepo del proyecto de graduación titulado "Plataforma Descentralizada para Intercambio de Criptomonedas" para acceder al título de Ingenieros en Computación. El proyecto consiste en desarrollar una Plataforma web descentralizada que permita el intercambio de criptomonedas entre pares, de manera transparente y anónima. Donde los usuarios puedan conectarse con su billetera virtual y crear una orden de compra/venta de criptomonedas.
 
 ## Objetivos y alcances del proyecto
 
-El objetivo principal es desarrollar una plataforma web descentralizada para el intercambio de criptomonedas, que permita al usuario final conectarse a la misma con su wallet preferida y realizar órdenes de intercambio de criptomonedas a las cuales cualquier otro usuario pueda responder.
-La futura plataforma llevará el nombre de **_OneBitSwap_**, y debe ser desarrollada usando únicamente tecnologías web 3.0.
+- Aplicar conocimientos de Ingeniería de Software para el análisis , planificación y desarrollo de una aplicación web.
+- Aprender acerca del proceso de desarrollo y despliegue de aplicaciones sobre la Web 3.0.
+- Diseñar e implementar una plataforma que permita intercambiar criptomonedas de manera simple, rápida, transparente y anónima entre usuarios.
+- Aplicar tecnologías y marcos de trabajos de la Web 3.0, la cual se constituye como una serie de herramientas descentralizadas que permiten encarar de otra forma el flujo de información y de herramientas online a través de sistemas de validación de identidad y propiedad típicos de las blockchains.
 
 ## Implementación
 
-| Aspecto de implementación           | Tecnología                                                            |
+| Parte del sistema                   | Tecnología a utilizar                                                 |
 | ----------------------------------- | --------------------------------------------------------------------- |
 | Billetera digital                   | [Metamask](https://docs.metamask.io/guide/)                           |
 | Interfaz de usuario (Aplicación)    | [Next.js](https://nextjs.org/docs)                                    |
 | Lenguaje de desarrollo (Aplicación) | [Typescript](https://www.typescriptlang.org/docs/handbook/intro.html) |
-| Cliente Ethereum                    | [Ethers.js](https://docs.ethers.io/v5/)                               |
+| Cliente de blockchain               | [Ethers.js](https://docs.ethers.io/v5/)                               |
 | Entorno de desarrollo (Contratos)   | [Hardhat](https://hardhat.org/hardhat-runner/docs/getting-started)    |
 | Lenguaje de desarrollo (Contratos)  | [Solidity](https://docs.soliditylang.org/en/v0.8.17/)                 |
-| Blockchain                          | [Harmony](https://docs.harmony.one/home/developers/getting-started)   |
+| Blockchain para despliegue          | [Polygon](https://wiki.polygon.technology/)                           |
+| Proveedor de nodos                  | [Alchemy](https://docs.alchemy.com/reference/api-overview)            |
 | Oráculo                             | [Chainlink](https://chain.link/)                                      |
 | Servidor Web                        | [fleek](https://docs.fleek.co/)                                       |
 | Almacenamiento de archivos          | [IPFS](https://ipfs.tech/#install)                                    |
 | Entorno de desarrollo (IDE)         | [VSCode](https://code.visualstudio.com/)                              |
 | Repositorio colaborativo de código  | [Github](https://github.com/)                                         |
 
-## Contrato de Plataforma
+## Comandos básicos
 
-Algunas tareas básicas:
+```bash
+# Ejecutar tareas por paquete
+yarn workspace @one-bit-swap/<paquete> <tarea|comando>
 
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.ts
+# Comandos predefinidos
+yarn clean # limpiar archivos generados por hardhat para el deploy
+yarn chain # montar nodo local para pruebas
+yarn compile # compilar contratos
+yarn deploy # desplegar contrato (previamente compilado) en el nodo local (temporalmente)
+yarn deploy-fill # desplegar contrato ya poblado para pruebas del cliente
+yarn dev # ejecutar aplicación del cliente en modo desarrollo
+yarn build # construir aplicación para despliegue
+yarn start # iniciar aplicación ya construida
+yarn test:contracts # correr pruebas de contratos (tiene que correr el nodo local de hardhat)
+yarn test:client # correr pruebas de cliente (temporalmente deshabilidado)
 ```
-
----
-
-### Iteraciones
-
-#### Mumbai
-
-1. `0x89F32f0CFA18abf8C5a888829EE7ebaf103c927a` -> [Codigo](https://mumbai.polygonscan.com/address/0x89F32f0CFA18abf8C5a888829EE7ebaf103c927a#code)
 
 ---
 
 ## Archivo de variables de entorno
 
-```conf
-TESTNET_PRIVATE_KEY=privateKey
-MAINNET_PRIVATE_KEY=privateKey
-POLYGON_API_KEY=apikey
+```properties
+# Clave privada del propietario del contrato y plataforma
+OWNER_PRIVATE_KEY=privateKey
+
+# ApiKey de polygonscan para verificar contratos
+POLYGON_API_KEY=privateKey
+
+# ApiKey de Alchemy para usar el RPC propio
+ALCHEMY_API_KEY=apikey
 ```
 
 ---
 
 ## Scripts utilizados
 
+La siguiente sección muestra los comandos utilizados paso a paso para crear la aplicación
+
 ```bash
-yarn create next-app --typescript
-yarn eslint
+mkdir one-bit-swap && cd one-bit-swap
+git init
+mkdir packages
+mkdir packages/hardhat
+mkdir packages/nextjs
 
-yarn add --dev @typescript-eslint/parser @typescript-eslint/eslint-plugin eslint-import-resolver-typescript
-yarn add --dev prettier eslint-config-prettier eslint-plugin-prettier
-yarn add --dev husky
+# Hardhat (dentro del directorio)
+yarn init
+yarn add --dev hardhat dotenv hardhat-abi-exporter
+yarn hardhat # continuar los pasos para configurar un proyecto con typescript
+yarn add @openzeppelin/contracts @chainlink/contracts # agregar las librerias para tokens ERC20 y oraculos
 
-yarn run hardhat
-# Crear nuevo proyecto con Typescript, agregar gitignore
-# No instalar los paquetes que ofrece porque lo hace con npm
-# Se lo hace manual con yarn a continuación
-yarn add --dev @nomicfoundation/hardhat-toolbox @nomicfoundation/hardhat-network-helpers @nomicfoundation/hardhat-chai-matchers @nomiclabs/hardhat-ethers @nomiclabs/hardhat-etherscan chai ethers hardhat-gas-reporter solidity-coverage @typechain/hardhat typechain @typechain/ethers-v5 @ethersproject/abi @ethersproject/providers @types/mocha mocha ts-node hardhat
+# Nextjs (dentro de packages/)
+yarn create next-app --typescript nextjs
+cd nextjs
+yarn add @mui/material @emotion/react @emotion/styled @mui/icons-material
 
-yarn add dotenv # para ejecutar variables de entorno
-
-yarn add @openzeppelin/contracts @chainlink/contracts # para utilzar las interfaces de contratos de token ERC20 y el oraculo
+# Monorepo root
+touch package.json # archivo de configuracion para monorepo, tomando los espacios de trabajo dentro de packages
+yarn add --dev --ignore-workspace-root-check
+  @typescript-eslint/parser
+  @typescript-eslint/eslint-plugin
+  eslint-import-resolver-typescript
+  prettier
+  eslint-config-prettier
+  eslint-plugin-prettier
+yarn install
 ```
