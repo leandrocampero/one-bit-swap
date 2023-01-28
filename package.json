@@ -13,7 +13,7 @@
     "chain": "yarn workspace @one-bit-swap/hardhat chain",
     "compile": "yarn workspace @one-bit-swap/hardhat compile",
     "deploy": "yarn workspace @one-bit-swap/hardhat deploy",
-    "deploy-and-fill": "yarn workspace @one-bit-swap/hardhat fill",
+    "deploy-fill": "yarn workspace @one-bit-swap/hardhat fill",
     "dev": "yarn workspace @one-bit-swap/nextjs dev",
     "build": "yarn workspace @one-bit-swap/nextjs build",
     "start": "yarn workspace @one-bit-swap/nextjs start",
