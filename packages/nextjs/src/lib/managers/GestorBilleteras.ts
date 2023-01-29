@@ -1,5 +1,5 @@
-import Billeteras from 'lib/models/Billeteras'
-import { RolesBilleteras } from 'lib/types.d'
+import Billeteras from '@/lib/models/Billeteras'
+import { RolesBilleteras } from '@/lib/types.d'
 
 export default class GestorBilleteras {
   private _billeteras: Array<Billeteras>

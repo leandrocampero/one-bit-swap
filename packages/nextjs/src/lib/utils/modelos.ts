@@ -1,7 +1,7 @@
-import Billeteras from 'lib/models/Billeteras'
-import Ordenes from 'lib/models/Ordenes'
-import Tokens from 'lib/models/Tokens'
-import { Estados, RolesBilleteras, TiposOrdenes } from 'lib/types.d'
+import Billeteras from '@/lib/models/Billeteras'
+import Ordenes from '@/lib/models/Ordenes'
+import Tokens from '@/lib/models/Tokens'
+import { Estados, RolesBilleteras, TiposOrdenes } from '@/lib/types.d'
 
 // tokens
 // tokens desactivados

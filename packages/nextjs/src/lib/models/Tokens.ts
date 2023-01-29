@@ -1,4 +1,4 @@
-import BlockchainAdapter from 'lib/BlockchainAdapter'
+import BlockchainAdapter from '@/lib/BlockchainAdapter'
 import { Estados } from '../types.d'
 
 const adapter = BlockchainAdapter.instanciar()

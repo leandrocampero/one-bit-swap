@@ -1,12 +1,12 @@
 // https://docs.metamask.io/guide/ethereum-provider.html#using-the-provider
+import GestorBilleteras from '@/lib/managers/GestorBilleteras'
+import { RolesBilleteras } from '@/lib/types.d'
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet'
 import LogoutIcon from '@mui/icons-material/Logout'
 import SettingsIcon from '@mui/icons-material/Settings'
 import { Button, Menu, MenuProps, styled } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import { ethers } from 'ethers'
-import GestorBilleteras from 'lib/managers/GestorBilleteras'
-import { RolesBilleteras } from 'lib/types.d'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 

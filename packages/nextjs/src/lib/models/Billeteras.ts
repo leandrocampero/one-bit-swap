@@ -1,4 +1,4 @@
-import { Estados, RolesBilleteras } from 'lib/types.d'
+import { Estados, RolesBilleteras } from '@/lib/types.d'
 export default class Billeteras {
   private _direccion: string
   private _rol: RolesBilleteras

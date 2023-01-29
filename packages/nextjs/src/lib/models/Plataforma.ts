@@ -1,6 +1,6 @@
-import GestorBilleteras from 'lib/managers/GestorBilleteras'
-import GestorOrdenes from 'lib/managers/GestorOrdenes'
-import GestorTokens from 'lib/managers/GestorTokens'
+import GestorBilleteras from '@/lib/managers/GestorBilleteras'
+import GestorOrdenes from '@/lib/managers/GestorOrdenes'
+import GestorTokens from '@/lib/managers/GestorTokens'
 
 export default class Plataforma {
   private _estado: number

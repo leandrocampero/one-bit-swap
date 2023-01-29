@@ -1,4 +1,4 @@
-import { EstadosOrdenes, TiposOrdenes } from 'lib/types.d'
+import { EstadosOrdenes, TiposOrdenes } from '@/lib/types.d'
 import Billeteras from './Billeteras'
 import Tokens from './Tokens'
 

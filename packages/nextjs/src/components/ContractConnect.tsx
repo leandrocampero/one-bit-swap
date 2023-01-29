@@ -1,7 +1,7 @@
+import BlockchainAdapter from '@/lib/BlockchainAdapter'
 import Button from '@mui/material/Button'
-import BlockchainAdapter from 'lib/BlockchainAdapter'
+import { Datos } from '@one-bit-swap/hardhat/typechain-types/'
 import { useState } from 'react'
-import { Datos } from '../../../hardhat/typechain-types/'
 
 export default function ContractConnect() {
   const [resultado, setResultado] = useState<Datos.TokenStruct[]>([])

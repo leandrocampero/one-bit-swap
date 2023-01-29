@@ -1,4 +1,4 @@
-import Ordenes from 'lib/models/Ordenes'
+import Ordenes from '@/lib/models/Ordenes'
 export default class GestorOrdenes {
   private _ordenes: Array<Ordenes>
 

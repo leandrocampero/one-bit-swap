@@ -1,17 +1,17 @@
-import { BigNumber, ethers } from 'ethers'
 import {
   ERROR_DESCONOCIDO,
   ERROR_NO_CONTRACT_ADDRESS,
   ERROR_NO_METAMASK,
   ERROR_NO_SIGNER,
   NOMBRE_TOKEN_SESION,
-} from 'lib/constants/mensajes'
-import { TiposOrdenes } from 'lib/types.d'
-import Plataforma from '../../hardhat/artifacts/contracts/Plataforma.sol/Plataforma.json'
+} from '@/lib/constants/mensajes'
+import { TiposOrdenes } from '@/lib/types.d'
+import Plataforma from '@one-bit-swap/hardhat/artifacts/contracts/Plataforma.sol/Plataforma.json'
 import {
   Datos,
   Plataforma as IPlataforma,
-} from '../../hardhat/typechain-types/'
+} from '@one-bit-swap/hardhat/typechain-types/'
+import { BigNumber, ethers } from 'ethers'
 import { Session } from './types'
 import {
   formatArrayBilleteras,

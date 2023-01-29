@@ -1,5 +1,5 @@
+import { Datos } from '@one-bit-swap/hardhat/typechain-types/contracts/Datos'
 import { ethers } from 'ethers'
-import { Datos } from '../../../hardhat/typechain-types/contracts/Datos'
 
 export function formatArrayBilleteras(
   listado: Datos.BilleteraStructOutput[]

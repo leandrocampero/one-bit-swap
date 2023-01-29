@@ -1,4 +1,4 @@
-import Tokens from 'lib/models/Tokens'
+import Tokens from '@/lib/models/Tokens'
 export default class GestorTokens {
   private _tokens: Array<Tokens>
   private static _gestor: GestorTokens
