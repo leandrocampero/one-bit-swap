@@ -14,7 +14,7 @@ contract GestorOrdenes is Datos, GestorTokens {
     bytes32 _puntoPartida, // OBS: el puntoPartida es la última orden listada
     uint _ventana
   ) public view returns (Orden[] memory) {
-    Orden[] memory listado = new Orden[](ordenes.cantidadActivas);
+    Orden[] memory listado = new Orden[](_ventana);
     Orden memory orden;
     uint indiceResultado = 0;
     bytes32 idOrdenSiguiente = 0x00;
