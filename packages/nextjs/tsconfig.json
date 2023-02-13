@@ -17,8 +17,15 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "types": ["./src/context/context.d.ts", "./src/types.d.ts"]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/lib/types.d.ts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "src/**/*.d.ts",
+    "node_modules/@types/node/"
+  ],
   "exclude": ["node_modules"]
 }

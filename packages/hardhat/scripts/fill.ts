@@ -1,12 +1,13 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
+import { writeFileSync } from 'fs'
 import { ethers } from 'hardhat'
-import { formatArrayOrdenes, showConsoleTable } from '../utils/helpers'
 import {
   ERC20Mock,
   ERC20Mock__factory,
   Plataforma,
   Plataforma__factory,
 } from '../typechain-types/'
+import { formatArrayOrdenes, showConsoleTable } from '../utils/helpers'
 
 /*******************************************************************************
 
@@ -241,6 +242,19 @@ async function main() {
   //             Mostrar por consola              //
   //**********************************************//
   showConsoleTable(listado)
+
+  //**********************************************//
+  //      Exportando direcciones para probar      //
+  //**********************************************//
+  const deploy = {
+    platform: plataforma.address,
+  }
+
+  writeFileSync(
+    './../nextjs/src/contracts/deploy.json',
+    JSON.stringify(deploy),
+    'utf-8'
+  )
 }
 
 // We recommend this pattern to be able to use async/await everywhere

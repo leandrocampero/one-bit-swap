@@ -1,4 +1,3 @@
-import BlockchainAdapter from '@/lib/BlockchainAdapter'
 import GestorBilleteras from '@/lib/managers/GestorBilleteras'
 import GestorTokens from '@/lib/managers/GestorTokens'
 import Billeteras from '@/lib/models/Billeteras'
@@ -9,10 +8,12 @@ import {
   Estados,
   EstadosOrdenes,
   NavMenu,
+  Orden,
   TipoColumna,
   TiposOrdenes,
-} from '@/lib/types.d'
+} from '@/types.d'
 import { b1, tUSDT } from '@/lib/utils/modelos'
+import { OrdenesContext } from '@/store/Store'
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange'
 import {
   Autocomplete,
@@ -35,7 +36,8 @@ import {
   Tabs,
   TextField,
 } from '@mui/material'
-import { useEffect, useState } from 'react'
+import { ethers } from 'ethers'
+import { useContext, useEffect, useState } from 'react'
 
 export default function ListaOrdenes() {
   const [getTokens, setTokens] = useState(Array<Tokens>)
@@ -50,12 +52,13 @@ export default function ListaOrdenes() {
   const [getFechaInicio, setFechaInicio] = useState(undefined)
   const [getFechaFin, setFechaFin] = useState(undefined)
   const [filtrar, setFiltrar] = useState(false)
+  const { connect, cargarOrdenesActivas, ordenes, accounts } =
+    useContext(OrdenesContext)
 
-  const adapter = new BlockchainAdapter()
   const gestorBilletera = new GestorBilleteras()
   const gTokens = GestorTokens.instanciar()
-  const [getTokenVenta, setTokenVenta] = useState<Tokens>(tUSDT)
-  const [getTokenCompra, setTokenCompra] = useState<Tokens>(tUSDT)
+  const [getTokenVenta, setTokenVenta] = useState<string>('')
+  const [getTokenCompra, setTokenCompra] = useState<string>('')
 
   const handleChangeTokenButton = (event: React.SyntheticEvent) => {
     const aux = getTokenVenta
@@ -68,7 +71,6 @@ export default function ListaOrdenes() {
   }
 
   const handleChangeTokenVenta = (event: React.SyntheticEvent, value: any) => {
-    console.log(value)
     setTokenVenta(value)
   }
 
@@ -95,7 +97,7 @@ export default function ListaOrdenes() {
     } else if (nuevoValor == NavMenu.misOrdenes) {
       setOrdenes(
         adapter.BuscarOrdenes(
-          getBilleteraUsuario,
+          accounts[0],
           getTipoOrden == TiposOrdenes.todas ? undefined : getTipoOrden,
           getTokenCompra,
           getTokenVenta,
@@ -110,7 +112,7 @@ export default function ListaOrdenes() {
     } else if (nuevoValor == NavMenu.miHistorial) {
       setOrdenes(
         adapter.BuscarOrdenes(
-          getBilleteraUsuario,
+          accounts[0],
           getTipoOrden == TiposOrdenes.todas ? undefined : getTipoOrden,
           getTokenCompra,
           getTokenVenta,
@@ -132,7 +134,7 @@ export default function ListaOrdenes() {
   function handleEjecutarOrden(
     tipo: TiposOrdenes,
     id: string,
-    comprador: Billeteras
+    comprador: string
   ) {
     adapter.EjecutarOrden(tipo, id, comprador)
   }
@@ -169,10 +171,7 @@ export default function ListaOrdenes() {
   useEffect(() => {
     try {
       inicializar()
-      console.log('getTokens', getTokens)
-    } catch (e) {
-      console.log(e)
-    }
+    } catch (e) {}
   }, [])
 
   const columnas: Columna[] = [
@@ -216,10 +215,10 @@ export default function ListaOrdenes() {
         sx={{ mb: 2 }}
       >
         <Tab value={NavMenu.ordenesAbiertas} label={NavMenu.ordenesAbiertas} />
-        {gestorBilletera.verificarRol(getBilleteraUsuario) >= 1 && (
+        {gestorBilletera.verificarRol(accounts[0]) >= 1 && (
           <Tab value={NavMenu.misOrdenes} label={NavMenu.misOrdenes} />
         )}
-        {gestorBilletera.verificarRol(getBilleteraUsuario) >= 1 && (
+        {gestorBilletera.verificarRol(accounts[0]) >= 1 && (
           <Tab value={NavMenu.miHistorial} label={NavMenu.miHistorial} />
         )}
       </Tabs>
@@ -280,7 +279,7 @@ export default function ListaOrdenes() {
             sx={{ width: 300 }}
             options={getTokens}
             value={getTokenCompra}
-            onChange={(event: any, newValue: Tokens | null) => {
+            onChange={(event: any, newValue: string) => {
               setTokenCompra(newValue)
             }}
             getOptionDisabled={(option) =>
@@ -389,7 +388,7 @@ export default function ListaOrdenes() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {getOrdenes
+              {ordenes
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row) => {
                   return (
@@ -404,35 +403,29 @@ export default function ListaOrdenes() {
                       <TableCell align="left">
                         {row.montoVenta.toString()}
                       </TableCell>
-                      <TableCell align="left">
-                        {row.tokenVenta.ticker}
-                      </TableCell>
+                      <TableCell align="left">{row.tokenVenta}</TableCell>
                       <TableCell align="left">
                         {row.montoCompra.toString()}
                       </TableCell>
-                      <TableCell align="left">
-                        {row.tokenCompra.ticker}
-                      </TableCell>
+                      <TableCell align="left">{row.tokenCompra}</TableCell>
                       <TableCell align="left">
                         <ButtonGroup>
-                          {row.vendedor.direccion ==
-                            getBilleteraUsuario.direccion &&
-                            row.fechaEjecucion == undefined && (
+                          {row.vendedor == accounts[0] &&
+                            row.fechaFinalizacion == undefined && (
                               <Button
                                 onClick={() => handleCancelarOrden(row.idOrden)}
                               >
                                 Cancelar
                               </Button>
                             )}
-                          {row.fechaEjecucion == undefined &&
-                            row.vendedor.direccion !=
-                              getBilleteraUsuario.direccion && (
+                          {row.fechaFinalizacion == undefined &&
+                            row.vendedor != accounts[0] && (
                               <Button
                                 onClick={() =>
                                   handleEjecutarOrden(
                                     row.tipo,
                                     row.idOrden,
-                                    getBilleteraUsuario
+                                    accounts[0]
                                   )
                                 }
                               >
@@ -450,7 +443,7 @@ export default function ListaOrdenes() {
         <TablePagination
           rowsPerPageOptions={[10, 25, 100]}
           component="div"
-          count={getOrdenes.length}
+          count={ordenes.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}

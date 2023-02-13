@@ -1,7 +1,7 @@
 {
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true,
-    "source.organizeImports": true
+    "source.organizeImports": false
   },
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
@@ -36,6 +36,13 @@
       "text": "WARNING:",
       "backgroundColor": "#F3AA2B",
       "overviewRulerColor": "#F3AA2B"
+    },
+    {
+      "text": "console.log",
+      "backgroundColor": "#F3AA2B77",
+      "overviewRulerColor": "#F3AA2B",
+      "isWholeLine": true,
+      "color": "default"
     },
     {
       "text": "ERROR:",
