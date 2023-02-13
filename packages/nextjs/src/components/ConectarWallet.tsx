@@ -1,14 +1,14 @@
 // https://docs.metamask.io/guide/ethereum-provider.html#using-the-provider
-import GestorBilleteras from '@/lib/managers/GestorBilleteras'
-import { RolesBilleteras } from '@/lib/types.d'
+import { BlockchainContext } from '@/context/BlockchainContext'
+import { useWallet } from '@/hooks/wallet'
+import { RolesBilleteras } from '@/types.d'
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet'
 import LogoutIcon from '@mui/icons-material/Logout'
 import SettingsIcon from '@mui/icons-material/Settings'
 import { Button, Menu, MenuProps, styled } from '@mui/material'
 import { alpha } from '@mui/material/styles'
-import { ethers } from 'ethers'
 import Link from 'next/link'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 
 const StyledMenu = styled((props: MenuProps) => (
   <Menu
@@ -56,97 +56,47 @@ const StyledMenu = styled((props: MenuProps) => (
 const rol = RolesBilleteras.administrador
 
 export default function ConectarWallet() {
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
-  const open = Boolean(anchorEl)
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget)
-  }
-  const handleClose = () => {
-    setAnchorEl(null)
-  }
-
-  const [errorMessage, setErrorMessage] = useState('')
+  const { accounts, connect } = useWallet()
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [address, setAddress] = useState('')
-  const [addressRecortada, setAddressRecortada] = useState('')
-  const [provider, setProvider] = useState<ethers.providers.Web3Provider>()
-  const [signer, setSigner] = useState<ethers.Signer>()
-  const [logueado, setLogueado] = useState<boolean>(false)
-
-  const gBilletera = new GestorBilleteras()
-
-  async function connectToMetamask() {
-    if (window.ethereum && window.ethereum.isMetaMask) {
-      try {
-        const provider = new ethers.providers.Web3Provider(
-          window.ethereum,
-          'any'
-        )
-        const address = await provider.send('eth_requestAccounts', [])
-        accountChangedHandler(address[0])
-        setSigner(provider.getSigner())
-      } catch (error) {
-        console.log(error)
-      }
-    } else {
-      setErrorMessage('Please install MetaMask browser extension to interact')
-      console.log('errorMessage', errorMessage)
-    }
-  }
-
-  // update account, will cause component re-render
-  function accountChangedHandler(newAccount: string) {
-    console.log('newAccount', newAccount)
-    const wallet = gBilletera.nuevo(newAccount)
-    setAddress(wallet.direccion)
-    console.log(address)
-    const cadena1 =
-      newAccount.toString().slice(0, 5) +
-      '..' +
-      newAccount.toString().slice(newAccount.length - 4)
-    setAddressRecortada(cadena1)
-    localStorage.setItem('wallet', JSON.stringify(newAccount))
-    updateEthers()
-  }
-
-  function chainChangedHandler() {
-    window.location.reload()
-  }
-
-  function cerrarSesion() {
-    localStorage.removeItem('wallet')
-    const wallet = gBilletera.nuevo('')
-    setAddress(wallet.direccion)
-    handleClose()
-  }
-
-  if (typeof window !== 'undefined') {
-    if (typeof window.ethereum !== 'undefined') {
-      window.ethereum.on('accountsChanged', accountChangedHandler)
-      window.ethereum.on('chainChanged', chainChangedHandler)
-      window.ethereum.on('disconnect', cerrarSesion)
-    }
-  }
-  async function updateEthers() {
-    const tempProvider = new ethers.providers.Web3Provider(window.ethereum)
-    setProvider(tempProvider)
-
-    const tempSigner = tempProvider.getSigner()
-    setSigner(tempSigner)
-  }
+  const open = Boolean(anchorEl)
 
   useEffect(() => {
     try {
       const addressLS = JSON.parse(localStorage.getItem('wallet') || '')
       if (addressLS.length) {
-        accountChangedHandler(addressLS)
+        localStorage.setItem('wallet', JSON.stringify(addressLS))
       }
     } catch (error) {}
   }, [])
 
+  useEffect(() => {
+    const current = accounts[0] ?? ''
+    setAddress(
+      !current
+        ? ''
+        : current.slice(0, 5) + '..' + current.slice(current.length - 4)
+    )
+  }, [accounts[0]])
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget)
+  }
+  const cerrarSesion = () => {
+    setAnchorEl(null)
+    localStorage.removeItem('wallet')
+  }
+
+  if (typeof window !== 'undefined') {
+    if (typeof window.ethereum !== 'undefined') {
+      window.ethereum.on('disconnect', cerrarSesion)
+    }
+  }
+
   return (
     <div>
-      {!address.length ? (
-        <Button variant="contained" onClick={connectToMetamask}>
+      {!address ? (
+        <Button variant="contained" onClick={connect}>
           Conectar Wallet
         </Button>
       ) : (
@@ -161,7 +111,7 @@ export default function ConectarWallet() {
             onClick={handleClick}
             endIcon={<AccountBalanceWalletIcon />}
           >
-            {addressRecortada}
+            {address}
           </Button>
 
           {rol != RolesBilleteras.administrador ? (

@@ -1,7 +1,7 @@
 import BlockchainAdapter from '@/lib/BlockchainAdapter'
 import GestorBilleteras from '@/lib/managers/GestorBilleteras'
 import GestorTokens from '@/lib/managers/GestorTokens'
-import { Acciones, Estados, NavMenu } from '@/lib/types.d'
+import { Acciones, Estados, NavMenu } from '@/types.d'
 import { b10 } from '@/lib/utils/modelos'
 import {
   Button,

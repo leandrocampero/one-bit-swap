@@ -1,3 +1,5 @@
+import React from 'react'
+
 export enum Estados {
   activo = 0,
   suspendido = 1,
@@ -76,14 +78,48 @@ export interface Columna {
   align?: 'left' | 'center' | 'right'
 }
 
-export declare global {
-  interface Window {
-    ethereum: any
-  }
-}
-
 export interface Session {
   chainId: number
   address: string
   date: number
+}
+
+/******************************************************************************/
+
+export type AppProps = {
+  children: React.ReactNode
+}
+
+export type Orden = {
+  idOrden: string
+  vendedor: string
+  comprador: string
+  montoVenta: string
+  montoCompra: string
+  fechaCreacion: string
+  fechaFinalizacion: string
+  tokenCompra: string
+  tokenVenta: string
+  estado: EstadosOrdenes
+  tipo: TiposOrdenes
+}
+
+export type Token = {
+  ticker: string
+  contrato: string
+  oraculo: string | undefined
+  decimales: number
+  estado: Estados
+}
+
+export type Billetera = {
+  direccion: string
+  rol: RolesBilleteras
+  estado: Estados
+}
+
+export type Plataforma = {
+  contrato: string
+  estado: Estados
+  montoMinimo: number
 }
