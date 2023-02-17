@@ -1,5 +1,5 @@
-import CrearOrdenesTest from '@/components/CrearOrdenesTest'
-import ListarOrdenesTest from '@/components/ListarOrdenesTest'
+import CrearOrden from '@/components/Ordenes/crearOrden'
+import VistaOrdenes from '@/components/VistaOrdenes'
 import BaseLayout from '@/components/layout/BaseLayout'
 import { useBlockchainContext } from '@/context/BlockchainProvider'
 import styles from '@/styles/layout.module.scss'
@@ -36,13 +36,13 @@ export default function Intercambiar() {
         <Grid item xs={8}>
           <Box sx={sxProps} className={styles.base}>
             <h1>Ordenes Abiertas y demas</h1>
-            <ListarOrdenesTest />
+            <VistaOrdenes />
           </Box>
         </Grid>
         <Grid item xs={4}>
           <Box sx={sxProps} className={styles.base}>
             <h1>Ordenes compra/Venta e intercambio</h1>
-            <CrearOrdenesTest />
+            <CrearOrden />
           </Box>
         </Grid>
       </Grid>
