@@ -1,4 +1,4 @@
-import { Estados } from '@lib/types.d'
+import { Estados } from '@/types.d'
 import { Button, Grid, InputAdornment, TextField } from '@mui/material'
 import { useEffect, useState } from 'react'
 

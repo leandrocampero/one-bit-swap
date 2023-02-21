@@ -1,6 +1,4 @@
-import GestorTokens from '@lib/managers/GestorTokens'
-import Tokens from '@lib/models/Tokens'
-import { Columna, Estados, TipoColumna } from '@lib/types.d'
+import { Columna, Estados, TipoColumna, Token } from '@/types.d'
 import {
   Button,
   Checkbox,

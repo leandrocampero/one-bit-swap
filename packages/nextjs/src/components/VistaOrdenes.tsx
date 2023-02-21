@@ -1,17 +1,14 @@
-import GestorBilleteras from '@lib/managers/GestorBilleteras'
-import GestorOrdenes from '@lib/managers/GestorOrdenes'
-import GestorTokens from '@lib/managers/GestorTokens'
-import Billeteras from '@lib/models/Billeteras'
-import Ordenes from '@lib/models/Ordenes'
-import Tokens from '@lib/models/Tokens'
 import {
+  Billetera,
+  Orden,
+  Token,
   Columna,
   Estados,
   EstadosOrdenes,
   NavMenu,
   TipoColumna,
   TiposOrdenes,
-} from '@lib/types.d'
+} from '@/types.d'
 import {
   Autocomplete,
   Box,
@@ -32,32 +29,30 @@ import {
   Tabs,
   TextField,
 } from '@mui/material'
-import React, { useEffect, useState } from 'react'
-import { b1 } from 'scripts/modelos'
+import React, { useContext, useEffect, useState } from 'react'
 import EjecutarOrden from './EjecutarOrden'
+import { BlockchainContext } from '@/context/BlockchainContext'
 
-export const OrdenContext = React.createContext<Ordenes>(undefined)
+export const OrdenContext = React.createContext<Orden | undefined>(undefined)
 
 export default function VistaOrdenes() {
-  const [getTokens, setTokens] = useState(Array<Tokens>)
-  const [getOrdenes, setOrdenes] = useState(Array<Ordenes>)
+  const { state, actions } = useContext(BlockchainContext)
+  const [getTokens, setTokens] = useState(Array<Token>)
+  const [getOrdenes, setOrdenes] = useState(Array<Orden>)
   const [getTabValue, setTabValue] = useState(NavMenu.ordenesAbiertas)
   const [getBilleteraUsuario, setBilleteraUsuario] = useState<
-    Billeteras | undefined
-  >(b1)
+    Billetera | undefined
+  >(undefined)
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
-  const [getTokenVenta, setTokenVenta] = useState<Tokens | null>(null)
-  const [getTokenCompra, setTokenCompra] = useState<Tokens | null>(null)
+  const [getTokenVenta, setTokenVenta] = useState<Token | null>(null)
+  const [getTokenCompra, setTokenCompra] = useState<Token | null>(null)
   const [getTipoOrden, setTipoOrden] = useState(TiposOrdenes.todas)
   const [getMontoVenta, setMontoVenta] = useState(BigInt(0))
   const [getMontoCompra, setMontoCompra] = useState(BigInt(0))
-  const [getFechaInicio, setFechaInicio] = useState(undefined)
-  const [getFechaFin, setFechaFin] = useState(undefined)
 
-  const gestorBilletera = GestorBilleteras.instanciar()
-  const gestorOrdenes = GestorOrdenes.instanciar()
-  const gestorTokens = GestorTokens.instanciar()
+  const { tokens, ordenes } = state
+  const { cargarOrdenesActivas, cancelarOrden, ejecutarOrden } = actions
 
   const handleChangeTokenButton = () => {
     console.log('cambio ' + getTokenCompra + '  por ' + getTokenVenta)
@@ -69,7 +64,7 @@ export default function VistaOrdenes() {
 
   const handleChangeTokenVenta = (
     event: React.SyntheticEvent,
-    value: Tokens | null
+    value: Token | null
   ) => {
     console.log(value?.ticker)
     setTokenVenta(value)
@@ -77,7 +72,7 @@ export default function VistaOrdenes() {
 
   const handleChangeTokenCompra = (
     event: React.SyntheticEvent,
-    value: Tokens | null
+    value: Token | null
   ) => {
     console.log(value?.ticker)
     setTokenCompra(value)
@@ -85,23 +80,9 @@ export default function VistaOrdenes() {
 
   const handleChangeSelect = (event: SelectChangeEvent) => {
     setTipoOrden(parseInt(event.target.value))
-    setOrdenes(
-      gestorOrdenes.buscar(
-        getTabValue == NavMenu.ordenesAbiertas
-          ? undefined
-          : getBilleteraUsuario,
-        parseInt(event.target.value) == TiposOrdenes.todas
-          ? undefined
-          : parseInt(event.target.value),
-        getTokenCompra == null ? undefined : getTokenCompra,
-        getTokenVenta == null ? undefined : getTokenVenta,
-        getMontoCompra == BigInt(0) ? undefined : getMontoCompra,
-        getMontoVenta == BigInt(0) ? undefined : getMontoVenta,
-        getTabValue == NavMenu.miHistorial ? undefined : EstadosOrdenes.activa,
-        undefined,
-        undefined
-      )
-    )
+    // setOrdenes(
+    cargarOrdenesActivas(ordenes.datos[ordenes.datos.length - 1].idOrden)
+    //)
   }
 
   const handleTabChange = (
@@ -113,15 +94,11 @@ export default function VistaOrdenes() {
   }
 
   function handleCancelarOrden(id: string) {
-    gestorOrdenes.CancelarOrden(id)
+    cancelarOrden(id)
   }
 
-  function handleEjecutarOrden(
-    tipo: TiposOrdenes,
-    id: string,
-    comprador: Billeteras | undefined
-  ) {
-    gestorOrdenes.EjecutarOrden(tipo, id, comprador)
+  function handleEjecutarOrden(id: string) {
+    ejecutarOrden(id)
   }
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -136,25 +113,12 @@ export default function VistaOrdenes() {
   }
 
   useEffect(() => {
-    setOrdenes(
-      gestorOrdenes.buscar(
-        getTabValue == NavMenu.ordenesAbiertas
-          ? undefined
-          : getBilleteraUsuario,
-        getTipoOrden == TiposOrdenes.todas ? undefined : getTipoOrden,
-        getTokenCompra == null ? undefined : getTokenCompra,
-        getTokenVenta == null ? undefined : getTokenVenta,
-        getMontoCompra == BigInt(0) ? undefined : getMontoCompra,
-        getMontoVenta == BigInt(0) ? undefined : getMontoVenta,
-        getTabValue == NavMenu.ordenesAbiertas
-          ? EstadosOrdenes.activa
-          : undefined,
-        getFechaInicio,
-        getFechaFin
-      )
-    )
+    // setOrdenes(
+    cargarOrdenesActivas(ordenes.datos[ordenes.datos.length - 1].idOrden)
+    // )
+
     if (getTokens.length == 0) {
-      setTokens(gestorTokens.buscar('', Estados.todos))
+      setTokens(tokens.datos)
     }
   }, [
     getBilleteraUsuario,
@@ -163,8 +127,6 @@ export default function VistaOrdenes() {
     getTokenVenta,
     getMontoCompra,
     getMontoVenta,
-    getFechaFin,
-    getFechaInicio,
     getTabValue,
   ])
 
@@ -208,26 +170,22 @@ export default function VistaOrdenes() {
         aria-label="secondary tabs example"
       >
         <Tab value={NavMenu.ordenesAbiertas} label={NavMenu.ordenesAbiertas} />
-        {gestorBilletera.verificarRol(getBilleteraUsuario) >= 1 && (
-          <Tab value={NavMenu.misOrdenes} label={NavMenu.misOrdenes} />
-        )}
-        {gestorBilletera.verificarRol(getBilleteraUsuario) >= 1 && (
-          <Tab value={NavMenu.miHistorial} label={NavMenu.miHistorial} />
-        )}
+        <Tab value={NavMenu.misOrdenes} label={NavMenu.misOrdenes} />
+        <Tab value={NavMenu.miHistorial} label={NavMenu.miHistorial} />
       </Tabs>
       <Autocomplete
         id="token-select-venta"
         sx={{ width: 300 }}
-        options={getTokens}
-        getOptionDisabled={(option: Tokens) =>
-          option === getTokenCompra ||
+        options={tokens.datos}
+        getOptionDisabled={(option: Token) =>
+          option.ticker === getTokenCompra?.ticker ||
           (option.estado == Estados.suspendido &&
             getTabValue != NavMenu.miHistorial)
         }
         value={getTokenVenta}
         onChange={handleChangeTokenVenta}
         autoHighlight
-        getOptionLabel={(option: Tokens) => option.ticker}
+        getOptionLabel={(option: Token) => option.ticker}
         renderOption={(props, option) => (
           <Box
             component="li"
@@ -262,9 +220,9 @@ export default function VistaOrdenes() {
       <Autocomplete
         id="token-select-compra"
         sx={{ width: 300 }}
-        options={getTokens}
+        options={tokens.datos}
         getOptionDisabled={(option) =>
-          option === getTokenVenta ||
+          option.ticker === getTokenVenta?.ticker ||
           (option.estado == Estados.suspendido &&
             getTabValue != NavMenu.miHistorial)
         }
@@ -346,7 +304,7 @@ export default function VistaOrdenes() {
             <TableBody>
               {getOrdenes
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row: Ordenes) => {
+                .map((row: Orden) => {
                   return (
                     <TableRow
                       hover
@@ -361,37 +319,33 @@ export default function VistaOrdenes() {
                         {TiposOrdenes[row.tipo]}
                       </TableCell>
                       <TableCell
-                        key={row.idOrden + row.tokenVenta.ticker + Date.now()}
+                        key={row.idOrden + row.tokenVenta + Date.now()}
                         align="left"
                       >
                         {row.montoVenta.toString()}
                       </TableCell>
-                      <TableCell
-                        key={row.tokenVenta.ticker + Date.now()}
-                        align="left"
-                      >
-                        {row.tokenVenta.ticker}
+                      <TableCell key={row.tokenVenta + Date.now()} align="left">
+                        {row.tokenVenta}
                       </TableCell>
                       <TableCell
-                        key={row.idOrden + row.tokenCompra.ticker + Date.now()}
+                        key={row.idOrden + row.tokenCompra + Date.now()}
                         align="left"
                       >
                         {row.montoCompra.toString()}
                       </TableCell>
                       <TableCell
-                        key={row.tokenCompra.ticker + Date.now()}
+                        key={row.tokenCompra + Date.now()}
                         align="left"
                       >
-                        {row.tokenCompra.ticker}
+                        {row.tokenCompra}
                       </TableCell>
                       <TableCell
                         key={row.idOrden + 'acciones' + Date.now()}
                         align="left"
                       >
                         <ButtonGroup>
-                          {row.vendedor.direccion ==
-                            getBilleteraUsuario?.direccion &&
-                            row.fechaEjecucion == undefined &&
+                          {row.vendedor == getBilleteraUsuario?.direccion &&
+                            row.fechaFinalizacion == undefined &&
                             getTabValue != NavMenu.ordenesAbiertas && (
                               <Button
                                 onClick={() => handleCancelarOrden(row.idOrden)}
@@ -399,9 +353,8 @@ export default function VistaOrdenes() {
                                 Cancelar
                               </Button>
                             )}
-                          {row.fechaEjecucion == undefined &&
-                            row.vendedor.direccion !=
-                              getBilleteraUsuario?.direccion && (
+                          {row.fechaFinalizacion == undefined &&
+                            row.vendedor != getBilleteraUsuario?.direccion && (
                               // <Button
                               //   onClick={() =>
                               //     handleEjecutarOrden(

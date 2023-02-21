@@ -1,4 +1,4 @@
-import { TiposOrdenes } from '@lib/types.d'
+import { TiposOrdenes } from '@/types.d'
 import { Box, Button, Modal } from '@mui/material'
 import React, { useState } from 'react'
 

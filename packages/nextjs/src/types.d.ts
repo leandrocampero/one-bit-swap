@@ -3,12 +3,14 @@ import React from 'react'
 export enum Estados {
   activo = 0,
   suspendido = 1,
+  todos = 2,
 }
 
 export enum EstadosOrdenes {
   activa = 0,
   cancelada = 1,
   finalizada = 2,
+  todas = 3,
 }
 
 export enum TiposOrdenes {
@@ -37,6 +39,8 @@ export enum NavMenu {
   miHistorial = 'Historial',
   billeteras = 'Billeteras',
   tokens = 'Tokens',
+  billeterasSuspendidas = 'Billeteras Suspendidas',
+  configuracion = 'Configuración',
 }
 
 export enum Acciones {
@@ -51,13 +55,13 @@ export enum Acciones {
 
 export enum TipoColumna {
   // ordenes
-  id = 'Id',
+  id = 'id',
   tipo = 'Tipo',
-  cantidadVenta = 'CantidadVenta',
-  tokenVenta = 'TokenVenta',
-  cantidadCompra = 'CantidadCompra',
-  tokenCompra = 'TokenCompra',
-  fechaCreacion = 'FechaCreacion',
+  cantidadVenta = 'Cantidad de Venta',
+  tokenVenta = 'Venta',
+  cantidadCompra = 'Cantidad de Compra',
+  tokenCompra = 'Compra',
+  fechaCreacion = 'Fecha de Creacion',
   boton = 'Boton',
   // tokens
   ticker = 'Ticker',
@@ -65,7 +69,7 @@ export enum TipoColumna {
   contrato = 'Contrato',
   // billeteras
   rol = 'Rol',
-  billetera = 'Billetera',
+  direccion = 'Direccion',
   // comunes
   estado = 'Estado',
   acciones = 'Acciones',
@@ -76,6 +80,12 @@ export interface Columna {
   label: string
   minWidth?: number
   align?: 'left' | 'center' | 'right'
+}
+
+export declare global {
+  interface Window {
+    ethereum: any
+  }
 }
 
 export interface Session {

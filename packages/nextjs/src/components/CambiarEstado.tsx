@@ -1,6 +1,4 @@
-import Billeteras from '@lib/models/Billeteras'
-import Tokens from '@lib/models/Tokens'
-import { Estados } from '@lib/types'
+import { Billetera, Token, Estados } from '@/types.d'
 import { Box, Button, Modal } from '@mui/material'
 import { useState } from 'react'
 
@@ -19,7 +17,7 @@ const style = {
 }
 
 export default function CambiarEstado() {
-  const [getItem, setItem] = useState<Tokens | Billeteras>(undefined)
+  const [getItem, setItem] = useState<Token | Billetera>(undefined)
   const [getEstadoModal, setEstadoModal] = useState(false)
 
   const handleModalNuevo = () => {
@@ -27,7 +25,7 @@ export default function CambiarEstado() {
   }
   const handleCambiarEstado = () => {
     console.log('')
-    if (getItem instanceof Tokens) {
+    if (getItem instanceof Token) {
       getItem.estado == Estados.activo ? getItem.Activar() : getItem.Suspender()
     } else {
       getItem.Activar()

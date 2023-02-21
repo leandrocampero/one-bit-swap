@@ -1,6 +1,4 @@
-import GestorBilleteras from '@lib/managers/GestorBilleteras'
-import Billeteras from '@lib/models/Billeteras'
-import { Estados, RolesBilleteras } from '@lib/types.d'
+import { Estados, RolesBilleteras, Billetera } from '@/types.d'
 import {
   Button,
   Paper,
