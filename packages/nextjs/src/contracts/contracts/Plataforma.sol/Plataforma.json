@@ -223,6 +223,50 @@
     "inputs": [
       {
         "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "billeterasRegistradas",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "direccion",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "indiceAdmin",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "indiceBloqueado",
+        "type": "uint256"
+      },
+      {
+        "internalType": "enum Datos.RolBilletera",
+        "name": "rol",
+        "type": "uint8"
+      },
+      {
+        "internalType": "enum Datos.EstadoGeneral",
+        "name": "estado",
+        "type": "uint8"
+      },
+      {
+        "internalType": "bool",
+        "name": "existe",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
         "name": "_billetera",
         "type": "address"
       }
