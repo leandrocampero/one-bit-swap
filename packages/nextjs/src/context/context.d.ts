@@ -1,4 +1,5 @@
 import { Billetera, Orden, Plataforma, TiposOrdenes, Token } from '@/types'
+import { JsonRpcSigner } from '@ethersproject/providers'
 import { BigNumber } from 'ethers'
 
 //****************************************************************************//
@@ -44,6 +45,11 @@ export type BlockchainState = {
   administradores: IExternalData<Billetera>
   bloqueados: IExternalData<Billetera>
   transaccion: { cargando: boolean; error: Error | null }
+  sesion: {
+    cargando: boolean
+    error: Error | null
+    datos: Billetera
+  }
 }
 
 //****************************************************************************//
@@ -80,8 +86,7 @@ export type BlockchainActions = {
   cargarBloqueados: () => Promise<void>
   bloquearBilletera: (billetera: string) => Promise<void>
   desbloquearBilletera: (billetera: string) => Promise<void>
-  conectarBilletera: () => Promise<void>
-  cargarCuentasConectadas: () => Promise<void>
+  conectarBilletera: (signer: JsonRpcSigner | null) => Promise<void>
 }
 
 //****************************************************************************//
@@ -110,6 +115,9 @@ export enum ReducerActionType {
   MARCAR_TRANSACCION_EN_PROGRESO = 'MARCAR_TRANSACCION_EN_PROGRESO',
   MARCAR_TRANSACCION_REALIZADA = 'MARCAR_TRANSACCION_REALIZADA',
   MARCAR_TRANSACCION_FALLIDA = 'MARCAR_TRANSACCION_FALLIDA',
+  MARCAR_CARGANDO_SESION = 'MARCAR_CARGANDO_SESION',
+  MARCAR_ERROR_SESION = 'MARCAR_ERROR_SESION',
+  GUARDAR_DATOS_SESION = 'GUARDAR_DATOS_SESION',
 }
 
 export type ReducerAction = { type: ReducerActionType; payload?: any }

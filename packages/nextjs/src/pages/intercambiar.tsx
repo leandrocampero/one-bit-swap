@@ -1,25 +1,23 @@
 import BaseLayout from '@/components/layout/BaseLayout'
-import { useWallet } from '@/hooks/wallet'
+import { useBlockchainContext } from '@/context/BlockchainProvider'
 import { Divider } from '@mui/material'
 import Typography from '@mui/material/Typography'
 
 export default function Intercambiar() {
-  const { accounts, signer } = useWallet()
+  const { state } = useBlockchainContext()
 
   return (
-    <>
-      <BaseLayout>
-        <Typography variant="h1" color="initial">
-          Sesion
-        </Typography>
-        <Divider />
-        <Typography variant="h6" color="initial">
-          {`Address: ${accounts[0]}`}
-        </Typography>
-        <Typography variant="h6" color="initial">
-          {`Signer: ${signer?._isSigner}`}
-        </Typography>
-      </BaseLayout>
-    </>
+    <BaseLayout>
+      <Typography variant="h1" color="initial">
+        Sesion
+      </Typography>
+      <Divider />
+      <Typography variant="h6" color="initial">
+        {`Address: ${state.sesion.datos.direccion}`}
+      </Typography>
+      <Typography variant="h6" color="initial">
+        {`Estado: ${state.sesion.datos.estado === 0 ? 'Activo' : 'Suspendido'}`}
+      </Typography>
+    </BaseLayout>
   )
 }

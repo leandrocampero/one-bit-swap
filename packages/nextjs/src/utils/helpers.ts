@@ -19,12 +19,22 @@ import { ethers } from 'ethers'
 export function formatArrayBilleteras(
   listado: Datos.BilleteraStructOutput[]
 ): Billetera[] {
-  return listado.map(({ direccion, estado, existe, rol }) => ({
+  return listado.map(({ direccion, estado, rol }) => ({
     direccion,
     estado: getEstadoGeneral(estado),
     rol: getRolBilletera(rol),
-    existe,
   }))
+}
+
+export function formatBilletera(
+  billetera: Datos.BilleteraStructOutput
+): Billetera {
+  const { direccion, estado, rol } = billetera
+  return {
+    direccion,
+    estado: getEstadoGeneral(estado),
+    rol: getRolBilletera(rol),
+  }
 }
 
 export function formatArrayTokens(listado: Datos.TokenStructOutput[]): Token[] {

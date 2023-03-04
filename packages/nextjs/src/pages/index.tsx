@@ -1,4 +1,5 @@
 import BaseLayout from '@/components/layout/BaseLayout'
+import { useBlockchainContext } from '@/context/BlockchainProvider'
 import { useWallet } from '@/hooks/wallet'
 import {
   Button,
@@ -24,39 +25,41 @@ const ActionBox: SxProps = {
 
 export default function Home() {
   const router = useRouter()
-  const { connect, getAccounts, signer } = useWallet()
+  const { connect, signer } = useWallet()
+  const { actions } = useBlockchainContext()
+  const { cargarDatosPlataforma } = actions
 
   const handleConnect = useCallback(async () => {
     await connect()
-    await getAccounts()
-  }, [connect, getAccounts])
+  }, [connect])
 
   useEffect(() => {
-    !!signer && router.push('/intercambiar')
-  }, [signer, router])
+    if (!!signer) {
+      cargarDatosPlataforma()
+      router.push('/intercambiar')
+    }
+  }, [signer, router, cargarDatosPlataforma])
 
   return (
-    <>
-      <BaseLayout style={FlexBox}>
-        <Card elevation={5} sx={ActionBox}>
-          <CardHeader
-            title="OneBitSwap"
-            subheader="Conectar billetera para usar"
-          />
-          <Divider />
-          <CardContent>
-            <Button
-              variant="contained"
-              color="success"
-              size="large"
-              sx={{ width: '100%' }}
-              onClick={handleConnect}
-            >
-              Conectar Metamask
-            </Button>
-          </CardContent>
-        </Card>
-      </BaseLayout>
-    </>
+    <BaseLayout style={FlexBox}>
+      <Card elevation={5} sx={ActionBox}>
+        <CardHeader
+          title="OneBitSwap"
+          subheader="Conectar billetera para usar"
+        />
+        <Divider />
+        <CardContent>
+          <Button
+            variant="contained"
+            color="success"
+            size="large"
+            sx={{ width: '100%' }}
+            onClick={handleConnect}
+          >
+            Conectar Metamask
+          </Button>
+        </CardContent>
+      </Card>
+    </BaseLayout>
   )
 }

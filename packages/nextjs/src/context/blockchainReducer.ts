@@ -189,6 +189,32 @@ export const blockchainReducer = (
         },
       }
 
+    case ReducerActionType.MARCAR_CARGANDO_SESION:
+      return {
+        ...state,
+        sesion: { ...state.sesion, cargando: true, error: null },
+      }
+
+    case ReducerActionType.MARCAR_ERROR_SESION:
+      return {
+        ...state,
+        sesion: {
+          ...state.sesion,
+          cargando: false,
+          error: action.payload,
+        },
+      }
+
+    case ReducerActionType.GUARDAR_DATOS_SESION:
+      return {
+        ...state,
+        sesion: {
+          cargando: false,
+          error: null,
+          datos: { ...action.payload },
+        },
+      }
+
     default:
       return state
   }

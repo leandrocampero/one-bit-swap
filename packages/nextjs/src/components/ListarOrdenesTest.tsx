@@ -1,4 +1,4 @@
-import { BlockchainContext } from '@/context/BlockchainContext'
+import { BlockchainContext } from '@/context/BlockchainProvider'
 import { Orden, Token } from '@/types.d'
 import {
   Button,

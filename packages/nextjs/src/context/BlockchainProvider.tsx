@@ -1,19 +1,19 @@
-/*******************************************************************************
+//**************************************************************************//
+//                                                                          //
+//            ###                                                           //
+//             #   #    #  #####    ####   #####   #####   ####             //
+//             #   ##  ##  #    #  #    #  #    #    #    #                 //
+//             #   # ## #  #    #  #    #  #    #    #     ####             //
+//             #   #    #  #####   #    #  #####     #         #            //
+//             #   #    #  #       #    #  #   #     #    #    #            //
+//            ###  #    #  #        ####   #    #    #     ####             //
+//                                                                          //
+//**************************************************************************//
 
-#### ##     ## ########   #######  ########  ########  ######
- ##  ###   ### ##     ## ##     ## ##     ##    ##    ##    ##
- ##  #### #### ##     ## ##     ## ##     ##    ##    ##
- ##  ## ### ## ########  ##     ## ########     ##     ######
- ##  ##     ## ##        ##     ## ##   ##      ##          ##
- ##  ##     ## ##        ##     ## ##    ##     ##    ##    ##
-#### ##     ## ##         #######  ##     ##    ##     ######
-
-*******************************************************************************/
 import {
   ERROR_NO_CONTRACT_ADDRESS,
   ERROR_NO_SIGNER,
 } from '@/constants/mensajes'
-import { BlockchainContext } from '@/context/BlockchainContext'
 import { blockchainReducer } from '@/context/blockchainReducer'
 import {
   BlockchainActions,
@@ -21,25 +21,32 @@ import {
   ReducerActionType,
 } from '@/context/context.d'
 import Plataforma from '@/contracts/contracts/Plataforma.sol/Plataforma.json'
-import { useWallet } from '@/hooks/wallet'
-import { AppProps, Estados, TiposOrdenes } from '@/types.d'
+import deploy from '@/contracts/deploy.json'
+import { AppProps, Estados, RolesBilleteras, TiposOrdenes } from '@/types.d'
+import { formatArrayBilleteras, formatArrayOrdenes } from '@/utils/helpers'
+import { JsonRpcSigner } from '@ethersproject/providers'
 import { Plataforma as ContratoPlataforma } from '@one-bit-swap/hardhat/typechain-types/'
 import { ethers } from 'ethers'
-import { useCallback, useEffect, useReducer, useState } from 'react'
-import deploy from '@/contracts/deploy.json'
-import { formatArrayBilleteras, formatArrayOrdenes } from '@/utils/helpers'
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useReducer,
+  useState,
+} from 'react'
 
-/*******************************************************************************
-
- ######   #######  ##    ##  ######  ########    ###    ##    ## ########  ######
-##    ## ##     ## ###   ## ##    ##    ##      ## ##   ###   ##    ##    ##    ##
-##       ##     ## ####  ## ##          ##     ##   ##  ####  ##    ##    ##
-##       ##     ## ## ## ##  ######     ##    ##     ## ## ## ##    ##     ######
-##       ##     ## ##  ####       ##    ##    ######### ##  ####    ##          ##
-##    ## ##     ## ##   ### ##    ##    ##    ##     ## ##   ###    ##    ##    ##
- ######   #######  ##    ##  ######     ##    ##     ## ##    ##    ##     ######
-
-*******************************************************************************/
+//**************************************************************************//
+//                                                                          //
+// ######                                                                   //
+// #     #  ######  ######  #  #    #  #  #####  #   ####   #    #   ####   //
+// #     #  #       #       #  ##   #  #    #    #  #    #  ##   #  #       //
+// #     #  #####   #####   #  # #  #  #    #    #  #    #  # #  #   ####   //
+// #     #  #       #       #  #  # #  #    #    #  #    #  #  # #       #  //
+// #     #  #       #       #  #   ##  #    #    #  #    #  #   ##  #    #  //
+// ######   ######  #       #  #    #  #    #    #   ####   #    #   ####   //
+//                                                                          //
+//**************************************************************************//
 
 const INITIAL_STATE: BlockchainState = {
   plataforma: {
@@ -52,36 +59,67 @@ const INITIAL_STATE: BlockchainState = {
   administradores: { datos: [], cargando: false, error: null },
   bloqueados: { datos: [], cargando: false, error: null },
   transaccion: { cargando: false, error: null },
+  sesion: {
+    cargando: false,
+    error: null,
+    datos: {
+      direccion: '',
+      estado: Estados.activo,
+      rol: RolesBilleteras.usuario,
+    },
+  },
 }
 
 const ORDENES_OFFSET = 20
 
-/*******************************************************************************
+type BlockchainContextProps = {
+  state: BlockchainState
+  actions: BlockchainActions
+}
 
- ######   #######  ##    ## ######## ######## ##     ## ########
-##    ## ##     ## ###   ##    ##    ##        ##   ##     ##
-##       ##     ## ####  ##    ##    ##         ## ##      ##
-##       ##     ## ## ## ##    ##    ######      ###       ##
-##       ##     ## ##  ####    ##    ##         ## ##      ##
-##    ## ##     ## ##   ###    ##    ##        ##   ##     ##
- ######   #######  ##    ##    ##    ######## ##     ##    ##
+//**************************************************************************//
+//                                                                          //
+//           #####                                                          //
+//          #     #   ####   #    #  #####  ######  #    #  #####           //
+//          #        #    #  ##   #    #    #        #  #     #             //
+//          #        #    #  # #  #    #    #####     ##      #             //
+//          #        #    #  #  # #    #    #         ##      #             //
+//          #     #  #    #  #   ##    #    #        #  #     #             //
+//           #####    ####   #    #    #    ######  #    #    #             //
+//                                                                          //
+//**************************************************************************//
 
-*******************************************************************************/
+export const BlockchainContext = createContext<BlockchainContextProps>(
+  {} as BlockchainContextProps
+)
 
 export const BlockchainProvider = (props: AppProps) => {
   //**************************************************************************//
   //                                                                          //
-  //                          State and Custom Hooks                          //
+  //                   #####                                                  //
+  //                  #     #  #####    ##    #####  ######                   //
+  //                  #          #     #  #     #    #                        //
+  //                   #####     #    #    #    #    #####                    //
+  //                        #    #    ######    #    #                        //
+  //                  #     #    #    #    #    #    #                        //
+  //                   #####     #    #    #    #    ######                   //
   //                                                                          //
   //**************************************************************************//
+
   const [state, dispatch] = useReducer(blockchainReducer, INITIAL_STATE)
   const [contract, setContract] = useState<ContratoPlataforma | null>(null)
   const [contractAddress, setContractAddress] = useState<string>('')
-  const { signer, connect, getAccounts } = useWallet()
+  const [signer, setSigner] = useState<JsonRpcSigner | null>(null)
 
   //**************************************************************************//
   //                                                                          //
-  //                             Callbacks Hooks                              //
+  //  #####                                                                   //
+  // #     #    ##    #       #       #####     ##     ####   #    #   ####   //
+  // #         #  #   #       #       #    #   #  #   #    #  #   #   #       //
+  // #        #    #  #       #       #####   #    #  #       ####     ####   //
+  // #        ######  #       #       #    #  ######  #       #  #         #  //
+  // #     #  #    #  #       #       #    #  #    #  #    #  #   #   #    #  //
+  //  #####   #    #  ######  ######  #####   #    #   ####   #    #   ####   //
   //                                                                          //
   //**************************************************************************//
 
@@ -111,17 +149,15 @@ export const BlockchainProvider = (props: AppProps) => {
 
   //**************************************************************************//
   //                                                                          //
-  //                             Reducer Actions                              //
+  //               #                                                          //
+  //              # #     ####   #####  #   ####   #    #   ####              //
+  //             #   #   #    #    #    #  #    #  ##   #  #                  //
+  //            #     #  #         #    #  #    #  # #  #   ####              //
+  //            #######  #         #    #  #    #  #  # #       #             //
+  //            #     #  #    #    #    #  #    #  #   ##  #    #             //
+  //            #     #   ####     #    #   ####   #    #   ####              //
   //                                                                          //
   //**************************************************************************//
-
-  const conectarBilletera = useCallback(async () => {
-    await connect()
-  }, [connect])
-
-  const cargarCuentasConectadas = useCallback(async () => {
-    await getAccounts()
-  }, [getAccounts])
 
   const cargarOrdenesActivas = useCallback(
     async (base: string) => {
@@ -522,13 +558,35 @@ export const BlockchainProvider = (props: AppProps) => {
     [setupContract]
   )
 
+  const conectarBilletera = useCallback(async (signer: JsonRpcSigner) => {
+    setSigner(signer)
+
+    dispatch({ type: ReducerActionType.MARCAR_CARGANDO_SESION })
+
+    try {
+      const direccion = await signer.getAddress()
+
+      dispatch({
+        type: ReducerActionType.GUARDAR_DATOS_SESION,
+        payload: { direccion, estado: 0, rol: 0 },
+      })
+    } catch (error: any) {
+      dispatch({
+        type: ReducerActionType.MARCAR_ERROR_SESION,
+        payload: error.message,
+      })
+    }
+  }, [])
+
   //**************************************************************************//
   //                                                                          //
-  //                               Effect Hooks                               //
-  //    En desarrollo, con respecto a los hooks, react hace lo siguiente:     //
-  //     Se dispara al renderizar un hook un ciclo completo, inicio y fin     //
-  //                         Luego vuelve a disparar.                         //
-  //               Es para asegurar el correcto funcionamiento.               //
+  //          #######                                                         //
+  //          #        ######  ######  ######   ####   #####   ####           //
+  //          #        #       #       #       #    #    #    #               //
+  //          #####    #####   #####   #####   #         #     ####           //
+  //          #        #       #       #       #         #         #          //
+  //          #        #       #       #       #    #    #    #    #          //
+  //          #######  #       #       ######   ####     #     ####           //
   //                                                                          //
   //**************************************************************************//
 
@@ -547,11 +605,6 @@ export const BlockchainProvider = (props: AppProps) => {
     setContractAddress(deploy.platform)
   }, [])
 
-  // Conectar billetera al iniciar
-  useEffect(() => {
-    conectarBilletera()
-  }, [conectarBilletera])
-
   // Instanciar contrato
   useEffect(() => {
     let mountedLock = true
@@ -566,11 +619,6 @@ export const BlockchainProvider = (props: AppProps) => {
         setContract(newContract)
       } catch (error: any) {
         setContract(null)
-      } finally {
-        dispatch({
-          type: ReducerActionType.REINICIAR_ESTADO,
-          payload: INITIAL_STATE,
-        })
       }
     }
 
@@ -579,37 +627,18 @@ export const BlockchainProvider = (props: AppProps) => {
     }
   }, [signer, contractAddress])
 
-  // Carga inicial de ordenes activas
-  useEffect(() => {
-    let mountedLock = true
-
-    if (mountedLock) {
-      cargarOrdenesActivas(ethers.constants.HashZero)
-    }
-
-    return () => {
-      mountedLock = false
-    }
-  }, [cargarOrdenesActivas])
-
-  // Carga inicial de tokens activos
-  useEffect(() => {
-    let mountedLock = true
-
-    if (mountedLock) {
-      cargarTokens(true)
-    }
-
-    return () => {
-      mountedLock = false
-    }
-  }, [cargarTokens])
-
   //**************************************************************************//
   //                                                                          //
-  //                       Return values and structures                       //
+  //        ######                                                            //
+  //        #     #  #####    ####   #    #  #  #####   ######  #####         //
+  //        #     #  #    #  #    #  #    #  #  #    #  #       #    #        //
+  //        ######   #    #  #    #  #    #  #  #    #  #####   #    #        //
+  //        #        #####   #    #  #    #  #  #    #  #       #####         //
+  //        #        #   #   #    #   #  #   #  #    #  #       #   #         //
+  //        #        #    #   ####     ##    #  #####   ######  #    #        //
   //                                                                          //
   //**************************************************************************//
+
   const actions: BlockchainActions = {
     cargarOrdenesActivas,
     cargarOrdenesPropias,
@@ -632,7 +661,6 @@ export const BlockchainProvider = (props: AppProps) => {
     bloquearBilletera,
     desbloquearBilletera,
     conectarBilletera,
-    cargarCuentasConectadas,
   } as BlockchainActions
 
   return (
@@ -641,3 +669,16 @@ export const BlockchainProvider = (props: AppProps) => {
     </BlockchainContext.Provider>
   )
 }
+
+//**************************************************************************//
+//                                                                          //
+//       #     #                      #     #                               //
+//       #     #   ####   ######      #     #   ####    ####   #    #       //
+//       #     #  #       #           #     #  #    #  #    #  #   #        //
+//       #     #   ####   #####       #######  #    #  #    #  ####         //
+//       #     #       #  #           #     #  #    #  #    #  #  #         //
+//       #     #  #    #  #           #     #  #    #  #    #  #   #        //
+//        #####    ####   ######      #     #   ####    ####   #    #       //
+//                                                                          //
+//**************************************************************************//
+export const useBlockchainContext = () => useContext(BlockchainContext)
