@@ -71,6 +71,12 @@ export type BlockchainActions = {
   ) => Promise<void>
   cancelarOrden: (idOrden: string) => Promise<void>
   ejecutarOrden: (idOrden: string) => Promise<void>
+  buscarOrdenEspejo: (
+    tokenCompra: string,
+    tokenVenta: string,
+    montoCompra: string,
+    montoVenta: string
+  ) => Promise<Orden | null>
   cargarTokens: (incluirSuspendidos: boolean) => Promise<void>
   nuevoToken: (contrato: string, oraculo: string) => Promise<void>
   activarToken: (ticker: string) => Promise<void>

@@ -298,6 +298,62 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "_billetera",
+        "type": "address"
+      }
+    ],
+    "name": "buscarBilletera",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "direccion",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "indiceAdmin",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "indiceBloqueado",
+            "type": "uint256"
+          },
+          {
+            "internalType": "enum Datos.RolBilletera",
+            "name": "rol",
+            "type": "uint8"
+          },
+          {
+            "internalType": "enum Datos.EstadoGeneral",
+            "name": "estado",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bool",
+            "name": "existe",
+            "type": "bool"
+          },
+          {
+            "internalType": "string[]",
+            "name": "ordenes",
+            "type": "string[]"
+          }
+        ],
+        "internalType": "struct Datos.Billetera",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "bytes32",
         "name": "_idOrden",
         "type": "bytes32"
@@ -419,7 +475,7 @@
         "type": "uint256"
       }
     ],
-    "name": "buscarOrdenGemela",
+    "name": "buscarOrdenEspejo",
     "outputs": [
       {
         "components": [

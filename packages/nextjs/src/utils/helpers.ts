@@ -81,6 +81,36 @@ export function formatArrayOrdenes(
     )
 }
 
+export function formatOrden(orden: Datos.OrdenStructOutput): Orden {
+  const {
+    idOrden,
+    vendedor,
+    comprador,
+    montoVenta,
+    montoCompra,
+    fechaCreacion,
+    fechaFinalizacion,
+    estado,
+    tipo,
+    tokenCompra,
+    tokenVenta,
+  } = orden
+
+  return {
+    idOrden,
+    vendedor,
+    comprador,
+    montoVenta: montoVenta.toString(),
+    montoCompra: montoCompra.toString(),
+    fechaCreacion: fechaCreacion.toString(),
+    fechaFinalizacion: fechaFinalizacion.toString(),
+    tokenCompra,
+    tokenVenta,
+    estado: getEstadoOrden(estado),
+    tipo: getTipoOrden(tipo),
+  }
+}
+
 export function getTipoOrden(number: number): TiposOrdenes {
   switch (number) {
     case TiposOrdenes.compraVenta: {

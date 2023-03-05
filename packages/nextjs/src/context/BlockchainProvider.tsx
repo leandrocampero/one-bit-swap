@@ -22,8 +22,18 @@ import {
 } from '@/context/context.d'
 import Plataforma from '@/contracts/contracts/Plataforma.sol/Plataforma.json'
 import deploy from '@/contracts/deploy.json'
-import { AppProps, Estados, RolesBilleteras, TiposOrdenes } from '@/types.d'
-import { formatArrayBilleteras, formatArrayOrdenes } from '@/utils/helpers'
+import {
+  AppProps,
+  Estados,
+  Orden,
+  RolesBilleteras,
+  TiposOrdenes,
+} from '@/types.d'
+import {
+  formatArrayBilleteras,
+  formatArrayOrdenes,
+  formatOrden,
+} from '@/utils/helpers'
 import { JsonRpcSigner } from '@ethersproject/providers'
 import { Plataforma as ContratoPlataforma } from '@one-bit-swap/hardhat/typechain-types/'
 import { ethers } from 'ethers'
@@ -288,6 +298,32 @@ export const BlockchainProvider = (props: AppProps) => {
           type: ReducerActionType.MARCAR_TRANSACCION_FALLIDA,
           payload: error.message,
         })
+      }
+    },
+    [setupContract]
+  )
+
+  const buscarOrdenEspejo = useCallback(
+    async (
+      tokenCompra: string,
+      tokenVenta: string,
+      montoCompra: string,
+      montoVenta: string
+    ): Promise<Orden | null> => {
+      try {
+        const contract = setupContract()
+        const resultado = formatOrden(
+          await contract.buscarOrdenEspejo(
+            tokenCompra,
+            tokenVenta,
+            montoCompra,
+            montoVenta
+          )
+        )
+
+        return resultado
+      } catch (error) {
+        return null
       }
     },
     [setupContract]
@@ -645,6 +681,7 @@ export const BlockchainProvider = (props: AppProps) => {
     nuevaOrden,
     cancelarOrden,
     ejecutarOrden,
+    buscarOrdenEspejo,
     cargarTokens,
     nuevoToken,
     activarToken,
