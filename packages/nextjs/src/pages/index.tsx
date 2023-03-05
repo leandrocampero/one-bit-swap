@@ -25,23 +25,24 @@ const ActionBox: SxProps = {
 
 export default function Home() {
   const router = useRouter()
-  const { connect, signer } = useWallet()
-  const { actions } = useBlockchainContext()
+  const { connect } = useWallet()
+  const { actions, state } = useBlockchainContext()
   const { cargarDatosPlataforma } = actions
+  const { sesion } = state
 
   const handleConnect = useCallback(async () => {
     await connect()
   }, [connect])
 
   useEffect(() => {
-    if (!!signer) {
+    if (!sesion.cargando && sesion.datos.direccion !== '') {
       cargarDatosPlataforma()
       router.push('/intercambiar')
     }
-  }, [signer, router, cargarDatosPlataforma])
+  }, [sesion, router, cargarDatosPlataforma])
 
   return (
-    <BaseLayout style={FlexBox}>
+    <BaseLayout style={FlexBox} loading={sesion.cargando}>
       <Card elevation={5} sx={ActionBox}>
         <CardHeader
           title="OneBitSwap"

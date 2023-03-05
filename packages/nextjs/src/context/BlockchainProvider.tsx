@@ -33,6 +33,7 @@ import {
   formatArrayBilleteras,
   formatArrayOrdenes,
   formatOrden,
+  sleep,
 } from '@/utils/helpers'
 import { JsonRpcSigner } from '@ethersproject/providers'
 import { Plataforma as ContratoPlataforma } from '@one-bit-swap/hardhat/typechain-types/'
@@ -172,6 +173,7 @@ export const BlockchainProvider = (props: AppProps) => {
   const cargarOrdenesActivas = useCallback(
     async (base: string) => {
       dispatch({ type: ReducerActionType.MARCAR_CARGANDO_ORDENES })
+      await sleep()
 
       try {
         const contractTemp = setupContract()
@@ -196,6 +198,7 @@ export const BlockchainProvider = (props: AppProps) => {
   const cargarTokens = useCallback(
     async (incluirSuspendidos: boolean) => {
       dispatch({ type: ReducerActionType.MARCAR_CARGANDO_TOKENS })
+      await sleep()
 
       try {
         const contract = setupContract()
@@ -217,6 +220,7 @@ export const BlockchainProvider = (props: AppProps) => {
 
   const cargarOrdenesPropias = useCallback(async () => {
     dispatch({ type: ReducerActionType.MARCAR_CARGANDO_ORDENES })
+    await sleep()
 
     try {
       const contract = setupContract()
@@ -243,6 +247,7 @@ export const BlockchainProvider = (props: AppProps) => {
       tipo: TiposOrdenes
     ) => {
       dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO })
+      await sleep()
 
       try {
         const contract = setupContract()
@@ -268,6 +273,7 @@ export const BlockchainProvider = (props: AppProps) => {
   const cancelarOrden = useCallback(
     async (idOrden: string) => {
       dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO })
+      await sleep()
 
       try {
         const contract = setupContract()
@@ -287,6 +293,7 @@ export const BlockchainProvider = (props: AppProps) => {
   const ejecutarOrden = useCallback(
     async (idOrden: string) => {
       dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO })
+      await sleep()
 
       try {
         const contract = setupContract()
@@ -332,6 +339,7 @@ export const BlockchainProvider = (props: AppProps) => {
   const nuevoToken = useCallback(
     async (contrato: string, oraculo: string) => {
       dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO })
+      await sleep()
 
       try {
         const contract = setupContract()
@@ -351,6 +359,7 @@ export const BlockchainProvider = (props: AppProps) => {
   const activarToken = useCallback(
     async (ticker: string) => {
       dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO })
+      await sleep()
 
       try {
         const contract = setupContract()
@@ -370,6 +379,7 @@ export const BlockchainProvider = (props: AppProps) => {
   const suspenderToken = useCallback(
     async (ticker: string) => {
       dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO })
+      await sleep()
 
       try {
         const contract = setupContract()
@@ -389,6 +399,7 @@ export const BlockchainProvider = (props: AppProps) => {
   const modificarOraculoToken = useCallback(
     async (ticker: string, oraculo: string) => {
       dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO })
+      await sleep()
 
       try {
         const contract = setupContract()
@@ -407,6 +418,7 @@ export const BlockchainProvider = (props: AppProps) => {
 
   const cargarDatosPlataforma = useCallback(async () => {
     dispatch({ type: ReducerActionType.MARCAR_CARGANDO_PLATAFORMA })
+    await sleep()
 
     try {
       const contract = setupContract()
@@ -427,6 +439,7 @@ export const BlockchainProvider = (props: AppProps) => {
 
   const bloquearPlataforma = useCallback(async () => {
     dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO })
+    await sleep()
 
     try {
       const contract = setupContract()
@@ -443,6 +456,7 @@ export const BlockchainProvider = (props: AppProps) => {
 
   const desbloquearPlataforma = useCallback(async () => {
     dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO })
+    await sleep()
 
     try {
       const contract = setupContract()
@@ -460,6 +474,7 @@ export const BlockchainProvider = (props: AppProps) => {
   const cambiarMontoMinimoPlataforma = useCallback(
     async (montoMinimoUSD: string) => {
       dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO })
+      await sleep()
 
       try {
         const contract = setupContract()
@@ -478,6 +493,7 @@ export const BlockchainProvider = (props: AppProps) => {
 
   const cargarAdministradores = useCallback(async () => {
     dispatch({ type: ReducerActionType.MARCAR_CARGANDO_ADMINISTRADORES })
+    await sleep()
 
     try {
       const contract = setupContract()
@@ -500,6 +516,7 @@ export const BlockchainProvider = (props: AppProps) => {
   const nuevoAdministrador = useCallback(
     async (billetera: string) => {
       dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO })
+      await sleep()
 
       try {
         const contract = setupContract()
@@ -519,6 +536,7 @@ export const BlockchainProvider = (props: AppProps) => {
   const quitarAdministrador = useCallback(
     async (billetera: string) => {
       dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO })
+      await sleep()
 
       try {
         const contract = setupContract()
@@ -537,6 +555,7 @@ export const BlockchainProvider = (props: AppProps) => {
 
   const cargarBloqueados = useCallback(async () => {
     dispatch({ type: ReducerActionType.MARCAR_CARGANDO_BLOQUEADOS })
+    await sleep()
 
     try {
       const contract = setupContract()
@@ -559,6 +578,7 @@ export const BlockchainProvider = (props: AppProps) => {
   const bloquearBilletera = useCallback(
     async (billetera: string) => {
       dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO })
+      await sleep()
 
       try {
         const contract = setupContract()
@@ -578,6 +598,7 @@ export const BlockchainProvider = (props: AppProps) => {
   const desbloquearBilletera = useCallback(
     async (billetera: string) => {
       dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO })
+      await sleep()
 
       try {
         const contract = setupContract()
@@ -598,6 +619,7 @@ export const BlockchainProvider = (props: AppProps) => {
     setSigner(signer)
 
     dispatch({ type: ReducerActionType.MARCAR_CARGANDO_SESION })
+    await sleep()
 
     try {
       const direccion = await signer.getAddress()

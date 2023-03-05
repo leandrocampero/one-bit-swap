@@ -178,3 +178,10 @@ export function simpleAddress(address: string): string {
   const last4char = address.slice(-4)
   return `${first6char}..${last4char}`
 }
+
+export async function sleep() {
+  if (process.env.NODE_ENV === 'development') {
+    const sleep = new Promise((resolve) => setTimeout(resolve, 1000))
+    await sleep
+  }
+}

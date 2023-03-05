@@ -5,9 +5,10 @@ import Typography from '@mui/material/Typography'
 
 export default function Intercambiar() {
   const { state } = useBlockchainContext()
+  const { sesion } = state
 
   return (
-    <BaseLayout>
+    <BaseLayout loading={sesion.cargando}>
       <Typography variant="h1" color="initial">
         Sesion
       </Typography>

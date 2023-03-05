@@ -10,8 +10,8 @@ import Link from 'next/link'
 
 export default function Navbar() {
   return (
-    <Box sx={{ flexGrow: 1, mb: 5 }}>
-      <AppBar position="fixed">
+    <AppBar position="fixed">
+      <Box sx={{ flexGrow: 1 }}>
         <Toolbar>
           <Container maxWidth="lg">
             <Grid
@@ -28,7 +28,7 @@ export default function Navbar() {
             </Grid>
           </Container>
         </Toolbar>
-      </AppBar>
-    </Box>
+      </Box>
+    </AppBar>
   )
 }
