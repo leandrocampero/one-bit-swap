@@ -1,4 +1,5 @@
 import { ERROR_NO_METAMASK } from '@/constants/mensajes'
+import { useBlockchainContext } from '@/context/BlockchainProvider'
 import networks from '@/contracts/networks'
 import {
   ExternalProvider,
@@ -34,6 +35,8 @@ function useWallet() {
   const [accounts, setAccounts] = useState<string[]>([])
   const [network, setNetwork] = useState<Network | null>(null)
 
+  const { actions } = useBlockchainContext()
+
   const setupProvider = useCallback(async () => {
     //************************************************************************//
     //                                                                        //
@@ -51,9 +54,10 @@ function useWallet() {
     //                         Create Event Listeners                         //
     //                                                                        //
     //************************************************************************//
-
-    genericProvider.on('accountsChanged', (acc: string[]) => {
+    genericProvider.on('accountsChanged', async (acc: string[]) => {
       setAccounts(acc)
+      const signer = newProvider.getSigner()
+      actions.conectarBilletera(signer)
     })
 
     genericProvider.on('chainChanged', async () => {
@@ -81,7 +85,6 @@ function useWallet() {
     if (currentChainIdHex !== chainId) {
       try {
         await newProvider.send('wallet_switchEthereumChain', [{ chainId }])
-        window.location.reload()
       } catch (error: any) {
         // Red no encontrada en Metamask
         if (error?.code === 4902) {
@@ -95,6 +98,8 @@ function useWallet() {
                 blockExplorerUrls,
               },
             ])
+
+            await newProvider.send('wallet_switchEthereumChain', [{ chainId }])
           } catch (addError) {}
         }
       }
@@ -109,31 +114,26 @@ function useWallet() {
     setProvider(newProvider)
 
     return newProvider
-  }, [provider])
+  }, [provider, actions])
 
   const connect = useCallback(async () => {
     const provider = await setupProvider()
     const accounts: string[] = await provider.send('eth_requestAccounts', [])
     const network: Network = await provider.getNetwork()
     const signer: JsonRpcSigner = provider.getSigner()
+
+    actions.conectarBilletera(signer)
+
     setNetwork(network)
     setAccounts(accounts)
     setSigner(signer)
-  }, [setupProvider])
-
-  const getAccounts = useCallback(async () => {
-    const provider = await setupProvider()
-    const accounts: string[] = await provider.send('eth_accounts', [])
-    setAccounts(accounts)
-    return accounts
-  }, [setupProvider])
+  }, [setupProvider, actions])
 
   return {
     signer,
     accounts,
     network,
     connect,
-    getAccounts,
   }
 }
 

@@ -152,6 +152,12 @@ describe('OneBitSwap', function () {
       await expect(plataforma.desbloquearBilletera(usuario.address)).not.to.be
         .reverted
     })
+
+    it('Una billetera no registrada debería estar como usuario', async function () {
+      const billetera = await plataforma.buscarBilletera(vendedor.address)
+
+      expect(billetera.rol).to.eq(0)
+    })
   })
 
   describe('Tokens', function () {
@@ -286,8 +292,8 @@ describe('OneBitSwap', function () {
       ).to.emit(plataforma, 'NuevaOrden')
     })
 
-    it('Antes de crear una cuarta orden de compra-venta, verificar si ya existe una espejo', async function () {
-      const gemela = await plataforma.buscarOrdenGemela(
+    it('Antes de crear una cuarta orden de compra-venta, verificar si ya existe una orden invertida para ejecutar (espejada)', async function () {
+      const gemela = await plataforma.buscarOrdenEspejo(
         tokenVenta.symbol(),
         tokenCompra.symbol(),
         ethers.utils.parseEther('1200'),
@@ -313,7 +319,7 @@ describe('OneBitSwap', function () {
           .approve(plataforma.address, ethers.utils.parseEther('100000'))
       ).to.emit(tokenCompra, 'Approval')
 
-      const ordenEjecutada = await plataforma.buscarOrdenGemela(
+      const ordenEjecutada = await plataforma.buscarOrdenEspejo(
         tokenVenta.symbol(),
         tokenCompra.symbol(),
         ethers.utils.parseEther('1200'),
@@ -332,7 +338,7 @@ describe('OneBitSwap', function () {
     })
 
     it('Cancelar una orden de compra-venta y comprobar la devolución de fondos', async function () {
-      const ordenCancelada = await plataforma.buscarOrdenGemela(
+      const ordenCancelada = await plataforma.buscarOrdenEspejo(
         tokenVenta.symbol(),
         tokenCompra.symbol(),
         ethers.utils.parseEther('100'),

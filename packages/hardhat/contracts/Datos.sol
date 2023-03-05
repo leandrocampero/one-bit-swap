@@ -20,7 +20,8 @@ abstract contract Datos {
 
   enum RolBilletera {
     USUARIO,
-    ADMINISTRADOR
+    ADMINISTRADOR,
+    PROPIETARIO
   }
 
   /****************************************************************************/

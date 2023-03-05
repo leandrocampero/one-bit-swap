@@ -7,12 +7,11 @@ import {
   Typography,
 } from '@mui/material'
 import Link from 'next/link'
-import ConectarWallet from './ConectarWallet'
 
 export default function Navbar() {
   return (
-    <Box sx={{ flexGrow: 1, mb: 5 }}>
-      <AppBar position="fixed">
+    <AppBar position="fixed">
+      <Box sx={{ flexGrow: 1 }}>
         <Toolbar>
           <Container maxWidth="lg">
             <Grid
@@ -26,13 +25,10 @@ export default function Navbar() {
                   <Link href="/">OneBitSwap</Link>
                 </Typography>
               </Grid>
-              <Grid item>
-                <ConectarWallet />
-              </Grid>
             </Grid>
           </Container>
         </Toolbar>
-      </AppBar>
-    </Box>
+      </Box>
+    </AppBar>
   )
 }

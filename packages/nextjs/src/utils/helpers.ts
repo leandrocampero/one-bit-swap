@@ -19,12 +19,22 @@ import { ethers } from 'ethers'
 export function formatArrayBilleteras(
   listado: Datos.BilleteraStructOutput[]
 ): Billetera[] {
-  return listado.map(({ direccion, estado, existe, rol }) => ({
+  return listado.map(({ direccion, estado, rol }) => ({
     direccion,
     estado: getEstadoGeneral(estado),
     rol: getRolBilletera(rol),
-    existe,
   }))
+}
+
+export function formatBilletera(
+  billetera: Datos.BilleteraStructOutput
+): Billetera {
+  const { direccion, estado, rol } = billetera
+  return {
+    direccion,
+    estado: getEstadoGeneral(estado),
+    rol: getRolBilletera(rol),
+  }
 }
 
 export function formatArrayTokens(listado: Datos.TokenStructOutput[]): Token[] {
@@ -69,6 +79,36 @@ export function formatArrayOrdenes(
         tipo: getTipoOrden(tipo),
       })
     )
+}
+
+export function formatOrden(orden: Datos.OrdenStructOutput): Orden {
+  const {
+    idOrden,
+    vendedor,
+    comprador,
+    montoVenta,
+    montoCompra,
+    fechaCreacion,
+    fechaFinalizacion,
+    estado,
+    tipo,
+    tokenCompra,
+    tokenVenta,
+  } = orden
+
+  return {
+    idOrden,
+    vendedor,
+    comprador,
+    montoVenta: montoVenta.toString(),
+    montoCompra: montoCompra.toString(),
+    fechaCreacion: fechaCreacion.toString(),
+    fechaFinalizacion: fechaFinalizacion.toString(),
+    tokenCompra,
+    tokenVenta,
+    estado: getEstadoOrden(estado),
+    tipo: getTipoOrden(tipo),
+  }
 }
 
 export function getTipoOrden(number: number): TiposOrdenes {
@@ -137,4 +177,11 @@ export function simpleAddress(address: string): string {
   const first6char = address.slice(0, 6)
   const last4char = address.slice(-4)
   return `${first6char}..${last4char}`
+}
+
+export async function sleep() {
+  if (process.env.NODE_ENV === 'development') {
+    const sleep = new Promise((resolve) => setTimeout(resolve, 1000))
+    await sleep
+  }
 }

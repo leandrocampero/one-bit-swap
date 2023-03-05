@@ -7,6 +7,29 @@ import "./Datos.sol";
 
 contract GestorBilleteras is Datos {
   /**
+   * @notice devuelve datos de la billetera si
+   * @return billetera
+   */
+  function buscarBilletera(
+    address _billetera
+  ) public view returns (Billetera memory) {
+    Billetera storage billetera = billeterasRegistradas[_billetera];
+
+    uint256 size;
+
+    assembly {
+      size := extcodesize(_billetera)
+    }
+    require(size == 0, "La billetera es invalida");
+    require(
+      _billetera != address(0),
+      "La direccion de la billetera no puede ser cero"
+    );
+
+    return billetera;
+  }
+
+  /**
    * @notice lista todos los administradores
    * @return listado array de billeteras con rol administrador
    */

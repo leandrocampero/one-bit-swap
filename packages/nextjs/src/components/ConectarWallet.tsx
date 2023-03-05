@@ -1,5 +1,4 @@
 // https://docs.metamask.io/guide/ethereum-provider.html#using-the-provider
-import { BlockchainContext } from '@/context/BlockchainContext'
 import { useWallet } from '@/hooks/wallet'
 import { RolesBilleteras } from '@/types.d'
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet'
@@ -8,7 +7,7 @@ import SettingsIcon from '@mui/icons-material/Settings'
 import { Button, Menu, MenuProps, styled } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import Link from 'next/link'
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 const StyledMenu = styled((props: MenuProps) => (
   <Menu

@@ -1,4 +1,4 @@
-import { BlockchainContext } from '@/context/BlockchainContext'
+import { useBlockchainContext } from '@/context/BlockchainProvider'
 import { Token } from '@/types'
 import {
   Button,
@@ -6,6 +6,7 @@ import {
   FormControlLabel,
   FormLabel,
   InputLabel,
+  LinearProgress,
   MenuItem,
   Radio,
   RadioGroup,
@@ -14,10 +15,10 @@ import {
   TextField,
 } from '@mui/material'
 import { Box } from '@mui/system'
-import { useContext, useState } from 'react'
+import { useState } from 'react'
 
 export default function CrearOrdenesTest() {
-  const { state, actions } = useContext(BlockchainContext)
+  const { state, actions } = useBlockchainContext()
   const [tipoOrden, setTipoOrden] = useState<number>(0)
   const [tokenVenta, setTokenVenta] = useState<string>('')
   const [tokenCompra, setTokenCompra] = useState<string>('')
@@ -53,6 +54,12 @@ export default function CrearOrdenesTest() {
           </RadioGroup>
         </FormControl>
       </Box>
+
+      {tokens.cargando && (
+        <Box sx={{ width: '100%', marginBottom: 4 }}>
+          <LinearProgress />
+        </Box>
+      )}
 
       <Box sx={{ marginBottom: 4 }}>
         <FormControl fullWidth>
