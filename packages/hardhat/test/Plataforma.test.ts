@@ -152,6 +152,12 @@ describe('OneBitSwap', function () {
       await expect(plataforma.desbloquearBilletera(usuario.address)).not.to.be
         .reverted
     })
+
+    it('Una billetera no registrada debería estar como usuario', async function () {
+      const billetera = await plataforma.buscarBilletera(vendedor.address)
+
+      expect(billetera.rol).to.eq(0)
+    })
   })
 
   describe('Tokens', function () {

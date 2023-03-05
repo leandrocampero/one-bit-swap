@@ -178,10 +178,12 @@ contract GestorOrdenes is Datos, GestorTokens {
 
     // Enfilar por billetera
     ordenes.porBilletera[msg.sender].push(ordenNueva.idOrden); // IMPROVE: debería pasarlo a billeterasRegistradas
-    billeterasRegistradas[msg.sender].direccion = msg.sender;
-    billeterasRegistradas[msg.sender].rol = RolBilletera.USUARIO;
-    billeterasRegistradas[msg.sender].estado = EstadoGeneral.ACTIVO;
-    billeterasRegistradas[msg.sender].existe = true;
+    if (!billeterasRegistradas[msg.sender].existe) {
+      billeterasRegistradas[msg.sender].direccion = msg.sender;
+      billeterasRegistradas[msg.sender].rol = RolBilletera.USUARIO;
+      billeterasRegistradas[msg.sender].estado = EstadoGeneral.ACTIVO;
+      billeterasRegistradas[msg.sender].existe = true;
+    }
 
     // Enfilar en ordenes gemelas
     bytes32 grupoHashGuardado = keccak256(
@@ -363,10 +365,12 @@ contract GestorOrdenes is Datos, GestorTokens {
     ordenes.cantidadActivas--;
 
     // Guardar datos de comprador
-    billeterasRegistradas[msg.sender].direccion = msg.sender;
-    billeterasRegistradas[msg.sender].rol = RolBilletera.USUARIO;
-    billeterasRegistradas[msg.sender].estado = EstadoGeneral.ACTIVO;
-    billeterasRegistradas[msg.sender].existe = true;
+    if (!billeterasRegistradas[msg.sender].existe) {
+      billeterasRegistradas[msg.sender].direccion = msg.sender;
+      billeterasRegistradas[msg.sender].rol = RolBilletera.USUARIO;
+      billeterasRegistradas[msg.sender].estado = EstadoGeneral.ACTIVO;
+      billeterasRegistradas[msg.sender].existe = true;
+    }
 
     // Quitar de ordenes gemelas
     bytes32 grupoHashGuardado = keccak256(

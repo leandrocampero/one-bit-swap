@@ -13,9 +13,13 @@ contract Plataforma is Datos, GestorTokens, GestorBilleteras, GestorOrdenes {
     plataforma.propietario = msg.sender;
     plataforma.montoMinimoUSD = _montoMinimo;
     plataforma.estado = EstadoGeneral.ACTIVO;
+
+    billeterasRegistradas[msg.sender].existe = true;
+    billeterasRegistradas[msg.sender].rol = RolBilletera.PROPIETARIO;
+    billeterasRegistradas[msg.sender].estado = EstadoGeneral.ACTIVO;
   }
 
-  function bloquearPlataforma() public soloAdministrador returns (bool) {
+  function bloquearPlataforma() public soloPropietario returns (bool) {
     require(
       plataforma.estado == EstadoGeneral.ACTIVO,
       "La plataforma ya se encuentra bloqueada"
@@ -25,7 +29,7 @@ contract Plataforma is Datos, GestorTokens, GestorBilleteras, GestorOrdenes {
     return true;
   }
 
-  function desbloquearPlataforma() public soloAdministrador returns (bool) {
+  function desbloquearPlataforma() public soloPropietario returns (bool) {
     require(
       plataforma.estado == EstadoGeneral.SUSPENDIDO,
       "La plataforma ya se encuentra activa"
