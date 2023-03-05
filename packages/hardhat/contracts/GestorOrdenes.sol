@@ -14,10 +14,18 @@ contract GestorOrdenes is Datos, GestorTokens {
     bytes32 _puntoPartida, // OBS: el puntoPartida es la última orden listada
     uint _ventana
   ) public view returns (Orden[] memory) {
-    Orden[] memory listado = new Orden[](_ventana);
+    uint length;
     Orden memory orden;
     uint indiceResultado = 0;
     bytes32 idOrdenSiguiente = 0x00;
+
+    if (ordenes.cantidadActivas < _ventana) {
+      length = ordenes.cantidadActivas;
+    } else {
+      length = _ventana;
+    }
+
+    Orden[] memory listado = new Orden[](length);
 
     if (ordenes.cantidadActivas == 0) {
       return listado;
@@ -520,7 +528,7 @@ contract GestorOrdenes is Datos, GestorTokens {
     return exito;
   }
 
-  function buscarOrdenGemela(
+  function buscarOrdenEspejo(
     string memory _tokenCompra,
     string memory _tokenVenta,
     uint256 _montoCompra,
