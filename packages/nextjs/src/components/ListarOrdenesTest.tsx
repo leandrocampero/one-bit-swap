@@ -1,36 +1,45 @@
-import { BlockchainContext } from '@/context/BlockchainProvider'
+import { useBlockchainContext } from '@/context/BlockchainProvider'
 import { Orden, Token } from '@/types.d'
 import {
   Button,
+  CircularProgress,
   FormControl,
   Grid,
   InputLabel,
+  LinearProgress,
   MenuItem,
   Select,
   SelectChangeEvent,
 } from '@mui/material'
-import { useContext, useState } from 'react'
+import { ethers } from 'ethers'
+import { useCallback, useState } from 'react'
 
 export default function ListarOrdenesTest() {
-  const { state, actions } = useContext(BlockchainContext)
+  const { state, actions } = useBlockchainContext()
   const [tokenVenta, setTokenVenta] = useState<string>('')
   const [tokenCompra, setTokenCompra] = useState<string>('')
 
   const { tokens, ordenes } = state
   const { cargarOrdenesActivas } = actions
 
+  const handleCargarMas = useCallback(() => {
+    const cantidadOrdenes = ordenes.datos.length
+    const ultimaOrden =
+      (cantidadOrdenes !== 0 && ordenes.datos[cantidadOrdenes - 1].idOrden) ||
+      ethers.constants.HashZero
+
+    cargarOrdenesActivas(ultimaOrden)
+  }, [ordenes, cargarOrdenesActivas])
+
   return (
     <>
       <Button
         variant="contained"
         sx={{ width: '50%', marginBottom: 4 }}
-        onClick={async () =>
-          await cargarOrdenesActivas(
-            ordenes.datos[ordenes.datos.length - 1].idOrden
-          )
-        }
+        disabled={ordenes.cargando}
+        onClick={handleCargarMas}
       >
-        Dame ordenes
+        {ordenes.cargando ? <CircularProgress size={24} /> : 'Dame ordenes'}
       </Button>
       <Grid container spacing={2}>
         <Grid item xs={3}>
@@ -78,6 +87,11 @@ export default function ListarOrdenesTest() {
             {orden.idOrden}
           </Grid>
         ))}
+        {ordenes.cargando && (
+          <Grid item xs={12}>
+            <LinearProgress />
+          </Grid>
+        )}
       </Grid>
     </>
   )
