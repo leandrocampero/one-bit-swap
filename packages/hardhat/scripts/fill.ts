@@ -238,6 +238,16 @@ async function main() {
     }
   }
 
+  await plataforma.hacerAdministrador(
+    '0xB6101E241Df60EAF1b3735f6D73c511602fb8453'
+  ) // Leandro
+  await plataforma.hacerAdministrador(
+    '0x6b4830E71048A69E5a71b1FebF085610c7012EF3'
+  ) // Stonks
+  await plataforma.hacerAdministrador(
+    '0xD16DA42A2f5C89223E8f2e35e7F1B0a499cf744C'
+  ) // Gsus
+
   //**********************************************//
   //             Mostrar por consola              //
   //**********************************************//
