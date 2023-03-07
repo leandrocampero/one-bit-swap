@@ -1,4 +1,4 @@
-import { BlockchainContext } from '@/context/BlockchainContext'
+import { BlockchainContext } from '@/context/BlockchainProvider'
 import { Box, Button, Modal, TextField } from '@mui/material'
 import { ethers } from 'ethers'
 import React, { useContext, useState } from 'react'

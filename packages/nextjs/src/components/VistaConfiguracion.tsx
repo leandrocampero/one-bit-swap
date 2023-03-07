@@ -1,4 +1,4 @@
-import { BlockchainContext } from '@/context/BlockchainContext'
+import { BlockchainContext } from '@/context/BlockchainProvider'
 import { Estados } from '@/types.d'
 import { Button, Grid, InputAdornment, TextField } from '@mui/material'
 import { useContext, useState } from 'react'

@@ -16,7 +16,7 @@ const style = {
 }
 
 import { EsNuevoContext } from './VistaTokens'
-import { BlockchainContext } from '@/context/BlockchainContext'
+import { BlockchainContext } from '@/context/BlockchainProvider'
 import { ethers } from 'ethers'
 
 export default function NuevoModificaToken() {

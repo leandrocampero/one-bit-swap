@@ -30,7 +30,7 @@ import {
 } from '@mui/material'
 import React, { useCallback, useContext, useState } from 'react'
 import EjecutarOrden from './EjecutarOrden'
-import { BlockchainContext } from '@/context/BlockchainContext'
+import { BlockchainContext } from '@/context/BlockchainProvider'
 
 export const OrdenContext = React.createContext<Orden | undefined>(undefined)
 

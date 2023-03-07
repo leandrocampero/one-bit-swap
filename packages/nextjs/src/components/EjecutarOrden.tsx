@@ -17,7 +17,7 @@ const style = {
 }
 
 import { OrdenContext } from './VistaOrdenes'
-import { BlockchainContext } from '@/context/BlockchainContext'
+import { BlockchainContext } from '@/context/BlockchainProvider'
 
 export default function EjecutarOrden() {
   const { actions } = useContext(BlockchainContext)

@@ -12,7 +12,7 @@ import {
 } from '@mui/material'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import Nuevo from './NuevoSuspendido'
-import { BlockchainContext } from '@/context/BlockchainContext'
+import { BlockchainContext } from '@/context/BlockchainProvider'
 
 export default function VistaBilleterasSuspendidas() {
   const { state, actions } = useContext(BlockchainContext)

@@ -14,7 +14,7 @@ import {
 } from '@mui/material'
 import React, { useCallback, useContext, useState } from 'react'
 import NuevoModificaToken from './NuevoModificaToken'
-import { BlockchainContext } from '@/context/BlockchainContext'
+import { BlockchainContext } from '@/context/BlockchainProvider'
 
 export const EsNuevoContext = React.createContext<Token | undefined>(undefined)
 
