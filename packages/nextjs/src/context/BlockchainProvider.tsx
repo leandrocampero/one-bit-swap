@@ -32,6 +32,7 @@ import {
 import {
   formatArrayBilleteras,
   formatArrayOrdenes,
+  formatBilletera,
   formatOrden,
   sleep,
 } from '@/utils/helpers'
@@ -615,26 +616,38 @@ export const BlockchainProvider = (props: AppProps) => {
     [setupContract]
   )
 
-  const conectarBilletera = useCallback(async (signer: JsonRpcSigner) => {
-    setSigner(signer)
+  const conectarBilletera = useCallback(
+    async (signer: JsonRpcSigner) => {
+      setSigner(signer)
 
-    dispatch({ type: ReducerActionType.MARCAR_CARGANDO_SESION })
-    await sleep()
+      dispatch({ type: ReducerActionType.MARCAR_CARGANDO_SESION })
+      await sleep()
 
-    try {
-      const direccion = await signer.getAddress()
+      try {
+        const direccion = await signer.getAddress()
+        const contract = setupContract()
 
-      dispatch({
-        type: ReducerActionType.GUARDAR_DATOS_SESION,
-        payload: { direccion, estado: 0, rol: 0 },
-      })
-    } catch (error: any) {
-      dispatch({
-        type: ReducerActionType.MARCAR_ERROR_SESION,
-        payload: error.message,
-      })
-    }
-  }, [])
+        const billetera = formatBilletera(
+          await contract.buscarBilletera(direccion)
+        )
+
+        console.log('Billetera:', billetera)
+
+        const { estado, rol } = billetera
+
+        dispatch({
+          type: ReducerActionType.GUARDAR_DATOS_SESION,
+          payload: { direccion, estado, rol },
+        })
+      } catch (error: any) {
+        dispatch({
+          type: ReducerActionType.MARCAR_ERROR_SESION,
+          payload: error.message,
+        })
+      }
+    },
+    [setupContract]
+  )
 
   //**************************************************************************//
   //                                                                          //

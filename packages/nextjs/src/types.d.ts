@@ -7,8 +7,8 @@ export enum Estados {
 
 export enum EstadosOrdenes {
   activa = 0,
-  cancelada = 2,
-  finalizada = 3,
+  cancelada = 1,
+  finalizada = 2,
 }
 
 export enum TiposOrdenes {
@@ -18,9 +18,9 @@ export enum TiposOrdenes {
 }
 
 export enum RolesBilleteras {
-  usuario = 1,
-  administrador = 2,
-  propietario = 3,
+  usuario = 0,
+  administrador = 1,
+  propietario = 2,
 }
 
 /**
