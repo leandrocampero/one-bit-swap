@@ -30,10 +30,8 @@ function TabPanel(props: TabPanelProps) {
 
 export default function VistaAdminsitrador() {
   const [getTabValue, setTabValue] = useState(NavMenu.configuracion)
-  const [getBilleteraUsuario, setBilleteraUsuario] = useState<Billeteras>(b10)
-  const gestorBilletera = GestorBilleteras.instanciar()
 
-  const handleTabChange = (
+  const handleCambiarNavMenu = (
     event: React.SyntheticEvent,
     nuevoValor: NavMenu
   ) => {
@@ -44,50 +42,36 @@ export default function VistaAdminsitrador() {
     <div>
       <Tabs
         value={getTabValue}
-        onChange={handleTabChange}
+        onChange={handleCambiarNavMenu}
         textColor="secondary"
         indicatorColor="secondary"
         aria-label="secondary tabs example"
       >
-        {gestorBilletera.verificarRol(getBilleteraUsuario) >
-          RolesBilleteras.usuario && (
-          <Tab value={NavMenu.configuracion} label={NavMenu.configuracion} />
-        )}
-        {gestorBilletera.verificarRol(getBilleteraUsuario) >
-          RolesBilleteras.usuario && (
-          <Tab value={NavMenu.billeteras} label={NavMenu.billeteras} />
-        )}
-        {gestorBilletera.verificarRol(getBilleteraUsuario) >
-          RolesBilleteras.usuario && (
-          <Tab
-            value={NavMenu.billeterasSuspendidas}
-            label={NavMenu.billeterasSuspendidas}
-          />
-        )}
-        {gestorBilletera.verificarRol(getBilleteraUsuario) >
-          RolesBilleteras.usuario && (
-          <Tab value={NavMenu.tokens} label={NavMenu.tokens} />
-        )}
+        <Tab value={NavMenu.configuracion} label={NavMenu.configuracion} />
+
+        <Tab value={NavMenu.billeteras} label={NavMenu.billeteras} />
+
+        <Tab
+          value={NavMenu.billeterasSuspendidas}
+          label={NavMenu.billeterasSuspendidas}
+        />
+        <Tab value={NavMenu.tokens} label={NavMenu.tokens} />
       </Tabs>
 
       <TabPanel value={getTabValue} index={NavMenu.configuracion}>
-        {gestorBilletera.verificarRol(getBilleteraUsuario) >
-          RolesBilleteras.usuario && <VistaConfiguracion />}
+        <VistaConfiguracion />
       </TabPanel>
 
       <TabPanel value={getTabValue} index={NavMenu.billeteras}>
-        {gestorBilletera.verificarRol(getBilleteraUsuario) >
-          RolesBilleteras.usuario && <VistaBilleteras />}
+        <VistaBilleteras />
       </TabPanel>
 
       <TabPanel value={getTabValue} index={NavMenu.billeterasSuspendidas}>
-        {gestorBilletera.verificarRol(getBilleteraUsuario) >
-          RolesBilleteras.usuario && <VistaBilleterasSuspendidas />}
+        <VistaBilleterasSuspendidas />
       </TabPanel>
 
       <TabPanel value={getTabValue} index={NavMenu.tokens}>
-        {gestorBilletera.verificarRol(getBilleteraUsuario) >
-          RolesBilleteras.usuario && <VistaTokens />}
+        <VistaTokens />
       </TabPanel>
     </div>
   )

@@ -1,5 +1,6 @@
+import { BlockchainContext } from '@/context/BlockchainContext'
 import { Box, Button, Modal, TextField } from '@mui/material'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 
 const style = {
   position: 'absolute' as const,
@@ -18,6 +19,11 @@ const style = {
 export default function NuevoAdministrador() {
   const [getDireccion, setDireccion] = useState('')
   const [getEstadoModal, setEstadoModal] = useState(false)
+  const [error, setError] = useState<boolean>(false)
+
+  const { actions } = useContext(BlockchainContext)
+
+  const { nuevoAdministrador } = actions
 
   const handleAbrirModal = () => {
     setEstadoModal(!getEstadoModal)
@@ -25,7 +31,12 @@ export default function NuevoAdministrador() {
 
   const handleAgregar = () => {
     console.log('Nuevo Administrador')
-    setEstadoModal(!getEstadoModal)
+    if (getDireccion.length > 1) {
+      nuevoAdministrador(getDireccion)
+      setEstadoModal(!getEstadoModal)
+    } else {
+      setError(true)
+    }
   }
 
   return (
@@ -52,6 +63,7 @@ export default function NuevoAdministrador() {
                 setDireccion(event.target.value.trim())
               }
             />
+            {error && <h3>Ingrese parametros validos</h3>}{' '}
           </Box>
           <Button onClick={handleAgregar}>Agregar</Button>
         </Box>

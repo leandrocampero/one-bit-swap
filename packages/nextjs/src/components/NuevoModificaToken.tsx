@@ -1,5 +1,5 @@
 import { Box, Button, Modal, TextField } from '@mui/material'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 
 const style = {
   position: 'absolute' as const,
@@ -16,12 +16,19 @@ const style = {
 }
 
 import { EsNuevoContext } from './VistaTokens'
+import { BlockchainContext } from '@/context/BlockchainContext'
+import { ethers } from 'ethers'
 
 export default function NuevoModificaToken() {
   const contexto = React.useContext(EsNuevoContext)
   const [getContrato, setContrato] = useState<string>(contexto?.contrato ?? '')
   const [getOraculo, setOraculo] = useState<string>(contexto?.oraculo ?? '')
   const [getEstadoModal, setEstadoModal] = useState(false)
+  const [error, setError] = useState<boolean>(false)
+
+  const { actions } = useContext(BlockchainContext)
+
+  const { nuevoToken, modificarOraculoToken } = actions
 
   const handleModalNuevo = () => {
     setEstadoModal(!getEstadoModal)
@@ -29,7 +36,19 @@ export default function NuevoModificaToken() {
   }
   const handleCrear = () => {
     console.log('Creado')
-    setEstadoModal(!getEstadoModal)
+    if (
+      contexto == undefined &&
+      ethers.utils.isAddress(getContrato) &&
+      ethers.utils.isAddress(getOraculo)
+    ) {
+      nuevoToken(getContrato, getOraculo)
+      setEstadoModal(!getEstadoModal)
+    } else if (contexto != undefined && ethers.utils.isAddress(getOraculo)) {
+      modificarOraculoToken(contexto?.ticker, getOraculo)
+      setEstadoModal(!getEstadoModal)
+    } else {
+      setError(true)
+    }
   }
 
   return (
@@ -71,6 +90,7 @@ export default function NuevoModificaToken() {
                 setOraculo(event.target.value.trim())
               }
             />
+            {error && <h3>Ingrese parametros validos</h3>}
           </Box>
           <Button onClick={handleCrear}>Crear</Button>
         </Box>

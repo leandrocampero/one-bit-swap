@@ -9,24 +9,22 @@ import {
   TableCell,
   TableContainer,
   TableHead,
-  TablePagination,
   TableRow,
   TextField,
 } from '@mui/material'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useContext, useState } from 'react'
 import NuevoModificaToken from './NuevoModificaToken'
+import { BlockchainContext } from '@/context/BlockchainContext'
 
-export const EsNuevoContext = React.createContext<Tokens | undefined>(undefined)
+export const EsNuevoContext = React.createContext<Token | undefined>(undefined)
 
-export default function VistaTokens() {
-  const [getTableData, setTableData] = useState<Tokens[]>([])
-  //const [getTableData, setTableData] = useState([])
-  const [page, setPage] = useState(0)
-  const [rowsPerPage, setRowsPerPage] = useState(10)
-  const [getIncluyeBajas, setIncluyeBajas] = useState(true)
-  const [getTextoBusqueda, setTextoBusqueda] = useState('')
-  //const [getEsNuevo, setEsNuevo] = useState<Tokens | undefined>(undefined)
-  const gestorTokens = GestorTokens.instanciar()
+export default function VistaToken() {
+  const [getIncluyeBajas, setIncluyeBajas] = useState<boolean>(true)
+  const [getTextoBusqueda, setTextoBusqueda] = useState<string>('')
+
+  const { state, actions } = useContext(BlockchainContext)
+  const { tokens } = state
+  const { cargarTokens, activarToken, suspenderToken } = actions
 
   // no esta funcionando bien el filtro conjunto de text y ck¿heck
   const handleBuscar = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,28 +36,58 @@ export default function VistaTokens() {
   }
 
   const handleClicRecargar = () => {
-    // no se que hace aqui
+    cargarTokens(getIncluyeBajas)
   }
 
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage)
-  }
+  const cambiarEstado = useCallback(
+    (t: Token) => {
+      if (t.estado == Estados.activo) {
+        activarToken(t.ticker)
+      } else {
+        suspenderToken(t.ticker)
+      }
+    },
+    [activarToken, suspenderToken]
+  )
 
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setRowsPerPage(+event.target.value)
-    setPage(0)
-  }
-
-  useEffect(() => {
-    setTableData(
-      gestorTokens.buscar(
-        getTextoBusqueda,
-        getIncluyeBajas ? Estados.todos : Estados.activo
-      )
-    )
-  }, [getTextoBusqueda, getIncluyeBajas])
+  const listarTokens = useCallback(() => {
+    return tokens.datos
+      .filter((t: Token) => {
+        ;(t.ticker.toLowerCase().includes(getTextoBusqueda) ||
+          getTextoBusqueda == '') &&
+          (getIncluyeBajas ? t.estado == Estados.activo : true)
+      })
+      .map((row: Token) => {
+        return (
+          <TableRow
+            hover
+            role="checkbox"
+            tabIndex={-1}
+            key={Math.random() * 1000}
+          >
+            <TableCell key={row.ticker} align="left">
+              {row.ticker}
+            </TableCell>
+            <TableCell key={row.contrato} align="left">
+              {row.contrato}
+            </TableCell>
+            <TableCell key={row.contrato + row.estado} align="left">
+              {row.estado}
+            </TableCell>
+            <TableCell key={row.contrato + row.ticker} align="left">
+              <Button variant="contained" onClick={() => cambiarEstado(row)}>
+                {row.estado == Estados.activo ? 'Suspender' : 'Activar'}
+              </Button>
+              {row.estado == Estados.suspendido && (
+                <EsNuevoContext.Provider value={row}>
+                  <NuevoModificaToken />
+                </EsNuevoContext.Provider>
+              )}
+            </TableCell>
+          </TableRow>
+        )
+      })
+  }, [cambiarEstado, getIncluyeBajas, getTextoBusqueda, tokens.datos])
 
   const columnas: Columna[] = [
     {
@@ -132,64 +160,9 @@ export default function VistaTokens() {
                 ))}
               </TableRow>
             </TableHead>
-            <TableBody>
-              {getTableData
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row: Tokens) => {
-                  return (
-                    <TableRow
-                      hover
-                      role="checkbox"
-                      tabIndex={-1}
-                      key={Math.random() * 1000}
-                    >
-                      <TableCell key={row.ticker} align="left">
-                        {row.ticker}
-                      </TableCell>
-                      <TableCell key={row.contrato} align="left">
-                        {row.contrato}
-                      </TableCell>
-                      <TableCell key={row.estado} align="left">
-                        {row.estado == Estados.activo ? 'Activo' : 'Suspendido'}
-                      </TableCell>
-                      <TableCell key={row.ticker + row.contrato} align="left">
-                        {row.estado == Estados.suspendido && (
-                          <Button
-                            variant="contained"
-                            onClick={() => console.log('Activar token')}
-                          >
-                            Activar
-                          </Button>
-                        )}
-                        {row.estado == Estados.activo && (
-                          <Button
-                            variant="contained"
-                            onClick={() => console.log('suspender token')}
-                          >
-                            Suspender
-                          </Button>
-                        )}
-                        {row.estado == Estados.suspendido && (
-                          <EsNuevoContext.Provider value={row}>
-                            <NuevoModificaToken />
-                          </EsNuevoContext.Provider>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  )
-                })}
-            </TableBody>
+            <TableBody>{listarTokens()}</TableBody>
           </Table>
         </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[10, 25, 100]}
-          component="div"
-          count={getTableData.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
       </Paper>
     </>
   )

@@ -1,5 +1,7 @@
+import { BlockchainContext } from '@/context/BlockchainContext'
 import { Box, Button, Modal, TextField } from '@mui/material'
-import React, { useState } from 'react'
+import { ethers } from 'ethers'
+import React, { useContext, useState } from 'react'
 
 const style = {
   position: 'absolute' as const,
@@ -16,8 +18,12 @@ const style = {
 }
 
 export default function NuevoSuspendido() {
-  const [getDireccion, setDireccion] = useState('')
+  const [getDireccion, setDireccion] = useState<string>('')
   const [getEstadoModal, setEstadoModal] = useState(false)
+  const [error, setError] = useState<boolean>(false)
+  const { actions } = useContext(BlockchainContext)
+
+  const { bloquearBilletera } = actions
 
   const handleAbrirModal = () => {
     setEstadoModal(!getEstadoModal)
@@ -25,7 +31,12 @@ export default function NuevoSuspendido() {
 
   const handleSuspender = () => {
     console.log('Nuevo Suspendido')
-    setEstadoModal(!getEstadoModal)
+    if (ethers.utils.isAddress(getDireccion)) {
+      bloquearBilletera(getDireccion)
+      setEstadoModal(!getEstadoModal)
+    } else {
+      setError(true)
+    }
   }
 
   return (
@@ -52,6 +63,7 @@ export default function NuevoSuspendido() {
                 setDireccion(event.target.value.trim())
               }
             />
+            {error && <h3>Ingrese parametros validos</h3>}
           </Box>
           <Button onClick={handleSuspender}>Suspender</Button>
         </Box>

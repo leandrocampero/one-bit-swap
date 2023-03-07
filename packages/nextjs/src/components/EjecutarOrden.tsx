@@ -1,6 +1,6 @@
 import { TiposOrdenes } from '@/types.d'
 import { Box, Button, Modal } from '@mui/material'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 
 const style = {
   position: 'absolute' as const,
@@ -17,16 +17,22 @@ const style = {
 }
 
 import { OrdenContext } from './VistaOrdenes'
+import { BlockchainContext } from '@/context/BlockchainContext'
 
 export default function EjecutarOrden() {
+  const { actions } = useContext(BlockchainContext)
+
   const contexto = React.useContext(OrdenContext)
   const [getEstadoModal, setEstadoModal] = useState(false)
+
+  const { ejecutarOrden } = actions
 
   const handleModalNuevo = () => {
     setEstadoModal(!getEstadoModal)
   }
   const handleEjecutar = () => {
     console.log('Ejecutado')
+    ejecutarOrden(contexto?.idOrden)
     setEstadoModal(!getEstadoModal)
   }
 
@@ -44,18 +50,16 @@ export default function EjecutarOrden() {
         <Box sx={{ ...style, width: 600 }}>
           <Box>
             <h2>Resumen de Orden</h2>
-            <h2>
-              Recibo: {contexto.montoVenta + ' ' + contexto.tokenVenta.ticker}
-            </h2>
+            <h2>Recibo: {contexto?.montoVenta + ' ' + contexto?.tokenVenta}</h2>
             <h2>
               Cambio:
-              {(contexto.tipo == TiposOrdenes.compraVenta
-                ? contexto.montoCompra
+              {(contexto?.tipo == TiposOrdenes.compraVenta
+                ? contexto?.montoCompra
                 : 'traer del oraculo') +
                 ' ' +
-                contexto.tokenCompra.ticker}
+                contexto?.tokenCompra}
             </h2>
-            {contexto.tipo == TiposOrdenes.compraVenta && (
+            {contexto?.tipo == TiposOrdenes.compraVenta && (
               <h2>Razon de Conversión: {'traer de chainlink'}</h2>
             )}
           </Box>

@@ -24,12 +24,11 @@ import {
   TableCell,
   TableContainer,
   TableHead,
-  TablePagination,
   TableRow,
   Tabs,
   TextField,
 } from '@mui/material'
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useCallback, useContext, useState } from 'react'
 import EjecutarOrden from './EjecutarOrden'
 import { BlockchainContext } from '@/context/BlockchainContext'
 
@@ -37,14 +36,10 @@ export const OrdenContext = React.createContext<Orden | undefined>(undefined)
 
 export default function VistaOrdenes() {
   const { state, actions } = useContext(BlockchainContext)
-  const [getTokens, setTokens] = useState(Array<Token>)
-  const [getOrdenes, setOrdenes] = useState(Array<Orden>)
   const [getTabValue, setTabValue] = useState(NavMenu.ordenesAbiertas)
   const [getBilleteraUsuario, setBilleteraUsuario] = useState<
     Billetera | undefined
   >(undefined)
-  const [page, setPage] = useState(0)
-  const [rowsPerPage, setRowsPerPage] = useState(10)
   const [getTokenVenta, setTokenVenta] = useState<Token | null>(null)
   const [getTokenCompra, setTokenCompra] = useState<Token | null>(null)
   const [getTipoOrden, setTipoOrden] = useState(TiposOrdenes.todas)
@@ -52,17 +47,17 @@ export default function VistaOrdenes() {
   const [getMontoCompra, setMontoCompra] = useState(BigInt(0))
 
   const { tokens, ordenes } = state
-  const { cargarOrdenesActivas, cancelarOrden, ejecutarOrden } = actions
+  const { cargarOrdenesActivas, cargarOrdenesPropias, cancelarOrden } = actions
 
-  const handleChangeTokenButton = () => {
-    console.log('cambio ' + getTokenCompra + '  por ' + getTokenVenta)
+  const [loading, setLoading] = useState(false)
+
+  const handleCambiarTokenButton = () => {
     const aux = getTokenVenta
     setTokenVenta(getTokenCompra)
     setTokenCompra(aux)
-    console.log('cambio ' + getTokenCompra + '  por ' + getTokenVenta)
   }
 
-  const handleChangeTokenVenta = (
+  const handleCambiarTokenVenta = (
     event: React.SyntheticEvent,
     value: Token | null
   ) => {
@@ -70,7 +65,7 @@ export default function VistaOrdenes() {
     setTokenVenta(value)
   }
 
-  const handleChangeTokenCompra = (
+  const handleCambiarTokenCompra = (
     event: React.SyntheticEvent,
     value: Token | null
   ) => {
@@ -78,57 +73,39 @@ export default function VistaOrdenes() {
     setTokenCompra(value)
   }
 
-  const handleChangeSelect = (event: SelectChangeEvent) => {
+  const handleCambiarTipoOrden = (event: SelectChangeEvent) => {
     setTipoOrden(parseInt(event.target.value))
-    // setOrdenes(
-    cargarOrdenesActivas(ordenes.datos[ordenes.datos.length - 1].idOrden)
-    //)
   }
 
-  const handleTabChange = (
+  const handleCambiarNavMenu = (
     event: React.SyntheticEvent,
     nuevoValor: NavMenu
   ) => {
     setTabValue(nuevoValor)
-    setPage(0)
+    console.log(ordenes.datos.length + ' antes')
+    console.log(ordenes.datos[0]?.idOrden + 'id antes')
+    if (nuevoValor == NavMenu.ordenesAbiertas) {
+      cargarOrdenesActivas(ordenes.datos[0]?.idOrden)
+      console.log('activas')
+    } else {
+      cargarOrdenesPropias()
+      console.log('propias')
+    }
+    console.log(ordenes.datos.length + ' despues')
+    console.log(ordenes.datos[0]?.idOrden + 'id despues')
   }
 
   function handleCancelarOrden(id: string) {
     cancelarOrden(id)
   }
 
-  function handleEjecutarOrden(id: string) {
-    ejecutarOrden(id)
-  }
-
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage)
-  }
-
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setRowsPerPage(+event.target.value)
-    setPage(0)
-  }
-
-  useEffect(() => {
-    // setOrdenes(
-    cargarOrdenesActivas(ordenes.datos[ordenes.datos.length - 1].idOrden)
-    // )
-
-    if (getTokens.length == 0) {
-      setTokens(tokens.datos)
-    }
-  }, [
-    getBilleteraUsuario,
-    getTipoOrden,
-    getTokenCompra,
-    getTokenVenta,
-    getMontoCompra,
-    getMontoVenta,
-    getTabValue,
-  ])
+  const handleCargarMas = useCallback(() => {
+    setLoading(true)
+    return setTimeout(() => {
+      cargarOrdenesActivas(ordenes.datos[ordenes.datos.length - 1]?.idOrden)
+      setLoading(() => false)
+    }, 500)
+  }, [ordenes, setLoading, cargarOrdenesActivas])
 
   const columnas: Columna[] = [
     { id: TipoColumna.id, label: 'IdOrden', minWidth: 40, align: 'left' },
@@ -164,7 +141,7 @@ export default function VistaOrdenes() {
     <>
       <Tabs
         value={getTabValue}
-        onChange={handleTabChange}
+        onChange={handleCambiarNavMenu}
         textColor="secondary"
         indicatorColor="secondary"
         aria-label="secondary tabs example"
@@ -183,7 +160,7 @@ export default function VistaOrdenes() {
             getTabValue != NavMenu.miHistorial)
         }
         value={getTokenVenta}
-        onChange={handleChangeTokenVenta}
+        onChange={handleCambiarTokenVenta}
         autoHighlight
         getOptionLabel={(option: Token) => option.ticker}
         renderOption={(props, option) => (
@@ -213,7 +190,7 @@ export default function VistaOrdenes() {
           />
         )}
       />
-      <Button variant="contained" onClick={handleChangeTokenButton}>
+      <Button variant="contained" onClick={handleCambiarTokenButton}>
         Cambiar
       </Button>
       {/*aqui deberia ir un boton de intercambio o una imagen de dos flechitas*/}
@@ -227,7 +204,7 @@ export default function VistaOrdenes() {
             getTabValue != NavMenu.miHistorial)
         }
         value={getTokenCompra}
-        onChange={handleChangeTokenCompra}
+        onChange={handleCambiarTokenCompra}
         autoHighlight
         getOptionLabel={(option: any) => option.ticker}
         renderOption={(props, option) => (
@@ -276,7 +253,7 @@ export default function VistaOrdenes() {
         id="simple-select-tipo-orden"
         value={getTipoOrden.toString()}
         label="Tipo Orden"
-        onChange={handleChangeSelect}
+        onChange={handleCambiarTipoOrden}
       >
         <MenuItem value={TiposOrdenes.todas}>Todas</MenuItem>
         <MenuItem value={TiposOrdenes.compraVenta}>Compra-Venta</MenuItem>
@@ -290,6 +267,7 @@ export default function VistaOrdenes() {
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
+                <TableCell>Vendedor</TableCell>
                 {columnas.map((column) => (
                   <TableCell
                     key={column.id}
@@ -302,8 +280,26 @@ export default function VistaOrdenes() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {getOrdenes
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              {ordenes.datos
+                .filter((row: Orden) => {
+                  // si es propia y estoy viendo mis ordenes solo me interesa que se vean las activas
+                  // en cualquier otro caso me interesan ver todas
+                  return (
+                    // filtro por token de compra
+                    (getTokenCompra?.ticker == row.tokenCompra ||
+                      getTokenCompra == null) &&
+                    // filtro por token de venta
+                    (getTokenVenta?.ticker == row.tokenVenta ||
+                      getTokenVenta == null) &&
+                    // filtro por tipo de orden
+                    (getTipoOrden == row.tipo ||
+                      getTipoOrden == TiposOrdenes.todas) &&
+                    // filtro por tipo de  tab (abiertas, mis Ordenes, historial)
+                    (getTabValue == NavMenu.misOrdenes
+                      ? row.estado == EstadosOrdenes.activa
+                      : true)
+                  )
+                })
                 .map((row: Orden) => {
                   return (
                     <TableRow
@@ -312,6 +308,9 @@ export default function VistaOrdenes() {
                       tabIndex={-1}
                       key={row.idOrden + Date.now() * 2}
                     >
+                      <TableCell key={row.vendedor + Date.now()} align="left">
+                        {row.vendedor}
+                      </TableCell>
                       <TableCell key={row.idOrden + Date.now()} align="left">
                         {row.idOrden}
                       </TableCell>
@@ -355,17 +354,6 @@ export default function VistaOrdenes() {
                             )}
                           {row.fechaFinalizacion == undefined &&
                             row.vendedor != getBilleteraUsuario?.direccion && (
-                              // <Button
-                              //   onClick={() =>
-                              //     handleEjecutarOrden(
-                              //       row.tipo,
-                              //       row.idOrden,
-                              //       getBilleteraUsuario
-                              //     )
-                              //   }
-                              // >
-                              //   Ejecutar
-                              // </Button>
                               <OrdenContext.Provider value={row}>
                                 <EjecutarOrden />
                               </OrdenContext.Provider>
@@ -378,15 +366,9 @@ export default function VistaOrdenes() {
             </TableBody>
           </Table>
         </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[10, 25, 100]}
-          component="div"
-          count={getOrdenes.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
+        <Button disabled={loading} onClick={handleCargarMas}>
+          {loading ? 'Loading...' : 'Press to load more'}
+        </Button>
       </Paper>
     </>
   )

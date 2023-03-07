@@ -1,4 +1,4 @@
-import { Estados, RolesBilleteras, Billetera } from '@/types.d'
+import { Estados, Billetera } from '@/types.d'
 import {
   Button,
   Paper,
@@ -7,21 +7,19 @@ import {
   TableCell,
   TableContainer,
   TableHead,
-  TablePagination,
   TableRow,
   TextField,
 } from '@mui/material'
-import { useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 import Nuevo from './NuevoSuspendido'
+import { BlockchainContext } from '@/context/BlockchainContext'
 
 export default function VistaBilleterasSuspendidas() {
-  const [getTableData, setTableData] = useState<Billeteras[]>([])
-  //const [getTableData, setTableData] = useState([])
-  const [page, setPage] = useState(0)
-  const [rowsPerPage, setRowsPerPage] = useState(10)
-  const [getTextoBusqueda, setTextoBusqueda] = useState('')
+  const { state, actions } = useContext(BlockchainContext)
+  const { bloqueados } = state
+  const { cargarBloqueados } = actions
 
-  const gestorBilletera = GestorBilleteras.instanciar()
+  const [getTextoBusqueda, setTextoBusqueda] = useState('')
 
   const handleClicRecargar = () => {
     // no se que hace aqui
@@ -31,22 +29,40 @@ export default function VistaBilleterasSuspendidas() {
     setTextoBusqueda(event.target.value.trim())
   }
 
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage)
-  }
-
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setRowsPerPage(+event.target.value)
-    setPage(0)
-  }
+  const listarBilleterasSuspendidas = useCallback(() => {
+    return bloqueados.datos
+      .filter((billetera: Billetera) =>
+        billetera.direccion.toLowerCase().includes(getTextoBusqueda)
+      )
+      .map((row: Billetera) => {
+        return (
+          <TableRow
+            hover
+            role="checkbox"
+            tabIndex={-1}
+            key={Math.random() * 1000}
+          >
+            <TableCell key={row.direccion} align="left">
+              {row.direccion}
+            </TableCell>
+            <TableCell key={row.direccion + row.rol} align="left">
+              {row.estado == Estados.suspendido && (
+                <Button
+                  variant="contained"
+                  onClick={() => console.log('Activar Billetera')}
+                >
+                  Activar
+                </Button>
+              )}
+            </TableCell>
+          </TableRow>
+        )
+      })
+  }, [bloqueados, getTextoBusqueda])
 
   useEffect(() => {
-    setTableData(
-      gestorBilletera.buscar(getTextoBusqueda, RolesBilleteras.usuario)
-    )
-  }, [getTextoBusqueda])
+    cargarBloqueados()
+  }, [cargarBloqueados])
 
   return (
     <>
@@ -82,45 +98,9 @@ export default function VistaBilleterasSuspendidas() {
                 ></TableCell>
               </TableRow>
             </TableHead>
-            <TableBody>
-              {getTableData
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row: Billeteras) => {
-                  return (
-                    <TableRow
-                      hover
-                      role="checkbox"
-                      tabIndex={-1}
-                      key={Math.random() * 1000}
-                    >
-                      <TableCell key={row.direccion} align="left">
-                        {row.direccion}
-                      </TableCell>
-                      <TableCell key={row.direccion + row.rol} align="left">
-                        {row.estado == Estados.suspendido && (
-                          <Button
-                            variant="contained"
-                            onClick={() => console.log('Activar Billetera')}
-                          >
-                            Activar
-                          </Button>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  )
-                })}
-            </TableBody>
+            <TableBody>{listarBilleterasSuspendidas()}</TableBody>
           </Table>
         </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[10, 25, 100]}
-          component="div"
-          count={getTableData.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
       </Paper>
     </>
   )
