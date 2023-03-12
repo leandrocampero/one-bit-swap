@@ -41,6 +41,8 @@ export enum NavMenu {
   tokens = 'Tokens',
   billeterasSuspendidas = 'Billeteras Suspendidas',
   configuracion = 'Configuración',
+  intercambio = 'Intercambio',
+  compraVenta = 'Compra/Venta',
 }
 
 export enum Acciones {
