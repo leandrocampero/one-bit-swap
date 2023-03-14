@@ -12,7 +12,7 @@ import {
   CompraTokenContext,
   VentaMontoContext,
   VentaTokenContext,
-} from './crearOrden'
+} from './CrearOrden'
 
 import { BlockchainContext } from '@/context/BlockchainProvider'
 import { Estados, Token } from '@/types.d'

@@ -1,4 +1,4 @@
-import CrearOrden from '@/components/Ordenes/crearOrden'
+import CrearOrden from '@/components/Ordenes/CrearOrden'
 import VistaOrdenes from '@/components/VistaOrdenes'
 import BaseLayout from '@/components/layout/BaseLayout'
 import { useBlockchainContext } from '@/context/BlockchainProvider'

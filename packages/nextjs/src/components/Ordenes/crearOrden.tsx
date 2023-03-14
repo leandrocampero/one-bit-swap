@@ -1,7 +1,9 @@
 import { Box, Button, Tab, Tabs, Typography } from '@mui/material'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import FormularioOrden from './FormularioOrden'
-import { NavMenu, Token } from '@/types.d'
+import { NavMenu, TiposOrdenes, Token } from '@/types.d'
+import { BlockchainContext } from '@/context/BlockchainProvider'
+import { ethers } from 'ethers'
 
 interface TabPanelProps {
   children?: React.ReactNode
@@ -31,6 +33,9 @@ export const CompraMontoContext = React.createContext<any>({})
 export const CompraTokenContext = React.createContext<any>({})
 
 export default function CrearOrden() {
+  const { actions } = useContext(BlockchainContext)
+  const { nuevaOrden } = actions
+
   const [valueTab, setValueTab] = useState<NavMenu>(NavMenu.compraVenta)
   const [compraMonto, setCompraMonto] = React.useState<number>(0)
   const [compraToken, setCompraToken] = React.useState<Token | null>(null)
@@ -46,6 +51,32 @@ export default function CrearOrden() {
     value: NavMenu
   ) => {
     setValueTab(value)
+  }
+
+  const handleClicCrearOrden = () => {
+    console.log('ordenPorCrear')
+    if (
+      (compraToken &&
+        compraMonto &&
+        ventaToken &&
+        ventaMonto &&
+        valueTab == NavMenu.compraVenta) ||
+      (compraToken &&
+        compraMonto &&
+        ventaToken &&
+        valueTab == NavMenu.intercambio)
+    ) {
+      nuevaOrden(
+        compraToken.ticker,
+        ventaToken.ticker,
+        ethers.utils.parseUnits(compraMonto.toString()).toString(),
+        ethers.utils.parseUnits(ventaMonto.toString()).toString(),
+        valueTab == NavMenu.intercambio
+          ? TiposOrdenes.intercambio
+          : TiposOrdenes.compraVenta
+      )
+    }
+    console.log('ordenCreada')
   }
 
   return (
@@ -96,7 +127,7 @@ export default function CrearOrden() {
           </CompraTokenContext.Provider>
         </CompraMontoContext.Provider>
         <Box textAlign="center">
-          <Button variant="contained">
+          <Button variant="contained" onClick={handleClicCrearOrden}>
             {'Crear orden de ' + NavMenu.intercambio}
           </Button>
         </Box>

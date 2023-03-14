@@ -1,5 +1,4 @@
 import {
-  Billetera,
   Orden,
   Token,
   Columna,
@@ -28,28 +27,27 @@ import {
   Tabs,
   TextField,
 } from '@mui/material'
-import React, { useCallback, useContext, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import EjecutarOrden from './EjecutarOrden'
 import { BlockchainContext } from '@/context/BlockchainProvider'
+import { ethers } from 'ethers'
 
 export const OrdenContext = React.createContext<Orden | undefined>(undefined)
 
 export default function VistaOrdenes() {
   const { state, actions } = useContext(BlockchainContext)
+  const { tokens, ordenes, sesion } = state
+  const { cargarOrdenesActivas, cargarOrdenesPropias, cancelarOrden } = actions
+
   const [getTabValue, setTabValue] = useState(NavMenu.ordenesAbiertas)
-  const [getBilleteraUsuario, setBilleteraUsuario] = useState<
-    Billetera | undefined
-  >(undefined)
+  const [getBilleteraUsuario, setBilleteraUsuario] = useState<string>(
+    sesion.datos.direccion
+  )
   const [getTokenVenta, setTokenVenta] = useState<Token | null>(null)
   const [getTokenCompra, setTokenCompra] = useState<Token | null>(null)
   const [getTipoOrden, setTipoOrden] = useState(TiposOrdenes.todas)
   const [getMontoVenta, setMontoVenta] = useState(BigInt(0))
   const [getMontoCompra, setMontoCompra] = useState(BigInt(0))
-
-  const { tokens, ordenes } = state
-  const { cargarOrdenesActivas, cargarOrdenesPropias, cancelarOrden } = actions
-
-  const [loading, setLoading] = useState(false)
 
   const handleCambiarTokenButton = () => {
     const aux = getTokenVenta
@@ -82,15 +80,20 @@ export default function VistaOrdenes() {
     nuevoValor: NavMenu
   ) => {
     setTabValue(nuevoValor)
+
     console.log(ordenes.datos.length + ' antes')
     console.log(ordenes.datos[0]?.idOrden + 'id antes')
+
     if (nuevoValor == NavMenu.ordenesAbiertas) {
-      cargarOrdenesActivas(ordenes.datos[0]?.idOrden)
+      cargarOrdenesActivas(ethers.constants.AddressZero)
+
       console.log('activas')
     } else {
       cargarOrdenesPropias()
+
       console.log('propias')
     }
+
     console.log(ordenes.datos.length + ' despues')
     console.log(ordenes.datos[0]?.idOrden + 'id despues')
   }
@@ -100,12 +103,17 @@ export default function VistaOrdenes() {
   }
 
   const handleCargarMas = useCallback(() => {
-    setLoading(true)
-    return setTimeout(() => {
-      cargarOrdenesActivas(ordenes.datos[ordenes.datos.length - 1]?.idOrden)
-      setLoading(() => false)
-    }, 500)
-  }, [ordenes, setLoading, cargarOrdenesActivas])
+    const cantidadOrdenes = ordenes.datos.length
+    const ultimaOrden =
+      (cantidadOrdenes !== 0 && ordenes.datos[cantidadOrdenes - 1].idOrden) ||
+      ethers.constants.HashZero
+
+    cargarOrdenesActivas(ultimaOrden)
+  }, [ordenes, cargarOrdenesActivas])
+
+  useEffect(() => {
+    cargarOrdenesActivas(ethers.constants.AddressZero)
+  }, [cargarOrdenesActivas])
 
   const columnas: Columna[] = [
     { id: TipoColumna.id, label: 'IdOrden', minWidth: 40, align: 'left' },
@@ -343,7 +351,7 @@ export default function VistaOrdenes() {
                         align="left"
                       >
                         <ButtonGroup>
-                          {row.vendedor == getBilleteraUsuario?.direccion &&
+                          {row.vendedor == getBilleteraUsuario &&
                             row.fechaFinalizacion == undefined &&
                             getTabValue != NavMenu.ordenesAbiertas && (
                               <Button
@@ -353,7 +361,7 @@ export default function VistaOrdenes() {
                               </Button>
                             )}
                           {row.fechaFinalizacion == undefined &&
-                            row.vendedor != getBilleteraUsuario?.direccion && (
+                            row.vendedor != getBilleteraUsuario && (
                               <OrdenContext.Provider value={row}>
                                 <EjecutarOrden />
                               </OrdenContext.Provider>
@@ -366,8 +374,8 @@ export default function VistaOrdenes() {
             </TableBody>
           </Table>
         </TableContainer>
-        <Button disabled={loading} onClick={handleCargarMas}>
-          {loading ? 'Loading...' : 'Press to load more'}
+        <Button disabled={ordenes.cargando} onClick={handleCargarMas}>
+          {ordenes.cargando ? 'Loading...' : 'Press to load more'}
         </Button>
       </Paper>
     </>
