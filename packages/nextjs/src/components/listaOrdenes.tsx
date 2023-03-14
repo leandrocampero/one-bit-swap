@@ -1,9 +1,6 @@
-import GestorBilleteras from '@/lib/managers/GestorBilleteras'
-import GestorTokens from '@/lib/managers/GestorTokens'
-import Billeteras from '@/lib/models/Billeteras'
-import Ordenes from '@/lib/models/Ordenes'
-import Tokens from '@/lib/models/Tokens'
 import {
+  Billetera,
+  Token,
   Columna,
   Estados,
   EstadosOrdenes,
@@ -12,7 +9,6 @@ import {
   TipoColumna,
   TiposOrdenes,
 } from '@/types.d'
-import { b1, tUSDT } from '@/lib/utils/modelos'
 import { OrdenesContext } from '@/store/Store'
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange'
 import {

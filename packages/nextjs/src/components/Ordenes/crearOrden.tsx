@@ -1,12 +1,14 @@
 import { Box, Button, Tab, Tabs, Typography } from '@mui/material'
-import React, { useState } from 'react'
-import OrdenCompra from './ordenCompra'
-import OrdenVenta from './ordenVenta'
+import React, { useContext, useState } from 'react'
+import FormularioOrden from './FormularioOrden'
+import { NavMenu, TiposOrdenes, Token } from '@/types.d'
+import { BlockchainContext } from '@/context/BlockchainProvider'
+import { ethers } from 'ethers'
 
 interface TabPanelProps {
   children?: React.ReactNode
-  index: number
-  value: number
+  index: NavMenu
+  value: NavMenu
 }
 
 function TabPanel(props: TabPanelProps) {
@@ -31,77 +33,103 @@ export const CompraMontoContext = React.createContext<any>({})
 export const CompraTokenContext = React.createContext<any>({})
 
 export default function CrearOrden() {
-  const labelVenta = 'Token a Entregar (Vender)'
-  const labelCompra = 'Token a Recibir (Comprar)'
-  const [valueTab, setValueTab] = useState(0)
-  const [compraMonto, setCompraMonto] = React.useState<number>()
-  const [compraToken, setCompraToken] = React.useState('USDT')
-  const [ventaMonto, setVentaMonto] = React.useState<number>()
-  const [ventaToken, setVentaToken] = React.useState('BNB')
+  const { actions } = useContext(BlockchainContext)
+  const { nuevaOrden } = actions
+
+  const [valueTab, setValueTab] = useState<NavMenu>(NavMenu.compraVenta)
+  const [compraMonto, setCompraMonto] = React.useState<number>(0)
+  const [compraToken, setCompraToken] = React.useState<Token | null>(null)
+  const [ventaMonto, setVentaMonto] = React.useState<number>(0)
+  const [ventaToken, setVentaToken] = React.useState<Token | null>(null)
 
   const montoCompraVenta = () => {
-    if (!ventaMonto) {
-      return 0
-    }
-    if (!compraMonto) {
-      return 0
-    }
-    return ventaMonto / compraMonto
+    return !ventaMonto || !compraMonto ? 0 : ventaMonto / compraMonto
   }
 
-  const handleChange = (event: React.SyntheticEvent, value: any) => {
+  const handleCambiarTipoOrden = (
+    event: React.SyntheticEvent,
+    value: NavMenu
+  ) => {
     setValueTab(value)
+  }
+
+  const handleClicCrearOrden = () => {
+    console.log('ordenPorCrear')
+    if (
+      (compraToken &&
+        compraMonto &&
+        ventaToken &&
+        ventaMonto &&
+        valueTab == NavMenu.compraVenta) ||
+      (compraToken &&
+        compraMonto &&
+        ventaToken &&
+        valueTab == NavMenu.intercambio)
+    ) {
+      nuevaOrden(
+        compraToken.ticker,
+        ventaToken.ticker,
+        ethers.utils.parseUnits(compraMonto.toString()).toString(),
+        ethers.utils.parseUnits(ventaMonto.toString()).toString(),
+        valueTab == NavMenu.intercambio
+          ? TiposOrdenes.intercambio
+          : TiposOrdenes.compraVenta
+      )
+    }
+    console.log('ordenCreada')
   }
 
   return (
     <div>
       <Tabs
         value={valueTab}
-        onChange={handleChange}
+        onChange={handleCambiarTipoOrden}
         indicatorColor="primary"
         textColor="inherit"
         variant="fullWidth"
         aria-label="full width tabs example"
       >
-        <Tab label="Compra/Venta"></Tab>
-        <Tab label="Intercambio"></Tab>
+        <Tab value={NavMenu.compraVenta} label={NavMenu.compraVenta}></Tab>
+        <Tab value={NavMenu.intercambio} label={NavMenu.intercambio}></Tab>
       </Tabs>
-      <TabPanel value={valueTab} index={0}>
+      <TabPanel value={valueTab} index={NavMenu.compraVenta}>
         <CompraMontoContext.Provider value={{ compraMonto, setCompraMonto }}>
           <CompraTokenContext.Provider value={{ compraToken, setCompraToken }}>
-            <OrdenCompra label={labelCompra} />
+            <VentaMontoContext.Provider value={{ ventaMonto, setVentaMonto }}>
+              <VentaTokenContext.Provider value={{ ventaToken, setVentaToken }}>
+                <FormularioOrden />
+              </VentaTokenContext.Provider>
+            </VentaMontoContext.Provider>
           </CompraTokenContext.Provider>
         </CompraMontoContext.Provider>
-        <VentaMontoContext.Provider value={{ ventaMonto, setVentaMonto }}>
-          <VentaTokenContext.Provider value={{ ventaToken, setVentaToken }}>
-            <OrdenVenta label={labelVenta} />
-          </VentaTokenContext.Provider>
-        </VentaMontoContext.Provider>
         <Typography variant="body2" gutterBottom align="center" mb={2}>
           {'Total ' +
             montoCompraVenta() +
             ' ' +
-            ventaToken +
+            ventaToken?.ticker +
             ' por ' +
-            compraToken}
+            compraToken?.ticker}
         </Typography>
         <Box textAlign="center">
-          <Button variant="contained">{'Crear orden de compra'}</Button>
+          <Button variant="contained">
+            {'Crear orden de ' + NavMenu.compraVenta}
+          </Button>
         </Box>
       </TabPanel>
-      <TabPanel value={valueTab} index={1}>
+      <TabPanel value={valueTab} index={NavMenu.intercambio}>
         <CompraMontoContext.Provider value={{ compraMonto, setCompraMonto }}>
           <CompraTokenContext.Provider value={{ compraToken, setCompraToken }}>
-            <OrdenCompra label={labelCompra} intercambio={true} />
+            <VentaMontoContext.Provider value={{ ventaMonto, setVentaMonto }}>
+              <VentaTokenContext.Provider value={{ ventaToken, setVentaToken }}>
+                <FormularioOrden intercambio={true} />
+              </VentaTokenContext.Provider>
+            </VentaMontoContext.Provider>
           </CompraTokenContext.Provider>
         </CompraMontoContext.Provider>
-        <VentaMontoContext.Provider value={{ ventaMonto, setVentaMonto }}>
-          <VentaTokenContext.Provider value={{ ventaToken, setVentaToken }}>
-            <OrdenVenta label={labelVenta} />
-          </VentaTokenContext.Provider>
-        </VentaMontoContext.Provider>
         <Box textAlign="center">
-          <Button variant="contained">{'Crear orden de intercambio'}</Button>
+          <Button variant="contained" onClick={handleClicCrearOrden}>
+            {'Crear orden de ' + NavMenu.intercambio}
+          </Button>
         </Box>
       </TabPanel>
     </div>

@@ -113,7 +113,7 @@ export default function ConectarWallet() {
             {address}
           </Button>
 
-          {rol != RolesBilleteras.administrador ? (
+          {rol == RolesBilleteras.administrador ? (
             <Button
               id="demo-customized-button"
               aria-controls={open ? 'demo-customized-menu' : undefined}
