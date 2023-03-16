@@ -5,7 +5,6 @@ import { useBlockchainContext } from '@/context/BlockchainProvider'
 import styles from '@/styles/layout.module.scss'
 import { Box, Grid } from '@mui/material'
 import { grey } from '@mui/material/colors'
-import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
 const sxProps = {
@@ -15,16 +14,9 @@ const sxProps = {
 }
 
 export default function Home() {
-  const router = useRouter()
   const { state, actions } = useBlockchainContext()
   const { sesion } = state
   const { cargarTokens } = actions
-
-  useEffect(() => {
-    if (!sesion.cargando && sesion.datos.direccion === '') {
-      router.push('/conectar')
-    }
-  }, [sesion, router])
 
   useEffect(() => {
     cargarTokens(false)

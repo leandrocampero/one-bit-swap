@@ -11,7 +11,6 @@
 //**************************************************************************//
 import networks from '@/contracts/networks'
 import { AppProps } from '@/types'
-import { sleep } from '@/utils/helpers'
 import { Web3Provider } from '@ethersproject/providers'
 import { useWeb3React } from '@web3-react/core'
 import { InjectedConnector } from '@web3-react/injected-connector'
@@ -85,7 +84,7 @@ export const SessionProvider = (props: AppProps) => {
   >(undefined)
 
   const router = useRouter()
-  const { active, activate } = useWeb3React<Web3Provider>()
+  const { active, activate, deactivate } = useWeb3React<Web3Provider>()
 
   //**************************************************************************//
   //                                                                          //
@@ -198,8 +197,19 @@ export const SessionProvider = (props: AppProps) => {
   }, [setupInjectedConnector, activate])
 
   const disconnect = useCallback(async () => {
-    return await sleep()
-  }, [])
+    try {
+      setLoading(true)
+
+      await deactivate()
+
+      setConnected(false)
+      setError(null)
+    } catch (error: any) {
+      setError(error.message)
+    } finally {
+      setLoading(false)
+    }
+  }, [deactivate])
 
   //**************************************************************************//
   //                                                                          //
@@ -259,12 +269,6 @@ export const SessionProvider = (props: AppProps) => {
   useEffect(() => {
     compareNetwork()
   }, [compareNetwork])
-
-  //**************************************************************************//
-  // Testing effects
-  useEffect(() => {
-    console.log('loading:', loading)
-  }, [loading])
 
   //**************************************************************************//
 
