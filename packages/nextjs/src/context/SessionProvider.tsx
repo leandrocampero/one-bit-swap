@@ -75,7 +75,8 @@ export const SessionContext = createContext<SessionContextProps>(
 
 export const SessionProvider = (props: AppProps) => {
   const [connected, setConnected] = useState<boolean>(false)
-  const [loading, setLoading] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(true)
+  const [eagerTried, setEagerTry] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
   const [switchNetwork, setSwitchNetwork] = useState<boolean>(false)
 
@@ -180,9 +181,9 @@ export const SessionProvider = (props: AppProps) => {
    * Inicia el proceso de conexión con la billetera
    */
   const connect = useCallback(async () => {
-    setLoading(true)
-
     try {
+      setLoading(true)
+
       const connector = setupInjectedConnector()
       await activate(connector, undefined, true)
 
@@ -212,16 +213,46 @@ export const SessionProvider = (props: AppProps) => {
   //                                                                          //
   //**************************************************************************//
 
+  // Si se inicia el componente, hay que cargar controlar primero si ya tiene permiso
+  useEffect(() => {
+    const eagerConnect = async () => {
+      const injectedConnector = new InjectedConnector({
+        supportedChainIds: [137, 80001, 31337], // Polygon, Mumbai, Hardhat
+      })
+
+      const isAuthorized = await injectedConnector.isAuthorized()
+
+      if (isAuthorized) {
+        try {
+          await connect()
+        } catch (error: any) {
+          setEagerTry(true)
+        }
+      } else {
+        setEagerTry(true)
+        setLoading(false)
+      }
+    }
+
+    if (eagerTried) {
+      return
+    } else {
+      eagerConnect()
+    }
+  }, [connect, eagerTried])
+
   // Si la billetera no está conectada redirigir
   useEffect(
     () => {
+      if (loading) return
+
       if (!active) {
         setConnected(false)
         router.push('/conectar')
       }
     },
     //eslint-disable-next-line
-    [active] //Si pongo router como dependencia se dispara muy seguido
+    [active, loading] //Si pongo router como dependencia se dispara muy seguido
   )
 
   // Si la red no es la correcta, solicitar el cambio

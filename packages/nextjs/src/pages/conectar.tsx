@@ -34,7 +34,7 @@ export default function Conectar() {
   }, [connected, loading, router])
 
   return (
-    <BaseLayout style={FlexBox} loading={loading}>
+    <BaseLayout style={FlexBox}>
       <Card elevation={5} sx={ActionBox}>
         <CardHeader
           title="OneBitSwap"
