@@ -1,6 +1,5 @@
 import BaseLayout from '@/components/layout/BaseLayout'
-import { useBlockchainContext } from '@/context/BlockchainProvider'
-import { useWallet } from '@/hooks/wallet'
+import { useSessionContext } from '@/context/SessionProvider'
 import {
   Button,
   Card,
@@ -24,25 +23,22 @@ const ActionBox: SxProps = {
 }
 
 export default function Conectar() {
+  const { connect, loading, connected } = useSessionContext()
   const router = useRouter()
-  const { connect } = useWallet()
-  const { actions, state } = useBlockchainContext()
-  const { cargarDatosPlataforma } = actions
-  const { sesion } = state
 
   const handleConnect = useCallback(async () => {
     await connect()
   }, [connect])
 
   useEffect(() => {
-    if (!sesion.cargando && sesion.datos.direccion !== '') {
-      cargarDatosPlataforma()
+    if (connected && !loading) {
       router.push('/')
     }
-  }, [sesion, router, cargarDatosPlataforma])
+    console.log('router')
+  }, [connected, loading, router])
 
   return (
-    <BaseLayout style={FlexBox} loading={sesion.cargando}>
+    <BaseLayout style={FlexBox} loading={loading}>
       <Card elevation={5} sx={ActionBox}>
         <CardHeader
           title="OneBitSwap"
