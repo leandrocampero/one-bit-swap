@@ -9,6 +9,7 @@
 //            ###  #    #  #        ####   #    #    #     ####             //
 //                                                                          //
 //**************************************************************************//
+import networks from '@/contracts/networks'
 import { AppProps } from '@/types'
 import { sleep } from '@/utils/helpers'
 import { Web3Provider } from '@ethersproject/providers'
@@ -39,8 +40,10 @@ export type SessionContextProps = {
   connected: boolean
   loading: boolean
   error: string | null
+  switchNetwork: boolean
   connect: () => Promise<void>
   disconnect: () => Promise<void>
+  changeNetwork: () => Promise<void>
 }
 
 //**************************************************************************//
@@ -74,6 +77,8 @@ export const SessionProvider = (props: AppProps) => {
   const [connected, setConnected] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
+  const [switchNetwork, setSwitchNetwork] = useState<boolean>(false)
+
   const [injectedConnector, setInjectedConnector] = useState<
     InjectedConnector | undefined
   >(undefined)
@@ -103,9 +108,73 @@ export const SessionProvider = (props: AppProps) => {
       supportedChainIds: [137, 80001, 31337], // Polygon, Mumbai, Hardhat
     })
 
+    window.ethereum.on('chainChanged', async (chainIdHex: string) => {
+      const mode = process.env.NODE_ENV as keyof typeof networks
+      const networkToSwitch = networks[mode]
+      const { chainId: expectedNetwork } = networkToSwitch
+
+      setSwitchNetwork(chainIdHex !== expectedNetwork)
+    })
+
     setInjectedConnector(connector)
     return connector
   }, [injectedConnector])
+
+  /**
+   * Compara la red a usar por la aplicación con la actual
+   */
+  const compareNetwork = useCallback(async () => {
+    // Red actual
+    const connector = setupInjectedConnector()
+    const currentNetwork = await connector.getChainId()
+
+    // Red esperada
+    const mode = process.env.NODE_ENV as keyof typeof networks
+    const networkToSwitch = networks[mode]
+    const { chainId: expectedNetwork } = networkToSwitch
+
+    setSwitchNetwork(currentNetwork !== expectedNetwork)
+  }, [setupInjectedConnector])
+
+  /**
+   * Cambia la red a la esperada por la aplicación
+   */
+  const changeNetwork = useCallback(async () => {
+    try {
+      const mode = process.env.NODE_ENV as keyof typeof networks
+      const networkToSwitch = networks[mode]
+      const { chainId, blockExplorerUrls, chainName, nativeCurrency, rpcUrls } =
+        networkToSwitch
+
+      const connector = setupInjectedConnector()
+      const provider = await connector.getProvider()
+
+      try {
+        await provider.send('wallet_switchEthereumChain', [{ chainId }])
+      } catch (error: any) {
+        // Red no encontrada en Metamask
+        if (error?.code === 4902) {
+          try {
+            await provider.send('wallet_addEthereumChain', [
+              {
+                chainId,
+                rpcUrls,
+                chainName,
+                nativeCurrency,
+                blockExplorerUrls,
+              },
+            ])
+
+            await provider.send('wallet_switchEthereumChain', [{ chainId }])
+          } catch (addError) {
+            throw new Error(error.message)
+          }
+        }
+      }
+    } catch (error: any) {
+      setError(error.message)
+    }
+  }, [setupInjectedConnector])
 
   /**
    * Inicia el proceso de conexión con la billetera
@@ -155,6 +224,11 @@ export const SessionProvider = (props: AppProps) => {
     [active] //Si pongo router como dependencia se dispara muy seguido
   )
 
+  // Si la red no es la correcta, solicitar el cambio
+  useEffect(() => {
+    compareNetwork()
+  }, [compareNetwork])
+
   //**************************************************************************//
   // Testing effects
   useEffect(() => {
@@ -165,7 +239,15 @@ export const SessionProvider = (props: AppProps) => {
 
   return (
     <SessionContext.Provider
-      value={{ connected, loading, error, connect, disconnect }}
+      value={{
+        connected,
+        loading,
+        error,
+        switchNetwork,
+        connect,
+        disconnect,
+        changeNetwork,
+      }}
     >
       {props.children}
     </SessionContext.Provider>

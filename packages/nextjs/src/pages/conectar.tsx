@@ -9,7 +9,7 @@ import {
   SxProps,
 } from '@mui/material'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 
 const FlexBox = {
   display: 'flex',
@@ -23,18 +23,14 @@ const ActionBox: SxProps = {
 }
 
 export default function Conectar() {
-  const { connect, loading, connected } = useSessionContext()
+  const { connect, changeNetwork, loading, connected, switchNetwork } =
+    useSessionContext()
   const router = useRouter()
-
-  const handleConnect = useCallback(async () => {
-    await connect()
-  }, [connect])
 
   useEffect(() => {
     if (connected && !loading) {
       router.push('/')
     }
-    console.log('router')
   }, [connected, loading, router])
 
   return (
@@ -46,15 +42,29 @@ export default function Conectar() {
         />
         <Divider />
         <CardContent>
-          <Button
-            variant="contained"
-            color="success"
-            size="large"
-            sx={{ width: '100%' }}
-            onClick={handleConnect}
-          >
-            Conectar Metamask
-          </Button>
+          {switchNetwork ? (
+            <Button
+              key={'network'}
+              variant="contained"
+              color="primary"
+              size="large"
+              sx={{ width: '100%' }}
+              onClick={changeNetwork}
+            >
+              Cambiar de red
+            </Button>
+          ) : (
+            <Button
+              key={'connect'}
+              variant="contained"
+              color="success"
+              size="large"
+              sx={{ width: '100%' }}
+              onClick={connect}
+            >
+              Conectar Metamask
+            </Button>
+          )}
         </CardContent>
       </Card>
     </BaseLayout>
