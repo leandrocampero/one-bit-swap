@@ -11,6 +11,8 @@
 //**************************************************************************//
 
 import {
+  ERROR_AUTENTICAR_BILLETERA,
+  ERROR_BILLETERA_SUSPENDIDA,
   ERROR_NO_CONTRACT_ADDRESS,
   ERROR_NO_SIGNER,
 } from '@/constants/mensajes'
@@ -121,7 +123,7 @@ export const BlockchainProvider = (props: AppProps) => {
   const [state, dispatch] = useReducer(blockchainReducer, INITIAL_STATE)
   const [contract, setContract] = useState<ContratoPlataforma | null>(null)
   const [contractAddress, setContractAddress] = useState<string>('')
-  const [signer, setSigner] = useState<JsonRpcSigner | null>(null)
+  const [signer, setSigner] = useState<JsonRpcSigner | undefined>(undefined)
 
   //**************************************************************************//
   //                                                                          //
@@ -135,29 +137,36 @@ export const BlockchainProvider = (props: AppProps) => {
   //                                                                          //
   //**************************************************************************//
 
-  const setupContract = useCallback((): ContratoPlataforma => {
-    if (contract !== null) {
-      return contract
-    }
+  const setupContract = useCallback(
+    (newSigner?: JsonRpcSigner): ContratoPlataforma => {
+      if (contract !== null) {
+        return contract
+      }
 
-    if (signer === null) {
-      throw new Error(ERROR_NO_SIGNER)
-    }
+      const selectedSigner = newSigner ?? signer
 
-    if (contractAddress == '') {
-      throw new Error(ERROR_NO_CONTRACT_ADDRESS)
-    }
+      if (!selectedSigner) {
+        throw new Error(ERROR_NO_SIGNER)
+      }
 
-    const newContract = new ethers.Contract(
-      contractAddress,
-      Plataforma,
-      signer
-    ) as ContratoPlataforma
+      setSigner(newSigner)
 
-    setContract(newContract)
+      if (contractAddress == '') {
+        throw new Error(ERROR_NO_CONTRACT_ADDRESS)
+      }
 
-    return newContract
-  }, [contract, signer, contractAddress])
+      const newContract = new ethers.Contract(
+        contractAddress,
+        Plataforma,
+        selectedSigner
+      ) as ContratoPlataforma
+
+      setContract(newContract)
+
+      return newContract
+    },
+    [contract, signer, contractAddress]
+  )
 
   //**************************************************************************//
   //                                                                          //
@@ -616,34 +625,39 @@ export const BlockchainProvider = (props: AppProps) => {
     [setupContract]
   )
 
-  const conectarBilletera = useCallback(
-    async (signer: JsonRpcSigner) => {
-      setSigner(signer)
-
+  /**
+   * Busca los datos de la billetera para validarlos en el contrato
+   * @param signer es el signer provisto para inicar la conexión
+   */
+  const autenticarBilletera = useCallback(
+    async (signer: JsonRpcSigner): Promise<void> => {
       dispatch({ type: ReducerActionType.MARCAR_CARGANDO_SESION })
       await sleep()
 
       try {
+        const contract = setupContract(signer)
         const direccion = await signer.getAddress()
-        const contract = setupContract()
 
         const billetera = formatBilletera(
           await contract.buscarBilletera(direccion)
         )
 
-        console.log('Billetera:', billetera)
-
         const { estado, rol } = billetera
+
+        if (estado === Estados.suspendido) {
+          throw new Error(ERROR_BILLETERA_SUSPENDIDA)
+        }
 
         dispatch({
           type: ReducerActionType.GUARDAR_DATOS_SESION,
-          payload: { direccion, estado, rol },
+          payload: { account: direccion, estado, rol },
         })
       } catch (error: any) {
         dispatch({
           type: ReducerActionType.MARCAR_ERROR_SESION,
           payload: error.message,
         })
+        throw new Error(ERROR_AUTENTICAR_BILLETERA)
       }
     },
     [setupContract]
@@ -675,28 +689,6 @@ export const BlockchainProvider = (props: AppProps) => {
   useEffect(() => {
     setContractAddress(deploy.platform)
   }, [])
-
-  // Instanciar contrato
-  useEffect(() => {
-    let mountedLock = true
-
-    if (mountedLock) {
-      try {
-        const newContract = new ethers.Contract(
-          contractAddress,
-          Plataforma,
-          signer!
-        ) as ContratoPlataforma
-        setContract(newContract)
-      } catch (error: any) {
-        setContract(null)
-      }
-    }
-
-    return () => {
-      mountedLock = false
-    }
-  }, [signer, contractAddress])
 
   //**************************************************************************//
   //                                                                          //
@@ -732,7 +724,7 @@ export const BlockchainProvider = (props: AppProps) => {
     cargarBloqueados,
     bloquearBilletera,
     desbloquearBilletera,
-    conectarBilletera,
+    autenticarBilletera,
   } as BlockchainActions
 
   return (

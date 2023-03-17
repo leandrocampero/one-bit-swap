@@ -7,6 +7,10 @@ export const ERROR_NO_METAMASK =
   'No se pudo detectar metamask. Instale metamask para poder continuar'
 export const ERROR_NO_CONTRACT_ADDRESS =
   'No se encontró una dirección de contrato de la plataforma'
+export const ERROR_BILLETERA_SUSPENDIDA =
+  'La billetera con la se quiere conectar se encuentra suspendida'
+export const ERROR_AUTENTICAR_BILLETERA =
+  'Ocurrió un error al validar la billetera. Intente nuevamente'
 
 export const ERROR_TIPO_ORDEN_INVALIDO =
   'El tipo de orden ingresado es invalido'

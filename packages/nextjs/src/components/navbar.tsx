@@ -1,15 +1,18 @@
+import { useSessionContext } from '@/context/SessionProvider'
 import {
   AppBar,
   Box,
+  Button,
   Container,
   Grid,
   Toolbar,
   Typography,
 } from '@mui/material'
 import Link from 'next/link'
-import ConectarWallet from './ConectarWallet'
 
 export default function Navbar() {
+  const { disconnect, connected } = useSessionContext()
+
   return (
     <AppBar position="fixed">
       <Box sx={{ flexGrow: 1 }}>
@@ -26,9 +29,13 @@ export default function Navbar() {
                   <Link href="/">OneBitSwap</Link>
                 </Typography>
               </Grid>
-              <Grid item>
-                <ConectarWallet />
-              </Grid>
+              {connected && (
+                <Grid item>
+                  <Button variant="contained" color="info" onClick={disconnect}>
+                    Desconectar
+                  </Button>
+                </Grid>
+              )}
             </Grid>
           </Container>
         </Toolbar>

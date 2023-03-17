@@ -1,66 +1,42 @@
+import CrearOrdenesTest from '@/components/CrearOrdenesTest'
+import ListarOrdenesTest from '@/components/ListarOrdenesTest'
 import BaseLayout from '@/components/layout/BaseLayout'
 import { useBlockchainContext } from '@/context/BlockchainProvider'
-import { useWallet } from '@/hooks/wallet'
-import {
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  Divider,
-  SxProps,
-} from '@mui/material'
-import { useRouter } from 'next/router'
-import { useCallback, useEffect } from 'react'
+import styles from '@/styles/layout.module.scss'
+import { Box, Grid } from '@mui/material'
+import { grey } from '@mui/material/colors'
+import { useEffect } from 'react'
 
-const FlexBox = {
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-}
-
-const ActionBox: SxProps = {
-  maxWidth: '500px',
-  width: '100%',
+const sxProps = {
+  p: 5,
+  borderRadius: 2,
+  backgroundColor: grey[400],
 }
 
 export default function Home() {
-  const router = useRouter()
-  const { connect } = useWallet()
-  const { actions, state } = useBlockchainContext()
-  const { cargarDatosPlataforma } = actions
-  const { sesion } = state
-
-  const handleConnect = useCallback(async () => {
-    await connect()
-  }, [connect])
+  const { actions } = useBlockchainContext()
+  const { cargarTokens } = actions
 
   useEffect(() => {
-    if (!sesion.cargando && sesion.datos.direccion !== '') {
-      cargarDatosPlataforma()
-      router.push('/intercambiar')
-    }
-  }, [sesion, router, cargarDatosPlataforma])
+    cargarTokens(false)
+  }, [cargarTokens])
 
   return (
-    <BaseLayout style={FlexBox} loading={sesion.cargando}>
-      <Card elevation={5} sx={ActionBox}>
-        <CardHeader
-          title="OneBitSwap"
-          subheader="Conectar billetera para usar"
-        />
-        <Divider />
-        <CardContent>
-          <Button
-            variant="contained"
-            color="success"
-            size="large"
-            sx={{ width: '100%' }}
-            onClick={handleConnect}
-          >
-            Conectar Metamask
-          </Button>
-        </CardContent>
-      </Card>
+    <BaseLayout>
+      <Grid container spacing={2}>
+        <Grid item xs={8}>
+          <Box sx={sxProps} className={styles.base}>
+            <h1>Ordenes Abiertas y demas</h1>
+            <ListarOrdenesTest />
+          </Box>
+        </Grid>
+        <Grid item xs={4}>
+          <Box sx={sxProps} className={styles.base}>
+            <h1>Ordenes compra/Venta e intercambio</h1>
+            <CrearOrdenesTest />
+          </Box>
+        </Grid>
+      </Grid>
     </BaseLayout>
   )
 }
