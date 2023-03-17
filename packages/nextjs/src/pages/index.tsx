@@ -1,5 +1,5 @@
-import CrearOrden from '@/components/Ordenes/CrearOrden'
-import VistaOrdenes from '@/components/VistaOrdenes'
+import CrearOrdenesTest from '@/components/CrearOrdenesTest'
+import ListarOrdenesTest from '@/components/ListarOrdenesTest'
 import BaseLayout from '@/components/layout/BaseLayout'
 import { useBlockchainContext } from '@/context/BlockchainProvider'
 import styles from '@/styles/layout.module.scss'
@@ -14,8 +14,7 @@ const sxProps = {
 }
 
 export default function Home() {
-  const { state, actions } = useBlockchainContext()
-  const { sesion } = state
+  const { actions } = useBlockchainContext()
   const { cargarTokens } = actions
 
   useEffect(() => {
@@ -23,18 +22,18 @@ export default function Home() {
   }, [cargarTokens])
 
   return (
-    <BaseLayout loading={sesion.cargando}>
+    <BaseLayout>
       <Grid container spacing={2}>
         <Grid item xs={8}>
           <Box sx={sxProps} className={styles.base}>
             <h1>Ordenes Abiertas y demas</h1>
-            <VistaOrdenes />
+            <ListarOrdenesTest />
           </Box>
         </Grid>
         <Grid item xs={4}>
           <Box sx={sxProps} className={styles.base}>
             <h1>Ordenes compra/Venta e intercambio</h1>
-            <CrearOrden />
+            <CrearOrdenesTest />
           </Box>
         </Grid>
       </Grid>

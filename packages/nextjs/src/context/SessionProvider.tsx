@@ -22,6 +22,7 @@ import {
   useEffect,
   useState,
 } from 'react'
+import { useBlockchainContext } from './BlockchainProvider'
 
 //**************************************************************************//
 //                                                                          //
@@ -84,7 +85,11 @@ export const SessionProvider = (props: AppProps) => {
   >(undefined)
 
   const router = useRouter()
-  const { active, activate, deactivate } = useWeb3React<Web3Provider>()
+  const { active, library, account, activate, deactivate } =
+    useWeb3React<Web3Provider>()
+
+  const { actions } = useBlockchainContext()
+  const { autenticarBilletera } = actions
 
   //**************************************************************************//
   //                                                                          //
@@ -181,20 +186,35 @@ export const SessionProvider = (props: AppProps) => {
    */
   const connect = useCallback(async () => {
     try {
+      /**
+       * OBS:
+       * Inicia la carga
+       * Se finaliza cuando está validada la billetera contra el contrato
+       * Sino falla la conexión
+       */
       setLoading(true)
 
       const connector = setupInjectedConnector()
       await activate(connector, undefined, true)
 
-      setConnected(true)
       setError(null)
     } catch (error: any) {
       setConnected(false)
-      setError(error.message)
-    } finally {
       setLoading(false)
+      setError(error.message)
     }
   }, [setupInjectedConnector, activate])
+
+  const validate = useCallback(async (): Promise<boolean> => {
+    try {
+      const signer = library!.getSigner()
+
+      await autenticarBilletera(signer)
+      return true
+    } catch (error: any) {
+      return false
+    }
+  }, [library, autenticarBilletera])
 
   const disconnect = useCallback(async () => {
     try {
@@ -269,6 +289,34 @@ export const SessionProvider = (props: AppProps) => {
   useEffect(() => {
     compareNetwork()
   }, [compareNetwork])
+
+  // Manejo de carga: conectar y validar biletera
+  useEffect(() => {
+    let mounted = true
+
+    const awaitValidate = async () => {
+      const isValid = await validate()
+      if (mounted) {
+        setConnected(isValid)
+        setLoading(false)
+      }
+    }
+
+    if (active && loading) {
+      awaitValidate()
+    }
+
+    return () => {
+      mounted = false
+    }
+  }, [active, loading, validate])
+
+  // Al cambiar de cuenta, tengo que revalidar
+  useEffect(() => {
+    if (account) {
+      setLoading(true)
+    }
+  }, [account])
 
   //**************************************************************************//
 
