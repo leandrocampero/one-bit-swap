@@ -18,7 +18,15 @@ contract GestorTokens is Datos {
     bool _incluirSuspendidos
   ) public view returns (Token[] memory) {
     Token memory token;
-    Token[] memory resultado = new Token[](tokensCantidadActivos);
+    uint length;
+
+    if (_incluirSuspendidos) {
+      length = tokensCantidadTotal;
+    } else {
+      length = tokensCantidadActivos;
+    }
+
+    Token[] memory resultado = new Token[](length);
     uint indiceResultado = 0;
 
     for (uint index = 0; index < tokensListado.length; index++) {
@@ -78,6 +86,7 @@ contract GestorTokens is Datos {
 
     tokensListado.push(ticker);
     tokensCantidadActivos++;
+    tokensCantidadTotal++;
     emit NuevoToken(tokensRegistrados[ticker]);
 
     return true;

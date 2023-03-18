@@ -115,6 +115,7 @@ abstract contract Datos {
   mapping(string => Token) public tokensRegistrados; // OBS: ticker -> Token
   string[] tokensListado; // IMPROVE: posiblemente haya que mejorarlo, pero como no es primordial el ordenamiento para este array, queda así momentaneamente
   uint tokensCantidadActivos;
+  uint tokensCantidadTotal;
 
   mapping(address => Billetera) public billeterasRegistradas; // REVIEW: Se decide hacer un archivo de billeteras porque se necesita tanto buscarlas para interactuar con ellas como listarlas
   address[] billeterasBloqueadas; // IMPROVE: Se podría mejorar haciendo también una lista enlazada para un pagínado filtrado. Pero queda como actualización
