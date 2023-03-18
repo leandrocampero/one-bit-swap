@@ -33,6 +33,7 @@ export default function VistaToken() {
 
   const handleCheckBox = (event: React.ChangeEvent<HTMLInputElement>) => {
     setIncluyeBajas(event.target.checked)
+    console.log('incluyeBajas: ' + event.target.checked)
   }
 
   const handleClicRecargar = () => {

@@ -1,7 +1,7 @@
 import { useBlockchainContext } from '@/context/BlockchainProvider'
 import { Estados } from '@/types.d'
 import { Button, Grid, InputAdornment, TextField } from '@mui/material'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function VistaConfiguracion() {
   const { getters, actions } = useBlockchainContext()
@@ -12,18 +12,16 @@ export default function VistaConfiguracion() {
     cambiarMontoMinimoPlataforma,
   } = actions
 
-  const [montoMinimo, setMontoMinimo] = useState<number>(
-    plataforma.datos.montoMinimo
-  )
+  const [montoMinimo, setMontoMinimo] = useState<string>('')
 
   const handleCambiarMontoMinimoText = (
     evt: React.ChangeEvent<HTMLInputElement>
   ) => {
-    setMontoMinimo(parseInt(evt.target.value.trim()))
+    setMontoMinimo(evt.target.value.trim())
   }
 
   const handleCambiarMontoMinimoButton = () => {
-    cambiarMontoMinimoPlataforma(montoMinimo.toString())
+    cambiarMontoMinimoPlataforma(montoMinimo)
   }
 
   const handleCambiarEstadoPlataforma = () => {
@@ -34,13 +32,20 @@ export default function VistaConfiguracion() {
     }
   }
 
+  useEffect(() => {
+    console.log('MontoMinimo: ' + plataforma.datos.montoMinimo)
+  }, [plataforma])
+
   return (
     <>
       <Grid container spacing={2}>
+        <Grid item xs={5} md={10}>
+          <h4>Monto Minimo Actual: ${plataforma.datos.montoMinimo}</h4>
+        </Grid>
         <Grid item xs={5} md={5}>
           <TextField
             id="txt-busqueda"
-            label={'Monto Minimo Actual'}
+            label={'Nuevo Monto Minimo'}
             value={montoMinimo}
             variant="outlined"
             onChange={handleCambiarMontoMinimoText}
