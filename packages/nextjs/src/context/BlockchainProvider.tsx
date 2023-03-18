@@ -261,13 +261,14 @@ export const BlockchainProvider = (props: AppProps) => {
 
       try {
         const contract = setupContract()
-        await contract.nuevaOrden(
+        const receipt = await contract.nuevaOrden(
           tokenCompra,
           tokenVenta,
           ethers.utils.parseEther(montoCompra),
           ethers.utils.parseEther(montoVenta),
           tipo
         )
+        await receipt.wait()
 
         dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA })
       } catch (error: any) {
@@ -287,7 +288,8 @@ export const BlockchainProvider = (props: AppProps) => {
 
       try {
         const contract = setupContract()
-        await contract.cancelarOrden(idOrden)
+        const receipt = await contract.cancelarOrden(idOrden)
+        await receipt.wait()
 
         dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA })
       } catch (error: any) {
@@ -307,7 +309,8 @@ export const BlockchainProvider = (props: AppProps) => {
 
       try {
         const contract = setupContract()
-        await contract.ejecutarOrden(idOrden)
+        const receipt = await contract.ejecutarOrden(idOrden)
+        await receipt.wait()
 
         dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA })
       } catch (error: any) {
@@ -353,7 +356,8 @@ export const BlockchainProvider = (props: AppProps) => {
 
       try {
         const contract = setupContract()
-        await contract.nuevoToken(contrato, oraculo)
+        const receipt = await contract.nuevoToken(contrato, oraculo)
+        await receipt.wait()
 
         dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA })
       } catch (error: any) {
@@ -373,7 +377,8 @@ export const BlockchainProvider = (props: AppProps) => {
 
       try {
         const contract = setupContract()
-        await contract.activarToken(ticker)
+        const receipt = await contract.activarToken(ticker)
+        await receipt.wait()
 
         dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA })
       } catch (error: any) {
@@ -393,7 +398,8 @@ export const BlockchainProvider = (props: AppProps) => {
 
       try {
         const contract = setupContract()
-        await contract.suspenderToken(ticker)
+        const receipt = await contract.suspenderToken(ticker)
+        await receipt.wait()
 
         dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA })
       } catch (error: any) {
@@ -413,7 +419,8 @@ export const BlockchainProvider = (props: AppProps) => {
 
       try {
         const contract = setupContract()
-        await contract.modifcarOraculo(ticker, oraculo)
+        const receipt = await contract.modifcarOraculo(ticker, oraculo)
+        await receipt.wait()
 
         dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA })
       } catch (error: any) {
@@ -437,7 +444,11 @@ export const BlockchainProvider = (props: AppProps) => {
 
       dispatch({
         type: ReducerActionType.GUARDAR_DATOS_PLATAFORMA,
-        payload: { estado, propietario, montoMinimoUSD },
+        payload: {
+          estado,
+          propietario,
+          montoMinimo: montoMinimoUSD.toNumber(),
+        },
       })
     } catch (error: any) {
       dispatch({
@@ -453,7 +464,8 @@ export const BlockchainProvider = (props: AppProps) => {
 
     try {
       const contract = setupContract()
-      await contract.bloquearPlataforma()
+      const receipt = await contract.bloquearPlataforma()
+      await receipt.wait()
 
       dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA })
     } catch (error: any) {
@@ -470,7 +482,8 @@ export const BlockchainProvider = (props: AppProps) => {
 
     try {
       const contract = setupContract()
-      await contract.desbloquearPlataforma()
+      const receipt = await contract.desbloquearPlataforma()
+      await receipt.wait()
 
       dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA })
     } catch (error: any) {
@@ -488,7 +501,8 @@ export const BlockchainProvider = (props: AppProps) => {
 
       try {
         const contract = setupContract()
-        await contract.establecerMontoMinimo(montoMinimoUSD)
+        const receipt = await contract.establecerMontoMinimo(montoMinimoUSD)
+        await receipt.wait()
 
         dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA })
       } catch (error: any) {
@@ -530,7 +544,8 @@ export const BlockchainProvider = (props: AppProps) => {
 
       try {
         const contract = setupContract()
-        await contract.hacerAdministrador(billetera)
+        const receipt = await contract.hacerAdministrador(billetera)
+        await receipt.wait()
 
         dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA })
       } catch (error: any) {
@@ -550,7 +565,8 @@ export const BlockchainProvider = (props: AppProps) => {
 
       try {
         const contract = setupContract()
-        await contract.quitarAdministrador(billetera)
+        const receipt = await contract.quitarAdministrador(billetera)
+        await receipt.wait()
 
         dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA })
       } catch (error: any) {
@@ -592,7 +608,8 @@ export const BlockchainProvider = (props: AppProps) => {
 
       try {
         const contract = setupContract()
-        await contract.bloquearBilletera(billetera)
+        const receipt = await contract.bloquearBilletera(billetera)
+        await receipt.wait()
 
         dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA })
       } catch (error: any) {
@@ -612,7 +629,8 @@ export const BlockchainProvider = (props: AppProps) => {
 
       try {
         const contract = setupContract()
-        await contract.desbloquearBilletera(billetera)
+        const receipt = await contract.desbloquearBilletera(billetera)
+        await receipt.wait()
 
         dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA })
       } catch (error: any) {
