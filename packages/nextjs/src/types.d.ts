@@ -122,6 +122,7 @@ export type Token = {
   oraculo: string | undefined
   decimales: number
   estado: Estados
+  existe: boolean
 }
 
 export type Billetera = {
