@@ -15,9 +15,9 @@ const style = {
   pb: 3,
 }
 
-import { EsNuevoContext } from './VistaTokens'
 import { BlockchainContext } from '@/context/BlockchainProvider'
 import { ethers } from 'ethers'
+import { EsNuevoContext } from './VistaTokens'
 
 export default function NuevoModificaToken() {
   const contexto = React.useContext(EsNuevoContext)
@@ -30,12 +30,10 @@ export default function NuevoModificaToken() {
 
   const { nuevoToken, modificarOraculoToken } = actions
 
-  const handleModalNuevo = () => {
+  const handleMostrarOcultarModal = () => {
     setEstadoModal(!getEstadoModal)
-    console.log(contexto)
   }
   const handleCrear = () => {
-    console.log('Creado')
     if (
       contexto == undefined &&
       ethers.utils.isAddress(getContrato) &&
@@ -53,12 +51,16 @@ export default function NuevoModificaToken() {
 
   return (
     <>
-      <Button variant="contained" onClick={handleModalNuevo}>
+      <Button
+        sx={{ mr: 1 }}
+        variant="contained"
+        onClick={handleMostrarOcultarModal}
+      >
         {contexto == undefined ? 'Nuevo' : 'Modificar'}
       </Button>
       <Modal
         open={getEstadoModal}
-        onClose={handleModalNuevo}
+        onClose={handleMostrarOcultarModal}
         aria-labelledby="parent-modal-title"
         aria-describedby="parent-modal-description"
       >
@@ -71,6 +73,7 @@ export default function NuevoModificaToken() {
             </h2>
             <TextField
               required
+              fullWidth
               disabled={contexto == undefined ? false : true}
               id="contrato-required"
               label="Contrato"
@@ -82,6 +85,7 @@ export default function NuevoModificaToken() {
             />
             <TextField
               required
+              fullWidth
               id="oraculo-required"
               label="Oraculo"
               variant="standard"
@@ -92,7 +96,17 @@ export default function NuevoModificaToken() {
             />
             {error && <h3>Ingrese parametros validos</h3>}
           </Box>
-          <Button onClick={handleCrear}>Crear</Button>
+
+          <Box
+            display="flex"
+            sx={{ mt: 2, mb: -1 }}
+            justifyContent="space-around"
+          >
+            <Button onClick={handleCrear}>
+              {contexto == undefined ? 'Crear' : 'Modificar'}
+            </Button>
+            <Button onClick={handleMostrarOcultarModal}>Cancelar</Button>
+          </Box>
         </Box>
       </Modal>
     </>
