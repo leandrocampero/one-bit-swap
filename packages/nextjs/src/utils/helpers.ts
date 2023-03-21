@@ -185,3 +185,31 @@ export async function sleep() {
     await sleep
   }
 }
+
+export function getTimeAgoString(date: Date): string {
+  const now = new Date()
+  const diff = now.getTime() - date.getTime()
+
+  const minute = 60 * 1000
+  const hour = 60 * minute
+  const day = 24 * hour
+  const week = 7 * day
+  const month = 30 * day
+  const year = 365 * day
+
+  if (diff < minute) {
+    return Math.floor(diff / 1000) + ' segundos'
+  } else if (diff < hour) {
+    return Math.floor(diff / minute) + ' minutos'
+  } else if (diff < day) {
+    return Math.floor(diff / hour) + ' horas'
+  } else if (diff < week) {
+    return Math.floor(diff / day) + ' días'
+  } else if (diff < month) {
+    return Math.floor(diff / week) + ' semanas'
+  } else if (diff < year) {
+    return Math.floor(diff / month) + ' meses'
+  } else {
+    return Math.floor(diff / year) + ' años'
+  }
+}
