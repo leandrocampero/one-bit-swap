@@ -18,14 +18,14 @@ import { Box } from '@mui/system'
 import { useState } from 'react'
 
 export default function CrearOrdenesTest() {
-  const { state, actions } = useBlockchainContext()
+  const { getters, actions } = useBlockchainContext()
   const [tipoOrden, setTipoOrden] = useState<number>(0)
   const [tokenVenta, setTokenVenta] = useState<string>('')
   const [tokenCompra, setTokenCompra] = useState<string>('')
   const [montoVenta, setMontoVenta] = useState<string>('')
   const [montoCompra, setMontoCompra] = useState<string>('')
 
-  const { tokens } = state
+  const { tokens } = getters
   const { nuevaOrden } = actions
 
   return (

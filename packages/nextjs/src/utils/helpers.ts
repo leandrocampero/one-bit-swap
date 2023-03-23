@@ -16,6 +16,8 @@ import {
 import { Datos } from '@one-bit-swap/hardhat/typechain-types/contracts/Datos'
 import { ethers } from 'ethers'
 
+const OFFSET = 10 * 60
+
 export function formatArrayBilleteras(
   listado: Datos.BilleteraStructOutput[]
 ): Billetera[] {
@@ -71,8 +73,8 @@ export function formatArrayOrdenes(
         comprador,
         montoVenta: montoVenta.toString(),
         montoCompra: montoCompra.toString(),
-        fechaCreacion: fechaCreacion.toString(),
-        fechaFinalizacion: fechaFinalizacion.toString(),
+        fechaCreacion: fechaCreacion.sub(OFFSET).toString(),
+        fechaFinalizacion: fechaFinalizacion.sub(OFFSET).toString(),
         tokenCompra,
         tokenVenta,
         estado: getEstadoOrden(estado),
