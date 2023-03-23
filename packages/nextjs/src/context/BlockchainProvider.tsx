@@ -16,21 +16,27 @@ import {
   ERROR_NO_CONTRACT_ADDRESS,
   ERROR_NO_SIGNER,
 } from '@/constants/mensajes'
-import { blockchainReducer } from '@/context/blockchainReducer'
+import {
+  administradoresReducer,
+  bloqueadosReducer,
+  ordenesReducer,
+  plataformaReducer,
+  sesionReducer,
+  tokensReducer,
+  transaccionReducer,
+} from '@/context/blockchainReducer'
 import {
   BlockchainActions,
-  BlockchainState,
+  BlockchainGetters,
+  DATOS_INITIAL_STATE,
+  PLATAFORMA_INITIAL_STATE,
   ReducerActionType,
+  SESION_INITIAL_STATE,
+  TRANSACCION_INITIAL_STATE,
 } from '@/context/context.d'
 import Plataforma from '@/contracts/contracts/Plataforma.sol/Plataforma.json'
 import deploy from '@/contracts/deploy.json'
-import {
-  AppProps,
-  Estados,
-  Orden,
-  RolesBilleteras,
-  TiposOrdenes,
-} from '@/types.d'
+import { AppProps, Estados, Orden, TiposOrdenes } from '@/types.d'
 import {
   formatArrayBilleteras,
   formatArrayOrdenes,
@@ -46,6 +52,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useReducer,
   useState,
 } from 'react'
@@ -62,33 +69,11 @@ import {
 //                                                                          //
 //**************************************************************************//
 
-const INITIAL_STATE: BlockchainState = {
-  plataforma: {
-    datos: { contrato: '', montoMinimo: 0, estado: Estados.activo },
-    cargando: false,
-    error: null,
-  },
-  ordenes: { datos: [], cargando: false, error: null },
-  tokens: { datos: [], cargando: false, error: null },
-  administradores: { datos: [], cargando: false, error: null },
-  bloqueados: { datos: [], cargando: false, error: null },
-  transaccion: { cargando: false, error: null },
-  sesion: {
-    cargando: false,
-    error: null,
-    datos: {
-      direccion: '',
-      estado: Estados.activo,
-      rol: RolesBilleteras.usuario,
-    },
-  },
-}
-
 const ORDENES_OFFSET = 20
 
 type BlockchainContextProps = {
-  state: BlockchainState
   actions: BlockchainActions
+  getters: BlockchainGetters
 }
 
 //**************************************************************************//
@@ -120,7 +105,37 @@ export const BlockchainProvider = (props: AppProps) => {
   //                                                                          //
   //**************************************************************************//
 
-  const [state, dispatch] = useReducer(blockchainReducer, INITIAL_STATE)
+  const [plataforma, reducePlataforma] = useReducer(
+    plataformaReducer,
+    PLATAFORMA_INITIAL_STATE
+  )
+
+  const [ordenes, reduceOrdenes] = useReducer(
+    ordenesReducer,
+    DATOS_INITIAL_STATE
+  )
+
+  const [tokens, reduceTokens] = useReducer(tokensReducer, DATOS_INITIAL_STATE)
+
+  const [administradores, reduceAdministradores] = useReducer(
+    administradoresReducer,
+    DATOS_INITIAL_STATE
+  )
+
+  const [bloqueados, reduceBloqueados] = useReducer(
+    bloqueadosReducer,
+    DATOS_INITIAL_STATE
+  )
+
+  const [transaccion, reduceTransaccion] = useReducer(
+    transaccionReducer,
+    TRANSACCION_INITIAL_STATE
+  )
+
+  const [sesion, reduceSesion] = useReducer(sesionReducer, SESION_INITIAL_STATE)
+
+  /****************************************************************************/
+
   const [contract, setContract] = useState<ContratoPlataforma | null>(null)
   const [contractAddress, setContractAddress] = useState<string>('')
   const [signer, setSigner] = useState<JsonRpcSigner | undefined>(undefined)
@@ -170,19 +185,19 @@ export const BlockchainProvider = (props: AppProps) => {
 
   //**************************************************************************//
   //                                                                          //
-  //               #                                                          //
-  //              # #     ####   #####  #   ####   #    #   ####              //
-  //             #   #   #    #    #    #  #    #  ##   #  #                  //
-  //            #     #  #         #    #  #    #  # #  #   ####              //
-  //            #######  #         #    #  #    #  #  # #       #             //
-  //            #     #  #    #    #    #  #    #  #   ##  #    #             //
-  //            #     #   ####     #    #   ####   #    #   ####              //
+  //            #######                                                       //
+  //            #     #  #####   #####   ######  #####    ####                //
+  //            #     #  #    #  #    #  #       #    #  #                    //
+  //            #     #  #    #  #    #  #####   #    #   ####                //
+  //            #     #  #####   #    #  #       #####        #               //
+  //            #     #  #   #   #    #  #       #   #   #    #               //
+  //            #######  #    #  #####   ######  #    #   ####                //
   //                                                                          //
   //**************************************************************************//
 
   const cargarOrdenesActivas = useCallback(
     async (base: string) => {
-      dispatch({ type: ReducerActionType.MARCAR_CARGANDO_ORDENES })
+      reduceOrdenes({ type: ReducerActionType.MARCAR_CARGANDO })
       await sleep()
 
       try {
@@ -191,36 +206,16 @@ export const BlockchainProvider = (props: AppProps) => {
           await contractTemp.listarOrdenesActivas(base, ORDENES_OFFSET)
         )
 
-        dispatch({
-          type: ReducerActionType.GUARDAR_ORDENES,
-          payload: { ordenes: resultado, sobrescribir: false },
+        reduceOrdenes({
+          type: ReducerActionType.GUARDAR_DATOS,
+          payload: {
+            ordenes: resultado,
+            sobrescribir: base === ethers.constants.HashZero,
+          },
         })
       } catch (error: any) {
-        dispatch({
-          type: ReducerActionType.MARCAR_ERROR_ORDENES,
-          payload: error.message,
-        })
-      }
-    },
-    [setupContract]
-  )
-
-  const cargarTokens = useCallback(
-    async (incluirSuspendidos: boolean) => {
-      dispatch({ type: ReducerActionType.MARCAR_CARGANDO_TOKENS })
-      await sleep()
-
-      try {
-        const contract = setupContract()
-        const resultado = await contract.listarTokens(incluirSuspendidos)
-
-        dispatch({
-          type: ReducerActionType.GUARDAR_TOKENS,
-          payload: resultado,
-        })
-      } catch (error: any) {
-        dispatch({
-          type: ReducerActionType.MARCAR_ERROR_TOKENS,
+        reduceOrdenes({
+          type: ReducerActionType.MARCAR_ERROR,
           payload: error.message,
         })
       }
@@ -229,20 +224,20 @@ export const BlockchainProvider = (props: AppProps) => {
   )
 
   const cargarOrdenesPropias = useCallback(async () => {
-    dispatch({ type: ReducerActionType.MARCAR_CARGANDO_ORDENES })
+    reduceOrdenes({ type: ReducerActionType.MARCAR_CARGANDO })
     await sleep()
 
     try {
       const contract = setupContract()
       const resultado = formatArrayOrdenes(await contract.listarMisOrdenes())
 
-      dispatch({
-        type: ReducerActionType.GUARDAR_ORDENES,
+      reduceOrdenes({
+        type: ReducerActionType.GUARDAR_DATOS,
         payload: { ordenes: resultado, sobrescribir: true },
       })
     } catch (error: any) {
-      dispatch({
-        type: ReducerActionType.MARCAR_ERROR_ORDENES,
+      reduceOrdenes({
+        type: ReducerActionType.MARCAR_ERROR,
         payload: error.message,
       })
     }
@@ -256,7 +251,9 @@ export const BlockchainProvider = (props: AppProps) => {
       montoVenta: string,
       tipo: TiposOrdenes
     ) => {
-      dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO })
+      reduceTransaccion({
+        type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO,
+      })
       await sleep()
 
       try {
@@ -270,9 +267,11 @@ export const BlockchainProvider = (props: AppProps) => {
         )
         await receipt.wait()
 
-        dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA })
+        reduceTransaccion({
+          type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA,
+        })
       } catch (error: any) {
-        dispatch({
+        reduceTransaccion({
           type: ReducerActionType.MARCAR_TRANSACCION_FALLIDA,
           payload: error.message,
         })
@@ -283,7 +282,9 @@ export const BlockchainProvider = (props: AppProps) => {
 
   const cancelarOrden = useCallback(
     async (idOrden: string) => {
-      dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO })
+      reduceTransaccion({
+        type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO,
+      })
       await sleep()
 
       try {
@@ -291,9 +292,11 @@ export const BlockchainProvider = (props: AppProps) => {
         const receipt = await contract.cancelarOrden(idOrden)
         await receipt.wait()
 
-        dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA })
+        reduceTransaccion({
+          type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA,
+        })
       } catch (error: any) {
-        dispatch({
+        reduceTransaccion({
           type: ReducerActionType.MARCAR_TRANSACCION_FALLIDA,
           payload: error.message,
         })
@@ -304,7 +307,9 @@ export const BlockchainProvider = (props: AppProps) => {
 
   const ejecutarOrden = useCallback(
     async (idOrden: string) => {
-      dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO })
+      reduceTransaccion({
+        type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO,
+      })
       await sleep()
 
       try {
@@ -312,9 +317,11 @@ export const BlockchainProvider = (props: AppProps) => {
         const receipt = await contract.ejecutarOrden(idOrden)
         await receipt.wait()
 
-        dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA })
+        reduceTransaccion({
+          type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA,
+        })
       } catch (error: any) {
-        dispatch({
+        reduceTransaccion({
           type: ReducerActionType.MARCAR_TRANSACCION_FALLIDA,
           payload: error.message,
         })
@@ -349,9 +356,46 @@ export const BlockchainProvider = (props: AppProps) => {
     [setupContract]
   )
 
+  //**************************************************************************//
+  //                                                                          //
+  //            #######                                                       //
+  //               #      ####   #    #  ######  #    #   ####                //
+  //               #     #    #  #   #   #       ##   #  #                    //
+  //               #     #    #  ####    #####   # #  #   ####                //
+  //               #     #    #  #  #    #       #  # #       #               //
+  //               #     #    #  #   #   #       #   ##  #    #               //
+  //               #      ####   #    #  ######  #    #   ####                //
+  //                                                                          //
+  //**************************************************************************//
+
+  const cargarTokens = useCallback(
+    async (incluirSuspendidos: boolean) => {
+      reduceTokens({ type: ReducerActionType.MARCAR_CARGANDO })
+      await sleep()
+
+      try {
+        const contract = setupContract()
+        const resultado = await contract.listarTokens(incluirSuspendidos)
+
+        reduceTokens({
+          type: ReducerActionType.GUARDAR_DATOS,
+          payload: resultado,
+        })
+      } catch (error: any) {
+        reduceTokens({
+          type: ReducerActionType.MARCAR_ERROR,
+          payload: error.message,
+        })
+      }
+    },
+    [setupContract]
+  )
+
   const nuevoToken = useCallback(
     async (contrato: string, oraculo: string) => {
-      dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO })
+      reduceTransaccion({
+        type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO,
+      })
       await sleep()
 
       try {
@@ -359,9 +403,11 @@ export const BlockchainProvider = (props: AppProps) => {
         const receipt = await contract.nuevoToken(contrato, oraculo)
         await receipt.wait()
 
-        dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA })
+        reduceTransaccion({
+          type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA,
+        })
       } catch (error: any) {
-        dispatch({
+        reduceTransaccion({
           type: ReducerActionType.MARCAR_TRANSACCION_FALLIDA,
           payload: error.message,
         })
@@ -372,7 +418,9 @@ export const BlockchainProvider = (props: AppProps) => {
 
   const activarToken = useCallback(
     async (ticker: string) => {
-      dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO })
+      reduceTransaccion({
+        type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO,
+      })
       await sleep()
 
       try {
@@ -380,9 +428,11 @@ export const BlockchainProvider = (props: AppProps) => {
         const receipt = await contract.activarToken(ticker)
         await receipt.wait()
 
-        dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA })
+        reduceTransaccion({
+          type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA,
+        })
       } catch (error: any) {
-        dispatch({
+        reduceTransaccion({
           type: ReducerActionType.MARCAR_TRANSACCION_FALLIDA,
           payload: error.message,
         })
@@ -393,7 +443,9 @@ export const BlockchainProvider = (props: AppProps) => {
 
   const suspenderToken = useCallback(
     async (ticker: string) => {
-      dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO })
+      reduceTransaccion({
+        type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO,
+      })
       await sleep()
 
       try {
@@ -401,9 +453,11 @@ export const BlockchainProvider = (props: AppProps) => {
         const receipt = await contract.suspenderToken(ticker)
         await receipt.wait()
 
-        dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA })
+        reduceTransaccion({
+          type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA,
+        })
       } catch (error: any) {
-        dispatch({
+        reduceTransaccion({
           type: ReducerActionType.MARCAR_TRANSACCION_FALLIDA,
           payload: error.message,
         })
@@ -414,7 +468,9 @@ export const BlockchainProvider = (props: AppProps) => {
 
   const modificarOraculoToken = useCallback(
     async (ticker: string, oraculo: string) => {
-      dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO })
+      reduceTransaccion({
+        type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO,
+      })
       await sleep()
 
       try {
@@ -422,9 +478,11 @@ export const BlockchainProvider = (props: AppProps) => {
         const receipt = await contract.modifcarOraculo(ticker, oraculo)
         await receipt.wait()
 
-        dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA })
+        reduceTransaccion({
+          type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA,
+        })
       } catch (error: any) {
-        dispatch({
+        reduceTransaccion({
           type: ReducerActionType.MARCAR_TRANSACCION_FALLIDA,
           payload: error.message,
         })
@@ -433,8 +491,20 @@ export const BlockchainProvider = (props: AppProps) => {
     [setupContract]
   )
 
+  //**************************************************************************//
+  //                                                                          //
+  //     ######                                                               //
+  //     #     #  #         ##    #####  ######   ####   #####   #    #       //
+  //     #     #  #        #  #     #    #       #    #  #    #  ##  ##       //
+  //     ######   #       #    #    #    #####   #    #  #    #  # ## #       //
+  //     #        #       ######    #    #       #    #  #####   #    #       //
+  //     #        #       #    #    #    #       #    #  #   #   #    #       //
+  //     #        ######  #    #    #    #        ####   #    #  #    #       //
+  //                                                                          //
+  //**************************************************************************//
+
   const cargarDatosPlataforma = useCallback(async () => {
-    dispatch({ type: ReducerActionType.MARCAR_CARGANDO_PLATAFORMA })
+    reducePlataforma({ type: ReducerActionType.MARCAR_CARGANDO })
     await sleep()
 
     try {
@@ -442,8 +512,8 @@ export const BlockchainProvider = (props: AppProps) => {
       const { estado, propietario, montoMinimoUSD } =
         await contract.plataforma()
 
-      dispatch({
-        type: ReducerActionType.GUARDAR_DATOS_PLATAFORMA,
+      reducePlataforma({
+        type: ReducerActionType.GUARDAR_DATOS,
         payload: {
           estado,
           propietario,
@@ -451,15 +521,17 @@ export const BlockchainProvider = (props: AppProps) => {
         },
       })
     } catch (error: any) {
-      dispatch({
-        type: ReducerActionType.MARCAR_ERROR_PLATAFORMA,
+      reducePlataforma({
+        type: ReducerActionType.MARCAR_ERROR,
         payload: error.message,
       })
     }
   }, [setupContract])
 
   const bloquearPlataforma = useCallback(async () => {
-    dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO })
+    reduceTransaccion({
+      type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO,
+    })
     await sleep()
 
     try {
@@ -467,9 +539,11 @@ export const BlockchainProvider = (props: AppProps) => {
       const receipt = await contract.bloquearPlataforma()
       await receipt.wait()
 
-      dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA })
+      reduceTransaccion({
+        type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA,
+      })
     } catch (error: any) {
-      dispatch({
+      reduceTransaccion({
         type: ReducerActionType.MARCAR_TRANSACCION_FALLIDA,
         payload: error.message,
       })
@@ -477,7 +551,9 @@ export const BlockchainProvider = (props: AppProps) => {
   }, [setupContract])
 
   const desbloquearPlataforma = useCallback(async () => {
-    dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO })
+    reduceTransaccion({
+      type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO,
+    })
     await sleep()
 
     try {
@@ -485,9 +561,11 @@ export const BlockchainProvider = (props: AppProps) => {
       const receipt = await contract.desbloquearPlataforma()
       await receipt.wait()
 
-      dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA })
+      reduceTransaccion({
+        type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA,
+      })
     } catch (error: any) {
-      dispatch({
+      reduceTransaccion({
         type: ReducerActionType.MARCAR_TRANSACCION_FALLIDA,
         payload: error.message,
       })
@@ -496,7 +574,9 @@ export const BlockchainProvider = (props: AppProps) => {
 
   const cambiarMontoMinimoPlataforma = useCallback(
     async (montoMinimoUSD: string) => {
-      dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO })
+      reduceTransaccion({
+        type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO,
+      })
       await sleep()
 
       try {
@@ -504,9 +584,11 @@ export const BlockchainProvider = (props: AppProps) => {
         const receipt = await contract.establecerMontoMinimo(montoMinimoUSD)
         await receipt.wait()
 
-        dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA })
+        reduceTransaccion({
+          type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA,
+        })
       } catch (error: any) {
-        dispatch({
+        reduceTransaccion({
           type: ReducerActionType.MARCAR_TRANSACCION_FALLIDA,
           payload: error.message,
         })
@@ -515,8 +597,20 @@ export const BlockchainProvider = (props: AppProps) => {
     [setupContract]
   )
 
+  //**************************************************************************//
+  //                                                                          //
+  //                  #                                                       //
+  //                 # #    #####   #    #  #  #    #   ####                  //
+  //                #   #   #    #  ##  ##  #  ##   #  #                      //
+  //               #     #  #    #  # ## #  #  # #  #   ####                  //
+  //               #######  #    #  #    #  #  #  # #       #                 //
+  //               #     #  #    #  #    #  #  #   ##  #    #                 //
+  //               #     #  #####   #    #  #  #    #   ####                  //
+  //                                                                          //
+  //**************************************************************************//
+
   const cargarAdministradores = useCallback(async () => {
-    dispatch({ type: ReducerActionType.MARCAR_CARGANDO_ADMINISTRADORES })
+    reduceAdministradores({ type: ReducerActionType.MARCAR_CARGANDO })
     await sleep()
 
     try {
@@ -525,13 +619,13 @@ export const BlockchainProvider = (props: AppProps) => {
         await contract.listarAdministradores()
       )
 
-      dispatch({
-        type: ReducerActionType.GUARDAR_ADMINISTRADORES,
+      reduceAdministradores({
+        type: ReducerActionType.GUARDAR_DATOS,
         payload: resultado,
       })
     } catch (error: any) {
-      dispatch({
-        type: ReducerActionType.MARCAR_ERROR_ADMINISTRADORES,
+      reduceAdministradores({
+        type: ReducerActionType.MARCAR_ERROR,
         payload: error.message,
       })
     }
@@ -539,7 +633,9 @@ export const BlockchainProvider = (props: AppProps) => {
 
   const nuevoAdministrador = useCallback(
     async (billetera: string) => {
-      dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO })
+      reduceTransaccion({
+        type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO,
+      })
       await sleep()
 
       try {
@@ -547,9 +643,11 @@ export const BlockchainProvider = (props: AppProps) => {
         const receipt = await contract.hacerAdministrador(billetera)
         await receipt.wait()
 
-        dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA })
+        reduceTransaccion({
+          type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA,
+        })
       } catch (error: any) {
-        dispatch({
+        reduceTransaccion({
           type: ReducerActionType.MARCAR_TRANSACCION_FALLIDA,
           payload: error.message,
         })
@@ -560,7 +658,9 @@ export const BlockchainProvider = (props: AppProps) => {
 
   const quitarAdministrador = useCallback(
     async (billetera: string) => {
-      dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO })
+      reduceTransaccion({
+        type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO,
+      })
       await sleep()
 
       try {
@@ -568,9 +668,11 @@ export const BlockchainProvider = (props: AppProps) => {
         const receipt = await contract.quitarAdministrador(billetera)
         await receipt.wait()
 
-        dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA })
+        reduceTransaccion({
+          type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA,
+        })
       } catch (error: any) {
-        dispatch({
+        reduceTransaccion({
           type: ReducerActionType.MARCAR_TRANSACCION_FALLIDA,
           payload: error.message,
         })
@@ -579,8 +681,20 @@ export const BlockchainProvider = (props: AppProps) => {
     [setupContract]
   )
 
+  //**************************************************************************//
+  //                                                                          //
+  //        ######                                                            //
+  //        #     #  #        ####    ####   #    #  ######  #####            //
+  //        #     #  #       #    #  #    #  #   #   #       #    #           //
+  //        ######   #       #    #  #       ####    #####   #    #           //
+  //        #     #  #       #    #  #       #  #    #       #    #           //
+  //        #     #  #       #    #  #    #  #   #   #       #    #           //
+  //        ######   ######   ####    ####   #    #  ######  #####            //
+  //                                                                          //
+  //**************************************************************************//
+
   const cargarBloqueados = useCallback(async () => {
-    dispatch({ type: ReducerActionType.MARCAR_CARGANDO_BLOQUEADOS })
+    reduceBloqueados({ type: ReducerActionType.MARCAR_CARGANDO })
     await sleep()
 
     try {
@@ -589,13 +703,13 @@ export const BlockchainProvider = (props: AppProps) => {
         await contract.listarBilleterasBloqueadas()
       )
 
-      dispatch({
-        type: ReducerActionType.GUARDAR_BILLETERAS_BLOQUEADAS,
+      reduceBloqueados({
+        type: ReducerActionType.GUARDAR_DATOS,
         payload: resultado,
       })
     } catch (error: any) {
-      dispatch({
-        type: ReducerActionType.MARCAR_ERROR_BLOQUEADOS,
+      reduceBloqueados({
+        type: ReducerActionType.MARCAR_ERROR,
         payload: error.message,
       })
     }
@@ -603,7 +717,9 @@ export const BlockchainProvider = (props: AppProps) => {
 
   const bloquearBilletera = useCallback(
     async (billetera: string) => {
-      dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO })
+      reduceTransaccion({
+        type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO,
+      })
       await sleep()
 
       try {
@@ -611,9 +727,11 @@ export const BlockchainProvider = (props: AppProps) => {
         const receipt = await contract.bloquearBilletera(billetera)
         await receipt.wait()
 
-        dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA })
+        reduceTransaccion({
+          type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA,
+        })
       } catch (error: any) {
-        dispatch({
+        reduceTransaccion({
           type: ReducerActionType.MARCAR_TRANSACCION_FALLIDA,
           payload: error.message,
         })
@@ -624,7 +742,9 @@ export const BlockchainProvider = (props: AppProps) => {
 
   const desbloquearBilletera = useCallback(
     async (billetera: string) => {
-      dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO })
+      reduceTransaccion({
+        type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO,
+      })
       await sleep()
 
       try {
@@ -632,9 +752,11 @@ export const BlockchainProvider = (props: AppProps) => {
         const receipt = await contract.desbloquearBilletera(billetera)
         await receipt.wait()
 
-        dispatch({ type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA })
+        reduceTransaccion({
+          type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA,
+        })
       } catch (error: any) {
-        dispatch({
+        reduceTransaccion({
           type: ReducerActionType.MARCAR_TRANSACCION_FALLIDA,
           payload: error.message,
         })
@@ -643,13 +765,25 @@ export const BlockchainProvider = (props: AppProps) => {
     [setupContract]
   )
 
+  //**************************************************************************//
+  //                                                                          //
+  //            #####                                                         //
+  //           #     #  ######   ####    ####   #   ####   #    #             //
+  //           #        #       #       #       #  #    #  ##   #             //
+  //            #####   #####    ####    ####   #  #    #  # #  #             //
+  //                 #  #            #       #  #  #    #  #  # #             //
+  //           #     #  #       #    #  #    #  #  #    #  #   ##             //
+  //            #####   ######   ####    ####   #   ####   #    #             //
+  //                                                                          //
+  //**************************************************************************//
+
   /**
    * Busca los datos de la billetera para validarlos en el contrato
    * @param signer es el signer provisto para inicar la conexión
    */
   const autenticarBilletera = useCallback(
     async (signer: JsonRpcSigner): Promise<void> => {
-      dispatch({ type: ReducerActionType.MARCAR_CARGANDO_SESION })
+      reduceSesion({ type: ReducerActionType.MARCAR_CARGANDO })
       await sleep()
 
       try {
@@ -666,13 +800,13 @@ export const BlockchainProvider = (props: AppProps) => {
           throw new Error(ERROR_BILLETERA_SUSPENDIDA)
         }
 
-        dispatch({
-          type: ReducerActionType.GUARDAR_DATOS_SESION,
+        reduceSesion({
+          type: ReducerActionType.GUARDAR_DATOS,
           payload: { account: direccion, estado, rol },
         })
       } catch (error: any) {
-        dispatch({
-          type: ReducerActionType.MARCAR_ERROR_SESION,
+        reduceSesion({
+          type: ReducerActionType.MARCAR_ERROR,
           payload: error.message,
         })
         throw new Error(ERROR_AUTENTICAR_BILLETERA)
@@ -680,6 +814,26 @@ export const BlockchainProvider = (props: AppProps) => {
     },
     [setupContract]
   )
+
+  //**************************************************************************//
+  //                                                                          //
+  //           #####                                                          //
+  //          #     #  ######  #####  #####  ######  #####    ####            //
+  //          #        #         #      #    #       #    #  #                //
+  //          #  ####  #####     #      #    #####   #    #   ####            //
+  //          #     #  #         #      #    #       #####        #           //
+  //          #     #  #         #      #    #       #   #   #    #           //
+  //           #####   ######    #      #    ######  #    #   ####            //
+  //                                                                          //
+  //**************************************************************************//
+
+  const getPlataforma = useMemo(() => plataforma, [plataforma])
+  const getOrdenes = useMemo(() => ordenes, [ordenes])
+  const getTokens = useMemo(() => tokens, [tokens])
+  const getAdministradores = useMemo(() => administradores, [administradores])
+  const getBloqueados = useMemo(() => bloqueados, [bloqueados])
+  const getTransaccion = useMemo(() => transaccion, [transaccion])
+  const getSesion = useMemo(() => sesion, [sesion])
 
   //**************************************************************************//
   //                                                                          //
@@ -693,15 +847,15 @@ export const BlockchainProvider = (props: AppProps) => {
   //                                                                          //
   //**************************************************************************//
 
-  // Limpiar estado al desmontar componente
-  useEffect(() => {
-    return () => {
-      dispatch({
-        type: ReducerActionType.REINICIAR_ESTADO,
-        payload: INITIAL_STATE,
-      })
-    }
-  }, [])
+  // // Limpiar estado al desmontar componente
+  // useEffect(() => {
+  //   return () => {
+  //     dispatch({
+  //       type: ReducerActionType.REINICIAR_ESTADO,
+  //       payload: INITIAL_STATE,
+  //     })
+  //   }
+  // }, [])
 
   // Leer dirección del contrato
   useEffect(() => {
@@ -745,8 +899,18 @@ export const BlockchainProvider = (props: AppProps) => {
     autenticarBilletera,
   } as BlockchainActions
 
+  const getters: BlockchainGetters = {
+    plataforma: getPlataforma,
+    ordenes: getOrdenes,
+    tokens: getTokens,
+    administradores: getAdministradores,
+    bloqueados: getBloqueados,
+    transaccion: getTransaccion,
+    session: getSesion,
+  }
+
   return (
-    <BlockchainContext.Provider value={{ state, actions }}>
+    <BlockchainContext.Provider value={{ actions, getters }}>
       {props.children}
     </BlockchainContext.Provider>
   )

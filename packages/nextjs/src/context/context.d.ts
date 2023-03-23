@@ -1,4 +1,12 @@
-import { Billetera, Orden, Plataforma, TiposOrdenes, Token } from '@/types'
+import {
+  Billetera,
+  Estados,
+  Orden,
+  Plataforma,
+  RolesBilleteras,
+  TiposOrdenes,
+  Token,
+} from '@/types.d'
 import { JsonRpcSigner } from '@ethersproject/providers'
 import { BigNumber } from 'ethers'
 
@@ -34,22 +42,47 @@ export type Filtros = {
 //                                                                            //
 //****************************************************************************//
 
-export type BlockchainState = {
-  plataforma: {
-    datos: Plataforma
-    cargando: boolean
-    error: Error | null
-  }
-  ordenes: IExternalData<Orden>
-  tokens: IExternalData<Token>
-  administradores: IExternalData<Billetera>
-  bloqueados: IExternalData<Billetera>
-  transaccion: { cargando: boolean; error: Error | null }
-  sesion: {
-    cargando: boolean
-    error: Error | null
-    datos: Billetera
-  }
+export type PlataformaState = {
+  datos: Plataforma
+  cargando: boolean
+  error: Error | null
+}
+export type OrdenesState = IExternalData<Orden>
+export type TokensState = IExternalData<Token>
+export type AdministradoresState = IExternalData<Billetera>
+export type BloqueadosState = IExternalData<Billetera>
+export type TransaccionState = { cargando: boolean; error: Error | null }
+export type SesionState = {
+  datos: Billetera
+  cargando: boolean
+  error: Error | null
+}
+
+export const PLATAFORMA_INITIAL_STATE: PlataformaState = {
+  datos: { contrato: '', montoMinimo: 0, estado: Estados.activo },
+  cargando: false,
+  error: null,
+}
+
+export const DATOS_INITIAL_STATE = {
+  datos: [],
+  cargando: false,
+  error: null,
+}
+
+export const TRANSACCION_INITIAL_STATE: TransaccionState = {
+  cargando: false,
+  error: null,
+}
+
+export const SESION_INITIAL_STATE: SesionState = {
+  cargando: false,
+  error: null,
+  datos: {
+    direccion: '',
+    estado: Estados.activo,
+    rol: RolesBilleteras.usuario,
+  },
 }
 
 //****************************************************************************//
@@ -97,33 +130,34 @@ export type BlockchainActions = {
 
 //****************************************************************************//
 //                                                                            //
+//                             Blockchain Getters                             //
+//                                                                            //
+//****************************************************************************//
+
+export type BlockchainGetters = {
+  plataforma: PlataformaState
+  ordenes: OrdenesState
+  tokens: TokensState
+  administradores: AdministradoresState
+  bloqueados: BloqueadosState
+  transaccion: TransaccionState
+  session: SesionState
+}
+
+//****************************************************************************//
+//                                                                            //
 //                          Blockchain Reducer Types                          //
 //                                                                            //
 //****************************************************************************//
 
 export enum ReducerActionType {
-  MARCAR_CARGANDO_ORDENES = 'MARCAR_CARGANDO_ORDENES',
-  MARCAR_ERROR_ORDENES = 'MARCAR_ERROR_ORDENES',
-  GUARDAR_ORDENES = 'GUARDAR_ORDENES',
-  MARCAR_CARGANDO_TOKENS = 'MARCAR_CARGANDO_TOKENS',
-  MARCAR_ERROR_TOKENS = 'MARCAR_ERROR_TOKENS',
-  GUARDAR_TOKENS = 'GUARDAR_TOKENS',
-  MARCAR_CARGANDO_PLATAFORMA = 'MARCAR_CARGANDO_PLATAFORMA',
-  MARCAR_ERROR_PLATAFORMA = 'MARCAR_ERROR_PLATAFORMA',
-  GUARDAR_DATOS_PLATAFORMA = 'GUARDAR_DATOS_PLATAFORMA',
-  MARCAR_CARGANDO_ADMINISTRADORES = 'MARCAR_CARGANDO_ADMINISTRADORES',
-  MARCAR_ERROR_ADMINISTRADORES = 'MARCAR_ERROR_ADMINISTRADORES',
-  GUARDAR_ADMINISTRADORES = 'GUARDAR_ADMINISTRADORES',
-  MARCAR_CARGANDO_BLOQUEADOS = 'MARCAR_CARGANDO_BLOQUEADOS',
-  MARCAR_ERROR_BLOQUEADOS = 'MARCAR_ERROR_BLOQUEADOS',
-  GUARDAR_BILLETERAS_BLOQUEADAS = 'GUARDAR_BILLETERAS_BLOQUEADOS',
   REINICIAR_ESTADO = 'REINICIAR_ESTADO',
+  MARCAR_CARGANDO = 'MARCAR_CARGANDO',
+  MARCAR_ERROR = 'MARCAR_ERROR',
+  GUARDAR_DATOS = 'GUARDAR_DATOS',
   MARCAR_TRANSACCION_EN_PROGRESO = 'MARCAR_TRANSACCION_EN_PROGRESO',
   MARCAR_TRANSACCION_REALIZADA = 'MARCAR_TRANSACCION_REALIZADA',
   MARCAR_TRANSACCION_FALLIDA = 'MARCAR_TRANSACCION_FALLIDA',
-  MARCAR_CARGANDO_SESION = 'MARCAR_CARGANDO_SESION',
-  MARCAR_ERROR_SESION = 'MARCAR_ERROR_SESION',
-  GUARDAR_DATOS_SESION = 'GUARDAR_DATOS_SESION',
 }
 
 export type ReducerAction = { type: ReducerActionType; payload?: any }
