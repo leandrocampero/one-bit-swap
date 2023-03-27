@@ -1,6 +1,6 @@
 import { TiposOrdenes } from '@/types.d'
 import { Box, Button, Modal } from '@mui/material'
-import React, { useContext, useState } from 'react'
+import React, { useState } from 'react'
 
 const style = {
   position: 'absolute' as const,
@@ -16,11 +16,11 @@ const style = {
   pb: 3,
 }
 
+import { useBlockchainContext } from '@/context/BlockchainProvider'
 import { OrdenContext } from './VistaOrdenes'
-import { BlockchainContext } from '@/context/BlockchainProvider'
 
 export default function EjecutarOrden() {
-  const { actions } = useContext(BlockchainContext)
+  const { actions } = useBlockchainContext()
 
   const contexto = React.useContext(OrdenContext)
   const [getEstadoModal, setEstadoModal] = useState(false)

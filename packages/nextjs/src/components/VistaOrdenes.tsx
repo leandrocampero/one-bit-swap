@@ -1,12 +1,13 @@
+import { useBlockchainContext } from '@/context/BlockchainProvider'
 import {
-  Orden,
-  Token,
   Columna,
   Estados,
   EstadosOrdenes,
   NavMenu,
+  Orden,
   TipoColumna,
   TiposOrdenes,
+  Token,
 } from '@/types.d'
 import {
   Autocomplete,
@@ -27,16 +28,15 @@ import {
   Tabs,
   TextField,
 } from '@mui/material'
-import React, { useCallback, useContext, useEffect, useState } from 'react'
-import EjecutarOrden from './EjecutarOrden'
-import { BlockchainContext } from '@/context/BlockchainProvider'
 import { ethers } from 'ethers'
+import React, { useCallback, useEffect, useState } from 'react'
+import EjecutarOrden from './EjecutarOrden'
 
 export const OrdenContext = React.createContext<Orden | undefined>(undefined)
 
 export default function VistaOrdenes() {
-  const { state, actions } = useContext(BlockchainContext)
-  const { tokens, ordenes, sesion } = state
+  const { getters, actions } = useBlockchainContext()
+  const { tokens, ordenes, sesion } = getters
   const { cargarOrdenesActivas, cargarOrdenesPropias, cancelarOrden } = actions
 
   const [getTabValue, setTabValue] = useState(NavMenu.ordenesAbiertas)

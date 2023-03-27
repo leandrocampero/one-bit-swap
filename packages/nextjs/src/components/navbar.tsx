@@ -15,8 +15,8 @@ import Link from 'next/link'
 
 export default function Navbar() {
   const { disconnect, connected } = useSessionContext()
-  const { state } = useBlockchainContext()
-  const { sesion } = state
+  const { getters } = useBlockchainContext()
+  const { sesion } = getters
 
   return (
     <AppBar position="fixed">

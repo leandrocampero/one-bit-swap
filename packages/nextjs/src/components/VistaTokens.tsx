@@ -1,4 +1,4 @@
-import { BlockchainContext } from '@/context/BlockchainProvider'
+import { useBlockchainContext } from '@/context/BlockchainProvider'
 import { Columna, Estados, TipoColumna, Token } from '@/types.d'
 import {
   Button,
@@ -13,7 +13,7 @@ import {
   TableRow,
   TextField,
 } from '@mui/material'
-import React, { useCallback, useContext, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import NuevoModificaToken from './NuevoModificaToken'
 
 export const EsNuevoContext = React.createContext<Token | undefined>(undefined)
@@ -22,8 +22,8 @@ export default function VistaToken() {
   const [getIncluyeBajas, setIncluyeBajas] = useState<boolean>(true)
   const [getTextoBusqueda, setTextoBusqueda] = useState<string>('')
 
-  const { state, actions } = useContext(BlockchainContext)
-  const { tokens } = state
+  const { getters, actions } = useBlockchainContext()
+  const { tokens } = getters
   const { cargarTokens, activarToken, suspenderToken } = actions
 
   // no esta funcionando bien el filtro conjunto de text y ck¿heck

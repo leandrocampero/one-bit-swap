@@ -1,4 +1,5 @@
-import { Estados, Billetera } from '@/types.d'
+import { useBlockchainContext } from '@/context/BlockchainProvider'
+import { Billetera, Estados } from '@/types.d'
 import {
   Button,
   Paper,
@@ -10,13 +11,12 @@ import {
   TableRow,
   TextField,
 } from '@mui/material'
-import { useCallback, useContext, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import Nuevo from './NuevoSuspendido'
-import { BlockchainContext } from '@/context/BlockchainProvider'
 
 export default function VistaBilleterasSuspendidas() {
-  const { state, actions } = useContext(BlockchainContext)
-  const { bloqueados } = state
+  const { getters, actions } = useBlockchainContext()
+  const { bloqueados } = getters
   const { cargarBloqueados } = actions
 
   const [getTextoBusqueda, setTextoBusqueda] = useState('')

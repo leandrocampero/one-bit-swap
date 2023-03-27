@@ -1,5 +1,5 @@
 import { Box, Button, Modal, TextField } from '@mui/material'
-import React, { useContext, useState } from 'react'
+import React, { useState } from 'react'
 
 const style = {
   position: 'absolute' as const,
@@ -15,7 +15,7 @@ const style = {
   pb: 3,
 }
 
-import { BlockchainContext } from '@/context/BlockchainProvider'
+import { useBlockchainContext } from '@/context/BlockchainProvider'
 import { ethers } from 'ethers'
 import { EsNuevoContext } from './VistaTokens'
 
@@ -26,7 +26,7 @@ export default function NuevoModificaToken() {
   const [getEstadoModal, setEstadoModal] = useState(false)
   const [error, setError] = useState<boolean>(false)
 
-  const { actions } = useContext(BlockchainContext)
+  const { actions } = useBlockchainContext()
 
   const { nuevoToken, modificarOraculoToken } = actions
 
