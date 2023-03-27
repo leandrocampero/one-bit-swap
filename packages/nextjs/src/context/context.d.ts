@@ -115,6 +115,11 @@ export type BlockchainActions = {
   activarToken: (ticker: string) => Promise<void>
   suspenderToken: (ticker: string) => Promise<void>
   modificarOraculoToken: (ticker: string, oraculo: string) => Promise<void>
+  consultarCotizacion: (
+    tokenVenta: string,
+    tokenCompra: string,
+    montoVenta: string
+  ) => Promise<string | null>
   cargarDatosPlataforma: () => Promise<void>
   bloquearPlataforma: () => Promise<void>
   desbloquearPlataforma: () => Promise<void>

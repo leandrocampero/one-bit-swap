@@ -614,6 +614,35 @@
   {
     "inputs": [
       {
+        "internalType": "string",
+        "name": "_tokenVenta",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_tokenCompra",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_montoVenta",
+        "type": "uint256"
+      }
+    ],
+    "name": "consultarMontoCotizado",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "montoCompra",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "_billetera",
         "type": "address"

@@ -491,6 +491,29 @@ export const BlockchainProvider = (props: AppProps) => {
     [setupContract]
   )
 
+  const consultarCotizacion = useCallback(
+    async (
+      tokenVenta: string,
+      tokenCompra: string,
+      montoVenta: string
+    ): Promise<string | null> => {
+      try {
+        const contract = setupContract()
+        const resultado = await contract.consultarMontoCotizado(
+          tokenVenta,
+          tokenCompra,
+          montoVenta
+        )
+
+        return resultado.toString()
+      } catch (error: any) {
+        console.log(error.message)
+        return null
+      }
+    },
+    [setupContract]
+  )
+
   //**************************************************************************//
   //                                                                          //
   //     ######                                                               //
@@ -897,6 +920,7 @@ export const BlockchainProvider = (props: AppProps) => {
     bloquearBilletera,
     desbloquearBilletera,
     autenticarBilletera,
+    consultarCotizacion,
   } as BlockchainActions
 
   const getters: BlockchainGetters = {
