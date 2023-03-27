@@ -1,3 +1,4 @@
+import { BlockchainContext } from '@/context/BlockchainProvider'
 import { Columna, Estados, TipoColumna, Token } from '@/types.d'
 import {
   Button,
@@ -14,7 +15,6 @@ import {
 } from '@mui/material'
 import React, { useCallback, useContext, useState } from 'react'
 import NuevoModificaToken from './NuevoModificaToken'
-import { BlockchainContext } from '@/context/BlockchainProvider'
 
 export const EsNuevoContext = React.createContext<Token | undefined>(undefined)
 
@@ -40,22 +40,28 @@ export default function VistaToken() {
   }
 
   const cambiarEstado = useCallback(
-    (t: Token) => {
-      if (t.estado == Estados.activo) {
-        activarToken(t.ticker)
+    (token: Token) => {
+      if (token.estado == Estados.activo) {
+        suspenderToken(token.ticker)
       } else {
-        suspenderToken(t.ticker)
+        activarToken(token.ticker)
       }
     },
     [activarToken, suspenderToken]
   )
 
+  const capitalizeFirstLetter = (string: string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1)
+  }
+
   const listarTokens = useCallback(() => {
     return tokens.datos
-      .filter((t: Token) => {
-        ;(t.ticker.toLowerCase().includes(getTextoBusqueda) ||
-          getTextoBusqueda == '') &&
-          (getIncluyeBajas ? t.estado == Estados.activo : true)
+      .filter((token: Token) => {
+        return (
+          (token.ticker.toLowerCase().includes(getTextoBusqueda) ||
+            getTextoBusqueda == '') &&
+          (getIncluyeBajas ? true : token.estado == Estados.activo)
+        )
       })
       .map((row: Token) => {
         return (
@@ -72,10 +78,14 @@ export default function VistaToken() {
               {row.contrato}
             </TableCell>
             <TableCell key={row.contrato + row.estado} align="left">
-              {row.estado}
+              {capitalizeFirstLetter(Estados[row.estado])}
             </TableCell>
             <TableCell key={row.contrato + row.ticker} align="left">
-              <Button variant="contained" onClick={() => cambiarEstado(row)}>
+              <Button
+                sx={{ mr: 1 }}
+                variant="contained"
+                onClick={() => cambiarEstado(row)}
+              >
                 {row.estado == Estados.activo ? 'Suspender' : 'Activar'}
               </Button>
               {row.estado == Estados.suspendido && (
@@ -130,6 +140,7 @@ export default function VistaToken() {
       />
 
       <FormControlLabel
+        sx={{ ml: 1, my: 1 }}
         control={
           <Checkbox
             defaultChecked={true}
@@ -144,7 +155,7 @@ export default function VistaToken() {
         Recargar
       </Button>
 
-      <Paper sx={{ width: '100%' }}>
+      <Paper sx={{ mt: 2, width: '100%' }}>
         <TableContainer sx={{ maxHeight: 440 }}>
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
