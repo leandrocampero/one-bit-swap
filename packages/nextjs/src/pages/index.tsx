@@ -16,9 +16,8 @@ export default function Home() {
 
   return (
     <BaseLayout>
-      <Grid container spacing={2}>
+      <Grid container spacing={2} height={'100%'}>
         <Grid item xs={8}>
-          <h1>Listar ordenes</h1>
           <ListarOrdenes />
         </Grid>
         <Grid item xs={4}>

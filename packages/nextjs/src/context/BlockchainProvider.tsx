@@ -825,7 +825,7 @@ export const BlockchainProvider = (props: AppProps) => {
 
         reduceSesion({
           type: ReducerActionType.GUARDAR_DATOS,
-          payload: { account: direccion, estado, rol },
+          payload: { direccion, estado, rol },
         })
       } catch (error: any) {
         reduceSesion({
@@ -930,7 +930,7 @@ export const BlockchainProvider = (props: AppProps) => {
     administradores: getAdministradores,
     bloqueados: getBloqueados,
     transaccion: getTransaccion,
-    session: getSesion,
+    sesion: getSesion,
   }
 
   return (

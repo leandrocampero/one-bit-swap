@@ -146,7 +146,7 @@ export type BlockchainGetters = {
   administradores: AdministradoresState
   bloqueados: BloqueadosState
   transaccion: TransaccionState
-  session: SesionState
+  sesion: SesionState
 }
 
 //****************************************************************************//

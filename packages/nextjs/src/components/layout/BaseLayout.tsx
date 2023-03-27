@@ -22,7 +22,13 @@ export default function BaseLayout({
   const paginaConectar = router.pathname.startsWith('/conectar')
 
   return (
-    <Box paddingY={12} paddingX={4} height={'100vh'} sx={style}>
+    <Box
+      paddingTop={12}
+      paddingBottom={4}
+      paddingX={4}
+      height={'100vh'}
+      sx={style}
+    >
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={loading !== undefined ? loading : recuperandoSesion}

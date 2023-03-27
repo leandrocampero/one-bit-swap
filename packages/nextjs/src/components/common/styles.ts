@@ -7,4 +7,10 @@ const ContainerBox = {
   overflow: 'hidden',
 }
 
-export { ContainerBox }
+const FlexBoxSpaceBetween = {
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+}
+
+export { ContainerBox, FlexBoxSpaceBetween }
