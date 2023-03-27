@@ -36,7 +36,7 @@ export default function Navbar() {
               </Grid>
 
               {sesion.datos.rol == RolesBilleteras.administrador ? (
-                <Grid item>
+                <Grid item sx={{ marginLeft: 'auto' }}>
                   <Button
                     id="demo-customized-button"
                     variant="contained"

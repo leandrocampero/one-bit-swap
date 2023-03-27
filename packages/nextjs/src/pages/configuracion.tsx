@@ -1,4 +1,4 @@
-import VistaAdminsitrador from '@/components/VistaAdminsitrador'
+import VistaAdminsitrador from '@/components/vistaAdminsitrador'
 import styles from '@/styles/layout.module.scss'
 import { Box, Grid } from '@mui/material'
 import { grey } from '@mui/material/colors'
