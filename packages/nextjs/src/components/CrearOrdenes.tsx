@@ -18,7 +18,7 @@ import {
 import { Box } from '@mui/system'
 import { useCallback, useMemo, useState } from 'react'
 
-export default function CrearOrdenesTest() {
+export default function CrearOrdenes() {
   const { getters, actions } = useBlockchainContext()
   const [tipoOrden, setTipoOrden] = useState<number>(0)
   const [tokenVenta, setTokenVenta] = useState<string>('')

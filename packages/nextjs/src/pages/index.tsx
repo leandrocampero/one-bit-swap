@@ -1,5 +1,5 @@
-import CrearOrdenesTest from '@/components/CrearOrdenesTest'
-import ListarOrdenes from '@/components/ListarOrdenesTest'
+import CrearOrdenes from '@/components/CrearOrdenes'
+import ListarOrdenes from '@/components/ListarOrdenes'
 import { ContainerBox } from '@/components/common/styles'
 import BaseLayout from '@/components/layout/BaseLayout'
 import { useBlockchainContext } from '@/context/BlockchainProvider'
@@ -23,7 +23,7 @@ export default function Home() {
         <Grid item xs={4}>
           <Box sx={ContainerBox}>
             <h1>Ordenes compra/Venta e intercambio</h1>
-            <CrearOrdenesTest />
+            <CrearOrdenes />
           </Box>
         </Grid>
       </Grid>
