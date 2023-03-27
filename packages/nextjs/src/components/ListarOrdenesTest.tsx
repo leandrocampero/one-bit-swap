@@ -1,8 +1,14 @@
 import { useBlockchainContext } from '@/context/BlockchainProvider'
-import { Token } from '@/types.d'
+import { EstadosOrdenes, Orden, TiposOrdenes, Token } from '@/types.d'
+import { simpleAddress } from '@/utils/helpers'
 import {
+  Box,
   Button,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Divider,
   FormControl,
   Grid,
@@ -11,24 +17,25 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
+  Slide,
+  Tab,
+  Tabs,
   TextField,
+  Typography,
 } from '@mui/material'
-import Box from '@mui/material/Box'
-import Tab from '@mui/material/Tab'
-import Tabs from '@mui/material/Tabs'
 import { blue } from '@mui/material/colors'
+import { TransitionProps } from '@mui/material/transitions'
 import { BigNumber, ethers } from 'ethers'
-import * as React from 'react'
-import { useCallback, useMemo, useState } from 'react'
+import { forwardRef, useCallback, useEffect, useMemo, useState } from 'react'
 import TarjetaOrden from './Ordenes/TarjetaOrden'
-import { ContainerBox } from './common/styles'
+import { ContainerBox, FlexBoxSpaceBetween } from './common/styles'
 
 /******************************************************************************/
 
 const ID_TAB_PANEL = 'ordenes-tabpanel'
 const ARIA_LABEL_PANEL = 'ordenes-tab'
 const NAV_ITEMS = ['Ordenes activas', 'Mis ordenes', 'Historial']
-const TIPO_ORDEN = ['Compra-Venta', 'Intercambio', 'Todas']
+const TIPO_ORDEN = ['Compra-Venta', 'Intercambio']
 
 const a11yProps = (index: number) => {
   return {
@@ -37,20 +44,58 @@ const a11yProps = (index: number) => {
   }
 }
 
+const Transition = forwardRef(function Transition(
+  props: TransitionProps & {
+    children: React.ReactElement<any, any>
+  },
+  ref: React.Ref<unknown>
+) {
+  return <Slide direction="up" ref={ref} {...props} />
+})
+
 /******************************************************************************/
 
 export default function ListarOrdenes() {
-  const [tab, setTab] = useState(0)
   const { getters, actions } = useBlockchainContext()
-  const [tokenVenta, setTokenVenta] = useState<string>('TODOS')
-  const [tokenCompra, setTokenCompra] = useState<string>('TODOS')
-  const [tipoOrden, setTipoOrden] = useState<string>('Todas')
+
+  const [tokenVenta, setTokenVenta] = useState<string>('-')
+  const [tokenCompra, setTokenCompra] = useState<string>('-')
+  const [tipoOrden, setTipoOrden] = useState<string>('-')
   const [montoMaximo, setMontoMaximo] = useState<number | undefined>()
 
-  const { ordenes, tokens } = getters
-  const { cargarOrdenesActivas } = actions
+  const [ordenSeleccionada, setOrdenSeleccionada] = useState<Orden | undefined>(
+    undefined
+  )
 
-  /******************************************************************************/
+  const [tab, setTab] = useState(0)
+  const [showModalEjecutar, setShowModalEjecutar] = useState<boolean>(false)
+  const [showModalCancelar, setShowModalCancelar] = useState<boolean>(false)
+
+  const [preMontoMaximo, setPreMontoMaximo] = useState<number | undefined>()
+  const [timeOut, setTimeOut] = useState<NodeJS.Timeout | undefined>(undefined)
+
+  const { ordenes, tokens, transaccion } = getters
+  const {
+    cargarOrdenesActivas,
+    consultarCotizacion,
+    ejecutarOrden,
+    cancelarOrden,
+    cargarOrdenesPropias,
+  } = actions
+
+  const ordenesObjeto = useMemo(
+    () =>
+      ordenes.datos.reduce(
+        (objeto, orden) => ({
+          ...objeto,
+          [orden.idOrden as string]: { ...orden },
+        }),
+        {} as { [id: string]: Orden }
+      ),
+    [ordenes]
+  )
+
+  /****************************************************************************/
 
   const handleCargarMas = useCallback(() => {
     const cantidadOrdenes = ordenes.datos.length
@@ -61,45 +106,299 @@ export default function ListarOrdenes() {
     cargarOrdenesActivas(ultimaOrden)
   }, [ordenes, cargarOrdenesActivas])
 
-  const handleSincronizar = useCallback(() => {
-    cargarOrdenesActivas(ethers.constants.HashZero)
+  const handleSincronizar = useCallback(async () => {
+    await cargarOrdenesActivas(ethers.constants.HashZero)
   }, [cargarOrdenesActivas])
 
-  const handleChangeTab = useCallback(
-    (event: React.SyntheticEvent, newValue: number) => {
-      setTab(newValue)
+  const handleOpenModal = useCallback(
+    async (idOrden: string, operacion: 'ejecutar' | 'cancelar') => {
+      let montoCompra = ''
+      const orden = ordenesObjeto[idOrden]
+      if (ordenesObjeto[idOrden].tipo === TiposOrdenes.intercambio) {
+        const monto = await consultarCotizacion(
+          orden.tokenVenta,
+          orden.tokenCompra,
+          orden.montoVenta
+        )
+
+        const montoCompraParsed = ethers.utils.formatEther(monto ?? '0')
+        montoCompra =
+          montoCompraParsed.split('.')[1].length > 6
+            ? parseFloat(montoCompraParsed).toFixed(6)
+            : montoCompraParsed
+      } else {
+        montoCompra = ethers.utils.formatUnits(orden.montoCompra)
+      }
+
+      setOrdenSeleccionada({
+        ...ordenesObjeto[idOrden],
+        montoCompra,
+        montoVenta: ethers.utils.formatUnits(orden.montoVenta),
+        fechaCreacion: new Date(
+          Number(orden.fechaCreacion) * 1000
+        ).toLocaleString(),
+      })
+
+      if (operacion === 'ejecutar') {
+        setShowModalEjecutar(true)
+      } else {
+        setShowModalCancelar(true)
+      }
     },
-    []
+    [setShowModalEjecutar, ordenesObjeto, consultarCotizacion]
   )
 
-  /******************************************************************************/
+  const handleCloseModal = useCallback(async () => {
+    setOrdenSeleccionada(undefined)
+    setShowModalEjecutar(false)
+    setShowModalCancelar(false)
+  }, [setShowModalEjecutar])
+
+  const handleEjecutarOrden = useCallback(async () => {
+    await ejecutarOrden(ordenSeleccionada!.idOrden)
+
+    await handleSincronizar()
+    setOrdenSeleccionada(undefined)
+    setShowModalEjecutar(false)
+  }, [
+    setShowModalEjecutar,
+    handleSincronizar,
+    ejecutarOrden,
+    ordenSeleccionada,
+  ])
+
+  const handleCancelarOrden = useCallback(async () => {
+    await cancelarOrden(ordenSeleccionada!.idOrden)
+
+    await cargarOrdenesPropias()
+    setOrdenSeleccionada(undefined)
+    setShowModalCancelar(false)
+  }, [
+    setShowModalCancelar,
+    cargarOrdenesPropias,
+    cancelarOrden,
+    ordenSeleccionada,
+  ])
+
+  const handleInputChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setPreMontoMaximo(
+        Number(event.target.value) === 0
+          ? undefined
+          : Number(event.target.value)
+      )
+
+      if (timeOut) {
+        clearTimeout(timeOut)
+      }
+
+      const timeOutId = setTimeout(() => {
+        setMontoMaximo(
+          Number(event.target.value) === 0
+            ? undefined
+            : Number(event.target.value)
+        )
+      }, 650)
+      setTimeOut(timeOutId)
+    },
+    [timeOut]
+  )
+
+  const handleChangeTab = useCallback(
+    async (event: React.SyntheticEvent, newValue: number) => {
+      setTab(newValue)
+
+      if (newValue === 0) {
+        await handleSincronizar()
+      } else if (tab === 0) {
+        await cargarOrdenesPropias()
+      }
+    },
+    [tab, handleSincronizar, cargarOrdenesPropias]
+  )
+
+  /****************************************************************************/
 
   const ordenesRender = useMemo(() => {
     return ordenes.datos
       .filter(
         (orden) =>
-          (tokenVenta === 'TODOS' || orden.tokenVenta === tokenVenta) &&
-          (tokenCompra === 'TODOS' || orden.tokenCompra === tokenCompra) &&
-          (tipoOrden === 'Todas' || TIPO_ORDEN[orden.tipo] === tipoOrden) &&
+          (tokenVenta === '-' || orden.tokenVenta === tokenVenta) &&
+          (tokenCompra === '-' || orden.tokenCompra === tokenCompra) &&
+          (tipoOrden === '-' || TIPO_ORDEN[orden.tipo] === tipoOrden) &&
           (!montoMaximo ||
             BigNumber.from(orden.montoVenta).lte(
               ethers.utils.parseUnits(montoMaximo.toString())
-            ))
+            )) &&
+          (tab === 0 ||
+            ((tab !== 1 || orden.estado === EstadosOrdenes.activa) &&
+              (tab !== 2 || orden.estado !== EstadosOrdenes.activa)))
       )
       .map((orden, index) => (
         <TarjetaOrden
           key={orden.idOrden}
           orden={orden}
           sx={{ ...(index !== 0 && { marginTop: 3 }) }}
+          onAccion={handleOpenModal}
         />
       ))
-  }, [ordenes, montoMaximo, tokenCompra, tokenVenta, tipoOrden])
+  }, [
+    ordenes,
+    montoMaximo,
+    tokenCompra,
+    tokenVenta,
+    tipoOrden,
+    tab,
+    handleOpenModal,
+  ])
 
-  /******************************************************************************/
+  const vistaOrdenesActivas = useMemo(() => {
+    return tab === 0
+  }, [tab])
+
+  /****************************************************************************/
+
+  useEffect(() => {
+    handleSincronizar()
+    //eslint-disable-next-line
+  }, [])
+
+  /****************************************************************************/
 
   return (
     <>
-      <Box sx={{ ...ContainerBox, padding: 0 }}>
+      <Dialog
+        open={showModalEjecutar}
+        TransitionComponent={Transition}
+        keepMounted
+        maxWidth="xs"
+        fullWidth
+        onClose={undefined}
+        aria-describedby="dialog-ejecutar-orden"
+      >
+        {ordenSeleccionada === undefined ? (
+          '-'
+        ) : (
+          <>
+            <DialogTitle
+              sx={{
+                backgroundColor: 'primary.main',
+                color: 'common.white',
+                marginBottom: 2,
+              }}
+              id="dialog-ejecutar-orden"
+            >
+              {`Ejecutar orden de ${TIPO_ORDEN[ordenSeleccionada.tipo]}`}
+            </DialogTitle>
+            <DialogContent>
+              <Typography variant="h6" sx={FlexBoxSpaceBetween}>
+                <span>{'Se entrega:'}</span>
+                <span>{`${ordenSeleccionada.tokenVenta} ${ordenSeleccionada.montoVenta}`}</span>
+              </Typography>
+
+              <Typography variant="h6" sx={FlexBoxSpaceBetween}>
+                <span>{'A cambio de:'}</span>
+                <span>
+                  {`${ordenSeleccionada.tokenCompra} ${ordenSeleccionada.montoCompra}`}
+                </span>
+              </Typography>
+
+              <Typography variant="h6" sx={FlexBoxSpaceBetween}>
+                <span>{'Creada en:'}</span>
+                <span>{`${ordenSeleccionada.fechaCreacion}`}</span>
+              </Typography>
+
+              <Typography variant="h6" sx={FlexBoxSpaceBetween}>
+                <span>{'Creador:'}</span>
+                <span>{`${simpleAddress(ordenSeleccionada.vendedor)}`}</span>
+              </Typography>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseModal} variant="outlined">
+                Cerrar
+              </Button>
+
+              <Button
+                onClick={handleEjecutarOrden}
+                variant="contained"
+                color="success"
+              >
+                {transaccion.cargando ? (
+                  <CircularProgress size={24} sx={{ color: 'common.white' }} />
+                ) : (
+                  'Ejecutar'
+                )}
+              </Button>
+            </DialogActions>
+          </>
+        )}
+      </Dialog>
+
+      <Dialog
+        open={showModalCancelar}
+        TransitionComponent={Transition}
+        keepMounted
+        maxWidth="xs"
+        fullWidth
+        onClose={undefined}
+        aria-describedby="dialog-cancelar-orden"
+      >
+        {ordenSeleccionada === undefined ? (
+          '-'
+        ) : (
+          <>
+            <DialogTitle
+              sx={{
+                backgroundColor: 'error.main',
+                color: 'common.white',
+                marginBottom: 2,
+              }}
+              id="dialog-cancelar-orden"
+            >
+              {`Cancelar orden de ${TIPO_ORDEN[ordenSeleccionada.tipo]}`}
+            </DialogTitle>
+            <DialogContent>
+              <Typography variant="h6" sx={FlexBoxSpaceBetween}>
+                <span>{'Se entrega:'}</span>
+                <span>{`${ordenSeleccionada.tokenVenta} ${ordenSeleccionada.montoVenta}`}</span>
+              </Typography>
+
+              <Typography variant="h6" sx={FlexBoxSpaceBetween}>
+                <span>{'A cambio de:'}</span>
+                <span>
+                  {`${ordenSeleccionada.tokenCompra} ${ordenSeleccionada.montoCompra}`}
+                </span>
+              </Typography>
+
+              <Typography
+                variant="h6"
+                sx={{ textAlign: 'center', marginTop: 2 }}
+              >
+                {'¿Está seguro que desea cancelar esta orden?'}
+              </Typography>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseModal} variant="outlined">
+                Cerrar
+              </Button>
+
+              <Button
+                onClick={handleCancelarOrden}
+                variant="contained"
+                color="error"
+              >
+                {transaccion.cargando ? (
+                  <CircularProgress size={24} sx={{ color: 'common.white' }} />
+                ) : (
+                  'Cancelar'
+                )}
+              </Button>
+            </DialogActions>
+          </>
+        )}
+      </Dialog>
+
+      <Box sx={{ ...ContainerBox, padding: 0, height: '100%' }}>
         <Box
           sx={{
             backgroundColor: 'primary.dark',
@@ -150,7 +449,7 @@ export default function ListarOrdenes() {
                     setTokenVenta(event.target.value)
                   }
                 >
-                  <MenuItem value={'TODOS'}>{'TODOS'}</MenuItem>
+                  <MenuItem value={'-'}>{'-'}</MenuItem>
                   {tokens.datos.map((token: Token) => (
                     <MenuItem key={token.ticker} value={token.ticker}>
                       {token.ticker}
@@ -173,7 +472,7 @@ export default function ListarOrdenes() {
                     setTokenCompra(event.target.value)
                   }
                 >
-                  <MenuItem value={'TODOS'}>{'TODOS'}</MenuItem>
+                  <MenuItem value={'-'}>{'-'}</MenuItem>
                   {tokens.datos.map((token: Token) => (
                     <MenuItem key={token.ticker} value={token.ticker}>
                       {token.ticker}
@@ -195,6 +494,7 @@ export default function ListarOrdenes() {
                     setTipoOrden(event.target.value)
                   }
                 >
+                  <MenuItem value={'-'}>{'-'}</MenuItem>
                   {TIPO_ORDEN.map((tipo: string, index) => (
                     <MenuItem key={index} value={tipo}>
                       {tipo}
@@ -210,30 +510,44 @@ export default function ListarOrdenes() {
                   id="monto-venta-maximo"
                   label="Monto máximo de venta"
                   type="number"
-                  value={montoMaximo}
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    setMontoMaximo(
-                      Number(event.target.value) === 0
-                        ? undefined
-                        : Number(event.target.value)
-                    )
-                  }}
+                  value={preMontoMaximo}
+                  onChange={handleInputChange}
                 />
               </FormControl>
             </Grid>
 
             <Grid item xs={2}>
-              <Button
-                variant="contained"
-                sx={{ height: '100%', width: '100%' }}
-                onClick={handleSincronizar}
-              >
-                {ordenes.cargando ? (
-                  <CircularProgress size={24} sx={{ color: 'common.white' }} />
-                ) : (
-                  'Sincronizar'
-                )}
-              </Button>
+              {tab === 0 ? (
+                <Button
+                  variant="contained"
+                  sx={{ height: '100%', width: '100%' }}
+                  onClick={handleSincronizar}
+                >
+                  {ordenes.cargando ? (
+                    <CircularProgress
+                      size={24}
+                      sx={{ color: 'common.white' }}
+                    />
+                  ) : (
+                    'Recargar'
+                  )}
+                </Button>
+              ) : (
+                <Button
+                  variant="contained"
+                  sx={{ height: '100%', width: '100%' }}
+                  onClick={cargarOrdenesPropias}
+                >
+                  {ordenes.cargando ? (
+                    <CircularProgress
+                      size={24}
+                      sx={{ color: 'common.white' }}
+                    />
+                  ) : (
+                    'Sincronizar'
+                  )}
+                </Button>
+              )}
             </Grid>
           </Grid>
         </Box>
@@ -250,11 +564,13 @@ export default function ListarOrdenes() {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
+            height: '100%',
+            overflowY: 'auto',
           }}
         >
           {ordenes.datos.length === 0 ? 'No hay ordenes' : ordenesRender}
 
-          {ordenes.datos.length > 0 && (
+          {ordenes.datos.length > 0 && vistaOrdenesActivas && (
             <Button
               variant="contained"
               color="info"
