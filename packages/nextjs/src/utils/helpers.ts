@@ -16,6 +16,8 @@ import {
 import { Datos } from '@one-bit-swap/hardhat/typechain-types/contracts/Datos'
 import { ethers } from 'ethers'
 
+const OFFSET = 10 * 60
+
 export function formatArrayBilleteras(
   listado: Datos.BilleteraStructOutput[]
 ): Billetera[] {
@@ -71,8 +73,8 @@ export function formatArrayOrdenes(
         comprador,
         montoVenta: montoVenta.toString(),
         montoCompra: montoCompra.toString(),
-        fechaCreacion: fechaCreacion.toString(),
-        fechaFinalizacion: fechaFinalizacion.toString(),
+        fechaCreacion: fechaCreacion.sub(OFFSET).toString(),
+        fechaFinalizacion: fechaFinalizacion.sub(OFFSET).toString(),
         tokenCompra,
         tokenVenta,
         estado: getEstadoOrden(estado),
@@ -183,5 +185,33 @@ export async function sleep() {
   if (process.env.NODE_ENV === 'development') {
     const sleep = new Promise((resolve) => setTimeout(resolve, 1000))
     await sleep
+  }
+}
+
+export function getTimeAgoString(date: Date): string {
+  const now = new Date()
+  const diff = now.getTime() - date.getTime()
+
+  const minute = 60 * 1000
+  const hour = 60 * minute
+  const day = 24 * hour
+  const week = 7 * day
+  const month = 30 * day
+  const year = 365 * day
+
+  if (diff < minute) {
+    return Math.floor(diff / 1000) + ' segundos'
+  } else if (diff < hour) {
+    return Math.floor(diff / minute) + ' minutos'
+  } else if (diff < day) {
+    return Math.floor(diff / hour) + ' horas'
+  } else if (diff < week) {
+    return Math.floor(diff / day) + ' días'
+  } else if (diff < month) {
+    return Math.floor(diff / week) + ' semanas'
+  } else if (diff < year) {
+    return Math.floor(diff / month) + ' meses'
+  } else {
+    return Math.floor(diff / year) + ' años'
   }
 }

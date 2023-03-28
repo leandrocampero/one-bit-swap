@@ -1,6 +1,6 @@
-import { BlockchainContext } from '@/context/BlockchainProvider'
+import { useBlockchainContext } from '@/context/BlockchainProvider'
 import { Box, Button, Modal, TextField } from '@mui/material'
-import React, { useContext, useState } from 'react'
+import React, { useState } from 'react'
 
 const style = {
   position: 'absolute' as const,
@@ -21,7 +21,7 @@ export default function NuevoAdministrador() {
   const [getEstadoModal, setEstadoModal] = useState(false)
   const [error, setError] = useState<boolean>(false)
 
-  const { actions } = useContext(BlockchainContext)
+  const { actions } = useBlockchainContext()
 
   const { nuevoAdministrador } = actions
 

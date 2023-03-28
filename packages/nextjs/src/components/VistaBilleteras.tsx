@@ -1,4 +1,5 @@
-import { RolesBilleteras, Billetera } from '@/types.d'
+import { useBlockchainContext } from '@/context/BlockchainProvider'
+import { Billetera, RolesBilleteras } from '@/types.d'
 import {
   Button,
   Paper,
@@ -10,13 +11,12 @@ import {
   TableRow,
   TextField,
 } from '@mui/material'
-import { useCallback, useContext, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import Nuevo from './NuevoAdministrador'
-import { BlockchainContext } from '@/context/BlockchainProvider'
 
 export default function VistaBilleteras() {
-  const { state, actions } = useContext(BlockchainContext)
-  const { administradores } = state
+  const { getters, actions } = useBlockchainContext()
+  const { administradores } = getters
   const { cargarAdministradores } = actions
 
   const [getTextoBusqueda, setTextoBusqueda] = useState('')

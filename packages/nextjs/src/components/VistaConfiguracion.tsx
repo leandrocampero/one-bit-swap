@@ -1,11 +1,11 @@
-import { BlockchainContext } from '@/context/BlockchainProvider'
+import { useBlockchainContext } from '@/context/BlockchainProvider'
 import { Estados } from '@/types.d'
 import { Button, Grid, InputAdornment, TextField } from '@mui/material'
-import { useContext, useState } from 'react'
+import { useState } from 'react'
 
 export default function VistaConfiguracion() {
-  const { state, actions } = useContext(BlockchainContext)
-  const { plataforma } = state
+  const { getters, actions } = useBlockchainContext()
+  const { plataforma } = getters
   const {
     bloquearPlataforma,
     desbloquearPlataforma,

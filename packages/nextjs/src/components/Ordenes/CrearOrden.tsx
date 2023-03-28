@@ -1,9 +1,9 @@
-import { Box, Button, Tab, Tabs, Typography } from '@mui/material'
-import React, { useContext, useState } from 'react'
-import FormularioOrden from './FormularioOrden'
+import { useBlockchainContext } from '@/context/BlockchainProvider'
 import { NavMenu, TiposOrdenes, Token } from '@/types.d'
-import { BlockchainContext } from '@/context/BlockchainProvider'
+import { Box, Button, Tab, Tabs, Typography } from '@mui/material'
 import { ethers } from 'ethers'
+import React, { useState } from 'react'
+import FormularioOrden from './FormularioOrden'
 
 interface TabPanelProps {
   children?: React.ReactNode
@@ -33,7 +33,7 @@ export const CompraMontoContext = React.createContext<any>({})
 export const CompraTokenContext = React.createContext<any>({})
 
 export default function CrearOrden() {
-  const { actions } = useContext(BlockchainContext)
+  const { actions } = useBlockchainContext()
   const { nuevaOrden } = actions
 
   const [valueTab, setValueTab] = useState<NavMenu>(NavMenu.compraVenta)

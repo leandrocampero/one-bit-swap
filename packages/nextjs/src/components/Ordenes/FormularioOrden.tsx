@@ -6,7 +6,7 @@ import {
   OutlinedInput,
   TextField,
 } from '@mui/material'
-import React, { useContext } from 'react'
+import React from 'react'
 import {
   CompraMontoContext,
   CompraTokenContext,
@@ -14,12 +14,12 @@ import {
   VentaTokenContext,
 } from './CrearOrden'
 
-import { BlockchainContext } from '@/context/BlockchainProvider'
+import { useBlockchainContext } from '@/context/BlockchainProvider'
 import { Estados, Token } from '@/types.d'
 
 export default function OrdenCompra(props: any) {
-  const { state } = useContext(BlockchainContext)
-  const { tokens } = state
+  const { getters } = useBlockchainContext()
+  const { tokens } = getters
 
   const { compraMonto, setCompraMonto } = React.useContext(CompraMontoContext)
   const { compraToken, setCompraToken } = React.useContext(CompraTokenContext)

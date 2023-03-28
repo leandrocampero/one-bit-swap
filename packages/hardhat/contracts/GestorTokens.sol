@@ -190,4 +190,62 @@ contract GestorTokens is Datos {
     ) = oraculo.latestRoundData();
     decimales = oraculo.decimals();
   }
+
+  /**
+   * @notice consultar la cotización del monto a intercambiar del token compra
+   * @param _tokenVenta nombre del token a vender (único en la blockchain)
+   * @param _tokenCompra nombre del token a comprar (único en la blockchain)
+   * @param _montoVenta monto del token a vender (único en la blockchain)
+   * @return montoCompra monto del del token a comprar en base al oráculo
+   */
+  function consultarMontoCotizado(
+    string memory _tokenVenta,
+    string memory _tokenCompra,
+    uint256 _montoVenta
+  ) public view returns (uint256 montoCompra) {
+    // Tokens registrados
+    require(
+      tokensRegistrados[_tokenCompra].existe &&
+        tokensRegistrados[_tokenVenta].existe,
+      "Los tokens no son validos o no estan registrados"
+    );
+
+    (
+      int256 precioTokenVenta,
+      uint8 decimalesPrecioTokenVenta
+    ) = consultarCotizacion(_tokenVenta);
+
+    (
+      int256 precioTokenCompra,
+      uint8 decimalesPrecioTokenCompra
+    ) = consultarCotizacion(_tokenCompra);
+
+    require(
+      precioTokenCompra != 0 && precioTokenVenta != 0,
+      "No se pudo obtener datos de cotizacion"
+    );
+
+    int256 exponenteDecimales;
+
+    {
+      uint256 decimalesTokenVenta = tokensRegistrados[_tokenVenta].decimales;
+      uint256 decimalesTokenCompra = tokensRegistrados[_tokenCompra].decimales;
+
+      unchecked {
+        exponenteDecimales = int256(
+          decimalesTokenCompra +
+            decimalesPrecioTokenCompra -
+            decimalesTokenVenta -
+            decimalesPrecioTokenVenta
+        );
+      }
+    }
+
+    montoCompra = uint256(
+      safeMulExp(
+        (int256(_montoVenta) * precioTokenVenta) / precioTokenCompra,
+        exponenteDecimales
+      )
+    );
+  }
 }

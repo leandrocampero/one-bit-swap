@@ -2,6 +2,7 @@ import { useBlockchainContext } from '@/context/BlockchainProvider'
 import { Token } from '@/types'
 import {
   Button,
+  CircularProgress,
   FormControl,
   FormControlLabel,
   FormLabel,
@@ -15,18 +16,37 @@ import {
   TextField,
 } from '@mui/material'
 import { Box } from '@mui/system'
-import { useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
-export default function CrearOrdenesTest() {
-  const { state, actions } = useBlockchainContext()
+export default function CrearOrdenes() {
+  const { getters, actions } = useBlockchainContext()
   const [tipoOrden, setTipoOrden] = useState<number>(0)
   const [tokenVenta, setTokenVenta] = useState<string>('')
   const [tokenCompra, setTokenCompra] = useState<string>('')
   const [montoVenta, setMontoVenta] = useState<string>('')
   const [montoCompra, setMontoCompra] = useState<string>('')
 
-  const { tokens } = state
+  const { tokens, transaccion } = getters
   const { nuevaOrden } = actions
+
+  const handleNuevaOrden = useCallback(async () => {
+    await nuevaOrden(
+      tokenVenta,
+      tokenCompra,
+      montoVenta,
+      tipoOrden === 0 ? montoCompra : '0',
+      tipoOrden
+    )
+  }, [tokenVenta, tokenCompra, montoVenta, montoCompra, tipoOrden, nuevaOrden])
+
+  const habilidarOperacion = useMemo(() => {
+    return (
+      tokenVenta !== '' &&
+      tokenCompra !== '' &&
+      montoVenta !== '' &&
+      (tipoOrden === 1 || montoCompra !== '')
+    )
+  }, [tokenVenta, tokenCompra, montoVenta, montoCompra, tipoOrden])
 
   return (
     <>
@@ -130,17 +150,14 @@ export default function CrearOrdenesTest() {
       <Button
         variant="contained"
         sx={{ width: '100%' }}
-        onClick={() =>
-          nuevaOrden(
-            tokenVenta,
-            tokenCompra,
-            montoVenta,
-            montoCompra,
-            tipoOrden
-          )
-        }
+        disabled={!habilidarOperacion}
+        onClick={handleNuevaOrden}
       >
-        Crear orden
+        {transaccion.cargando ? (
+          <CircularProgress size={24} sx={{ color: 'common.white' }} />
+        ) : (
+          'Crear orden'
+        )}
       </Button>
     </>
   )

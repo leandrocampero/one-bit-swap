@@ -1,218 +1,320 @@
 import {
-  BlockchainState,
+  AdministradoresState,
+  BloqueadosState,
+  OrdenesState,
+  PlataformaState,
   ReducerAction,
   ReducerActionType,
+  SesionState,
+  TokensState,
+  TransaccionState,
 } from '@/context/context.d'
 import { Orden } from '@/types'
 import { ethers } from 'ethers'
 
-export const blockchainReducer = (
-  state: BlockchainState,
+//****************************************************************************//
+//                                                                            //
+//       ######                                                               //
+//       #     #  #         ##    #####  ######   ####   #####   #    #       //
+//       #     #  #        #  #     #    #       #    #  #    #  ##  ##       //
+//       ######   #       #    #    #    #####   #    #  #    #  # ## #       //
+//       #        #       ######    #    #       #    #  #####   #    #       //
+//       #        #       #    #    #    #       #    #  #   #   #    #       //
+//       #        ######  #    #    #    #        ####   #    #  #    #       //
+//                                                                            //
+//****************************************************************************//
+
+export const plataformaReducer = (
+  state: PlataformaState,
   action: ReducerAction
-): BlockchainState => {
+): PlataformaState => {
   switch (action.type) {
     case ReducerActionType.REINICIAR_ESTADO:
-      return { ...(action.payload as BlockchainState) }
+      return { ...(action.payload as PlataformaState) }
 
-    case ReducerActionType.MARCAR_CARGANDO_ORDENES:
+    case ReducerActionType.MARCAR_CARGANDO:
+      return { ...state, cargando: true, error: null }
+
+    case ReducerActionType.MARCAR_ERROR:
       return {
         ...state,
-        ordenes: { ...state.ordenes, cargando: true, error: null },
+        cargando: false,
+        error: action.payload,
       }
 
-    case ReducerActionType.MARCAR_ERROR_ORDENES:
+    case ReducerActionType.GUARDAR_DATOS:
+      return {
+        cargando: false,
+        error: null,
+        datos: { ...action.payload },
+      }
+
+    default:
+      return state
+  }
+}
+
+//****************************************************************************//
+//                                                                            //
+//              #######                                                       //
+//              #     #  #####   #####   ######  #####    ####                //
+//              #     #  #    #  #    #  #       #    #  #                    //
+//              #     #  #    #  #    #  #####   #    #   ####                //
+//              #     #  #####   #    #  #       #####        #               //
+//              #     #  #   #   #    #  #       #   #   #    #               //
+//              #######  #    #  #####   ######  #    #   ####                //
+//                                                                            //
+//****************************************************************************//
+
+export const ordenesReducer = (
+  state: OrdenesState,
+  action: ReducerAction
+): OrdenesState => {
+  switch (action.type) {
+    case ReducerActionType.REINICIAR_ESTADO:
+      return { ...(action.payload as OrdenesState) }
+
+    case ReducerActionType.MARCAR_CARGANDO:
+      return { ...state, cargando: true, error: null }
+
+    case ReducerActionType.MARCAR_ERROR:
       return {
         ...state,
-        ordenes: {
-          ...state.ordenes,
-          cargando: false,
-          error: action.payload,
-        },
+        cargando: false,
+        error: action.payload,
       }
 
-    case ReducerActionType.GUARDAR_ORDENES:
+    case ReducerActionType.GUARDAR_DATOS:
       const { ordenes, sobrescribir } = action.payload
       const datos = (ordenes as Array<Orden>).filter((ordenNueva) => {
         return (
           ordenNueva.idOrden !== ethers.constants.HashZero &&
-          state.ordenes.datos.findIndex(
-            (ordenGuardada) => ordenGuardada.idOrden === ordenNueva.idOrden
-          ) === -1
+          (sobrescribir ||
+            state.datos.findIndex(
+              (ordenGuardada) => ordenGuardada.idOrden === ordenNueva.idOrden
+            ) === -1)
         )
       })
+
       return {
-        ...state,
-        ordenes: {
-          ...state.ordenes,
-          cargando: false,
-          error: null,
-          datos: sobrescribir ? [...datos] : [...state.ordenes.datos, ...datos],
-        },
+        cargando: false,
+        error: null,
+        datos: sobrescribir ? [...datos] : [...state.datos, ...datos],
       }
 
-    case ReducerActionType.MARCAR_CARGANDO_TOKENS:
+    default:
+      return state
+  }
+}
+
+//****************************************************************************//
+//                                                                            //
+//              #######                                                       //
+//                 #      ####   #    #  ######  #    #   ####                //
+//                 #     #    #  #   #   #       ##   #  #                    //
+//                 #     #    #  ####    #####   # #  #   ####                //
+//                 #     #    #  #  #    #       #  # #       #               //
+//                 #     #    #  #   #   #       #   ##  #    #               //
+//                 #      ####   #    #  ######  #    #   ####                //
+//                                                                            //
+//****************************************************************************//
+
+export const tokensReducer = (
+  state: TokensState,
+  action: ReducerAction
+): TokensState => {
+  switch (action.type) {
+    case ReducerActionType.REINICIAR_ESTADO:
+      return { ...(action.payload as TokensState) }
+
+    case ReducerActionType.MARCAR_CARGANDO:
+      return { ...state, cargando: true, error: null }
+
+    case ReducerActionType.MARCAR_ERROR:
       return {
         ...state,
-        tokens: { ...state.tokens, cargando: true, error: null },
+        cargando: false,
+        error: action.payload,
       }
 
-    case ReducerActionType.MARCAR_ERROR_TOKENS:
+    case ReducerActionType.GUARDAR_DATOS:
       return {
-        ...state,
-        tokens: {
-          ...state.tokens,
-          cargando: false,
-          error: action.payload,
-        },
+        cargando: false,
+        error: null,
+        datos: [...action.payload],
       }
 
-    case ReducerActionType.GUARDAR_TOKENS:
+    default:
+      return state
+  }
+}
+
+//****************************************************************************//
+//                                                                            //
+//                    #                                                       //
+//                   # #    #####   #    #  #  #    #   ####                  //
+//                  #   #   #    #  ##  ##  #  ##   #  #                      //
+//                 #     #  #    #  # ## #  #  # #  #   ####                  //
+//                 #######  #    #  #    #  #  #  # #       #                 //
+//                 #     #  #    #  #    #  #  #   ##  #    #                 //
+//                 #     #  #####   #    #  #  #    #   ####                  //
+//                                                                            //
+//****************************************************************************//
+
+export const administradoresReducer = (
+  state: AdministradoresState,
+  action: ReducerAction
+): AdministradoresState => {
+  switch (action.type) {
+    case ReducerActionType.REINICIAR_ESTADO:
+      return { ...(action.payload as AdministradoresState) }
+
+    case ReducerActionType.MARCAR_CARGANDO:
       return {
         ...state,
-        tokens: {
-          ...state.tokens,
-          cargando: false,
-          error: null,
-          datos: [...action.payload],
-        },
+        cargando: true,
+        error: null,
       }
 
-    case ReducerActionType.MARCAR_CARGANDO_PLATAFORMA:
+    case ReducerActionType.MARCAR_ERROR:
       return {
         ...state,
-        plataforma: { ...state.plataforma, cargando: true, error: null },
+        cargando: false,
+        error: action.payload,
       }
 
-    case ReducerActionType.MARCAR_ERROR_PLATAFORMA:
+    case ReducerActionType.GUARDAR_DATOS:
       return {
-        ...state,
-        plataforma: {
-          ...state.plataforma,
-          cargando: false,
-          error: action.payload,
-        },
+        cargando: false,
+        error: null,
+        datos: [...action.payload],
       }
 
-    case ReducerActionType.GUARDAR_DATOS_PLATAFORMA:
+    default:
+      return state
+  }
+}
+
+//****************************************************************************//
+//                                                                            //
+//          ######                                                            //
+//          #     #  #        ####    ####   #    #  ######  #####            //
+//          #     #  #       #    #  #    #  #   #   #       #    #           //
+//          ######   #       #    #  #       ####    #####   #    #           //
+//          #     #  #       #    #  #       #  #    #       #    #           //
+//          #     #  #       #    #  #    #  #   #   #       #    #           //
+//          ######   ######   ####    ####   #    #  ######  #####            //
+//                                                                            //
+//****************************************************************************//
+
+export const bloqueadosReducer = (
+  state: BloqueadosState,
+  action: ReducerAction
+): BloqueadosState => {
+  switch (action.type) {
+    case ReducerActionType.REINICIAR_ESTADO:
+      return { ...(action.payload as BloqueadosState) }
+
+    case ReducerActionType.MARCAR_CARGANDO:
+      return { ...state, cargando: true, error: null }
+
+    case ReducerActionType.MARCAR_ERROR:
       return {
         ...state,
-        plataforma: {
-          ...state.plataforma,
-          cargando: false,
-          error: null,
-          datos: { ...action.payload },
-        },
+        cargando: false,
+        error: action.payload,
       }
 
-    case ReducerActionType.MARCAR_CARGANDO_ADMINISTRADORES:
+    case ReducerActionType.GUARDAR_DATOS:
       return {
-        ...state,
-        administradores: {
-          ...state.administradores,
-          cargando: true,
-          error: null,
-        },
+        cargando: false,
+        error: null,
+        datos: [...action.payload],
       }
 
-    case ReducerActionType.MARCAR_ERROR_ADMINISTRADORES:
-      return {
-        ...state,
-        administradores: {
-          ...state.administradores,
-          cargando: false,
-          error: action.payload,
-        },
-      }
+    default:
+      return state
+  }
+}
 
-    case ReducerActionType.GUARDAR_ADMINISTRADORES:
-      return {
-        ...state,
-        administradores: {
-          ...state.administradores,
-          cargando: false,
-          error: null,
-          datos: [...action.payload],
-        },
-      }
+//****************************************************************************//
+//                                                                            //
+//                              #######                                       //
+//                                 #     #    #                               //
+//                                 #      #  #                                //
+//                                 #       ##                                 //
+//                                 #       ##                                 //
+//                                 #      #  #                                //
+//                                 #     #    #                               //
+//                                                                            //
+//****************************************************************************//
 
-    case ReducerActionType.MARCAR_CARGANDO_BLOQUEADOS:
-      return {
-        ...state,
-        bloqueados: { ...state.bloqueados, cargando: true, error: null },
-      }
-
-    case ReducerActionType.MARCAR_ERROR_BLOQUEADOS:
-      return {
-        ...state,
-        bloqueados: {
-          ...state.bloqueados,
-          cargando: false,
-          error: action.payload,
-        },
-      }
-
-    case ReducerActionType.GUARDAR_BILLETERAS_BLOQUEADAS:
-      return {
-        ...state,
-        bloqueados: {
-          ...state.bloqueados,
-          cargando: false,
-          error: null,
-          datos: [...action.payload],
-        },
-      }
+export const transaccionReducer = (
+  state: TransaccionState,
+  action: ReducerAction
+): TransaccionState => {
+  switch (action.type) {
+    case ReducerActionType.REINICIAR_ESTADO:
+      return { ...(action.payload as TransaccionState) }
 
     case ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO:
       return {
-        ...state,
-        transaccion: {
-          cargando: true,
-          error: null,
-        },
+        cargando: true,
+        error: null,
       }
 
     case ReducerActionType.MARCAR_TRANSACCION_REALIZADA:
       return {
-        ...state,
-        transaccion: {
-          cargando: false,
-          error: null,
-        },
+        cargando: false,
+        error: null,
       }
 
     case ReducerActionType.MARCAR_TRANSACCION_FALLIDA:
       return {
-        ...state,
-        transaccion: {
-          cargando: false,
-          error: action.payload,
-        },
+        cargando: false,
+        error: action.payload,
       }
 
-    case ReducerActionType.MARCAR_CARGANDO_SESION:
+    default:
+      return state
+  }
+}
+
+//****************************************************************************//
+//                                                                            //
+//              #####                                                         //
+//             #     #  ######   ####    ####   #   ####   #    #             //
+//             #        #       #       #       #  #    #  ##   #             //
+//              #####   #####    ####    ####   #  #    #  # #  #             //
+//                   #  #            #       #  #  #    #  #  # #             //
+//             #     #  #       #    #  #    #  #  #    #  #   ##             //
+//              #####   ######   ####    ####   #   ####   #    #             //
+//                                                                            //
+//****************************************************************************//
+
+export const sesionReducer = (
+  state: SesionState,
+  action: ReducerAction
+): SesionState => {
+  switch (action.type) {
+    case ReducerActionType.REINICIAR_ESTADO:
+      return { ...(action.payload as SesionState) }
+
+    case ReducerActionType.MARCAR_CARGANDO:
+      return { ...state, cargando: true, error: null }
+
+    case ReducerActionType.MARCAR_ERROR:
       return {
         ...state,
-        sesion: { ...state.sesion, cargando: true, error: null },
+        cargando: false,
+        error: action.payload,
       }
 
-    case ReducerActionType.MARCAR_ERROR_SESION:
+    case ReducerActionType.GUARDAR_DATOS:
       return {
-        ...state,
-        sesion: {
-          ...state.sesion,
-          cargando: false,
-          error: action.payload,
-        },
-      }
-
-    case ReducerActionType.GUARDAR_DATOS_SESION:
-      return {
-        ...state,
-        sesion: {
-          cargando: false,
-          error: null,
-          datos: { ...action.payload },
-        },
+        cargando: false,
+        error: null,
+        datos: { ...action.payload },
       }
 
     default:
