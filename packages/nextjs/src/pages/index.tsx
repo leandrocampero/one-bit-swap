@@ -1,9 +1,8 @@
 import CrearOrdenes from '@/components/CrearOrdenes'
 import ListarOrdenes from '@/components/ListarOrdenes'
-import { ContainerBox } from '@/components/common/styles'
 import BaseLayout from '@/components/layout/BaseLayout'
 import { useBlockchainContext } from '@/context/BlockchainProvider'
-import { Box, Grid } from '@mui/material'
+import { Grid } from '@mui/material'
 import { useEffect } from 'react'
 
 export default function Home() {
@@ -21,10 +20,7 @@ export default function Home() {
           <ListarOrdenes />
         </Grid>
         <Grid item xs={4}>
-          <Box sx={ContainerBox}>
-            <h1>Ordenes compra/Venta e intercambio</h1>
-            <CrearOrdenes />
-          </Box>
+          <CrearOrdenes />
         </Grid>
       </Grid>
     </BaseLayout>
