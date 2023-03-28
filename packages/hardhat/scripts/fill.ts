@@ -238,6 +238,7 @@ async function main() {
     }
   }
 
+  // agrega adminsitradores
   await plataforma.hacerAdministrador(
     '0xB6101E241Df60EAF1b3735f6D73c511602fb8453'
   ) // Leandro
@@ -247,6 +248,11 @@ async function main() {
   await plataforma.hacerAdministrador(
     '0xD16DA42A2f5C89223E8f2e35e7F1B0a499cf744C'
   ) // Gsus
+
+  // agrega suspendidos
+  await plataforma.bloquearBilletera(
+    '0x2C9Fe1b36714DFe5B2e0dba74c1fe9eA59796F3f'
+  )
 
   //**********************************************//
   //             Mostrar por consola              //

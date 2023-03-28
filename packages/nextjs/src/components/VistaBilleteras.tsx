@@ -11,23 +11,30 @@ import {
   TableRow,
   TextField,
 } from '@mui/material'
-import { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import Nuevo from './NuevoAdministrador'
 
 export default function VistaBilleteras() {
   const { getters, actions } = useBlockchainContext()
-  const { administradores } = getters
-  const { cargarAdministradores } = actions
+  const { administradores, transaccion } = getters
+  const { cargarAdministradores, quitarAdministrador } = actions
 
   const [getTextoBusqueda, setTextoBusqueda] = useState('')
 
-  const handleClicRecargar = () => {
-    // no se que hace aqui
+  const handleClicRecargar = async () => {
+    await cargarAdministradores()
   }
 
   const handleBuscar = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTextoBusqueda(event.target.value.trim())
   }
+
+  const handleQuitarRol = useCallback(
+    async (billetera: string) => {
+      await quitarAdministrador(billetera)
+    },
+    [quitarAdministrador]
+  )
 
   const listarBilleterasAdministradoras = useCallback(() => {
     return administradores.datos
@@ -46,10 +53,10 @@ export default function VistaBilleteras() {
               {row.direccion}
             </TableCell>
             <TableCell key={1} align="left">
-              {row.rol == RolesBilleteras.administrador && (
+              {row.rol == RolesBilleteras.propietario && (
                 <Button
                   variant="contained"
-                  onClick={() => console.log('Quitar Rol')}
+                  onClick={() => handleQuitarRol(row.direccion)}
                 >
                   Quitar Rol Adminsitrador
                 </Button>
@@ -58,11 +65,14 @@ export default function VistaBilleteras() {
           </TableRow>
         )
       })
-  }, [administradores, getTextoBusqueda])
+  }, [administradores, getTextoBusqueda, handleQuitarRol])
 
   useEffect(() => {
-    cargarAdministradores()
-  }, [cargarAdministradores])
+    const { error, cargando } = transaccion
+    if (!error && !cargando) {
+      cargarAdministradores()
+    }
+  }, [transaccion, cargarAdministradores])
 
   return (
     <>

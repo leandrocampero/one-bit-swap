@@ -1,15 +1,16 @@
 import { useBlockchainContext } from '@/context/BlockchainProvider'
-import { Estados } from '@/types.d'
+import { Estados, RolesBilleteras } from '@/types.d'
 import { Button, Grid, InputAdornment, TextField } from '@mui/material'
 import { useEffect, useState } from 'react'
 
 export default function VistaConfiguracion() {
   const { getters, actions } = useBlockchainContext()
-  const { plataforma } = getters
+  const { plataforma, transaccion, sesion } = getters
   const {
     bloquearPlataforma,
     desbloquearPlataforma,
     cambiarMontoMinimoPlataforma,
+    cargarDatosPlataforma,
   } = actions
 
   const [montoMinimo, setMontoMinimo] = useState<string>('')
@@ -20,21 +21,25 @@ export default function VistaConfiguracion() {
     setMontoMinimo(evt.target.value.trim())
   }
 
-  const handleCambiarMontoMinimoButton = () => {
-    cambiarMontoMinimoPlataforma(montoMinimo)
+  const handleCambiarMontoMinimoButton = async () => {
+    await cambiarMontoMinimoPlataforma(montoMinimo)
+    setMontoMinimo('')
   }
 
-  const handleCambiarEstadoPlataforma = () => {
+  const handleCambiarEstadoPlataforma = async () => {
     if (plataforma.datos?.estado == Estados.activo) {
-      desbloquearPlataforma()
+      await desbloquearPlataforma()
     } else {
-      bloquearPlataforma()
+      await bloquearPlataforma()
     }
   }
 
   useEffect(() => {
-    console.log('MontoMinimo: ' + plataforma.datos.montoMinimo)
-  }, [plataforma])
+    const { error, cargando } = transaccion
+    if (!error && !cargando) {
+      cargarDatosPlataforma()
+    }
+  }, [transaccion, cargarDatosPlataforma])
 
   return (
     <>
@@ -70,7 +75,11 @@ export default function VistaConfiguracion() {
           </h3>
         </Grid>
         <Grid item xs={5} md={5}>
-          <Button variant="contained" onClick={handleCambiarEstadoPlataforma}>
+          <Button
+            variant="contained"
+            onClick={handleCambiarEstadoPlataforma}
+            disabled={sesion.datos.rol != RolesBilleteras.propietario}
+          >
             {(plataforma.datos?.estado == Estados.suspendido
               ? 'Suspender'
               : 'Activar') + ' Plataforma'}
