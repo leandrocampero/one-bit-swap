@@ -1,4 +1,5 @@
 import Navbar from '@/components/navbar'
+import { AlertProvider } from '@/context/AlertProvider'
 import { BlockchainProvider } from '@/context/BlockchainProvider'
 import { SessionProvider } from '@/context/SessionProvider'
 import { Web3Provider } from '@ethersproject/providers'
@@ -15,12 +16,14 @@ export function getLibrary(provider: any): Web3Provider {
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <Web3ReactProvider getLibrary={getLibrary}>
-      <BlockchainProvider>
-        <SessionProvider>
-          <Navbar />
-          <Component {...pageProps} />
-        </SessionProvider>
-      </BlockchainProvider>
+      <AlertProvider>
+        <BlockchainProvider>
+          <SessionProvider>
+            <Navbar />
+            <Component {...pageProps} />
+          </SessionProvider>
+        </BlockchainProvider>
+      </AlertProvider>
     </Web3ReactProvider>
   )
 }

@@ -22,6 +22,7 @@ import {
   useEffect,
   useState,
 } from 'react'
+import { useAlertContext } from './AlertProvider'
 import { useBlockchainContext } from './BlockchainProvider'
 
 //**************************************************************************//
@@ -90,6 +91,8 @@ export const SessionProvider = (props: AppProps) => {
 
   const { actions } = useBlockchainContext()
   const { autenticarBilletera } = actions
+
+  const { newAlert } = useAlertContext()
 
   //**************************************************************************//
   //                                                                          //
@@ -202,8 +205,9 @@ export const SessionProvider = (props: AppProps) => {
       setConnected(false)
       setLoading(false)
       setError(error.message)
+      newAlert('error', 'El usuario ha rechazado la conexión')
     }
-  }, [setupInjectedConnector, activate])
+  }, [setupInjectedConnector, activate, newAlert])
 
   const validate = useCallback(async (): Promise<boolean> => {
     try {

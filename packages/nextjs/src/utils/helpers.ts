@@ -40,13 +40,16 @@ export function formatBilletera(
 }
 
 export function formatArrayTokens(listado: Datos.TokenStructOutput[]): Token[] {
-  return listado.map(({ ticker, contrato, oraculo, decimales, estado }) => ({
-    ticker,
-    contrato,
-    oraculo,
-    decimales,
-    estado: getEstadoGeneral(estado),
-  }))
+  return listado.map(
+    ({ ticker, contrato, oraculo, decimales, estado }) =>
+      ({
+        ticker,
+        contrato,
+        oraculo,
+        decimales,
+        estado: getEstadoGeneral(estado),
+      } as Token)
+  )
 }
 
 export function formatArrayOrdenes(
@@ -214,4 +217,15 @@ export function getTimeAgoString(date: Date): string {
   } else {
     return Math.floor(diff / year) + ' años'
   }
+}
+
+export function formatErrorMessage(errorRaw: string): string {
+  const indexStart = errorRaw.indexOf("'")
+
+  if (indexStart === -1) return errorRaw
+
+  const indexEnd = errorRaw.indexOf("'", indexStart + 1)
+  const error = errorRaw.slice(indexStart + 1, indexEnd)
+
+  return error
 }

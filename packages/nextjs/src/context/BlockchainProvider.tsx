@@ -41,6 +41,7 @@ import {
   formatArrayBilleteras,
   formatArrayOrdenes,
   formatBilletera,
+  formatErrorMessage,
   formatOrden,
   sleep,
 } from '@/utils/helpers'
@@ -56,6 +57,7 @@ import {
   useReducer,
   useState,
 } from 'react'
+import { useAlertContext } from './AlertProvider'
 
 //**************************************************************************//
 //                                                                          //
@@ -139,6 +141,7 @@ export const BlockchainProvider = (props: AppProps) => {
   const [contract, setContract] = useState<ContratoPlataforma | null>(null)
   const [contractAddress, setContractAddress] = useState<string>('')
   const [signer, setSigner] = useState<JsonRpcSigner | undefined>(undefined)
+  const { newAlert } = useAlertContext()
 
   //**************************************************************************//
   //                                                                          //
@@ -214,13 +217,15 @@ export const BlockchainProvider = (props: AppProps) => {
           },
         })
       } catch (error: any) {
+        newAlert('error', formatErrorMessage(error.message))
+
         reduceOrdenes({
           type: ReducerActionType.MARCAR_ERROR,
-          payload: error.message,
+          payload: formatErrorMessage(error.message),
         })
       }
     },
-    [setupContract]
+    [setupContract, newAlert]
   )
 
   const cargarOrdenesPropias = useCallback(async () => {
@@ -236,12 +241,14 @@ export const BlockchainProvider = (props: AppProps) => {
         payload: { ordenes: resultado, sobrescribir: true },
       })
     } catch (error: any) {
+      newAlert('error', formatErrorMessage(error.message))
+
       reduceOrdenes({
         type: ReducerActionType.MARCAR_ERROR,
-        payload: error.message,
+        payload: formatErrorMessage(error.message),
       })
     }
-  }, [setupContract])
+  }, [setupContract, newAlert])
 
   const nuevaOrden = useCallback(
     async (
@@ -270,14 +277,17 @@ export const BlockchainProvider = (props: AppProps) => {
         reduceTransaccion({
           type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA,
         })
+        newAlert('success', 'Operación exitosa')
       } catch (error: any) {
+        newAlert('error', formatErrorMessage(error.message))
+
         reduceTransaccion({
           type: ReducerActionType.MARCAR_TRANSACCION_FALLIDA,
-          payload: error.message,
+          payload: formatErrorMessage(error.message),
         })
       }
     },
-    [setupContract]
+    [setupContract, newAlert]
   )
 
   const cancelarOrden = useCallback(
@@ -295,14 +305,17 @@ export const BlockchainProvider = (props: AppProps) => {
         reduceTransaccion({
           type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA,
         })
+        newAlert('success', 'Operación exitosa')
       } catch (error: any) {
+        newAlert('error', formatErrorMessage(error.message))
+
         reduceTransaccion({
           type: ReducerActionType.MARCAR_TRANSACCION_FALLIDA,
-          payload: error.message,
+          payload: formatErrorMessage(error.message),
         })
       }
     },
-    [setupContract]
+    [setupContract, newAlert]
   )
 
   const ejecutarOrden = useCallback(
@@ -320,14 +333,17 @@ export const BlockchainProvider = (props: AppProps) => {
         reduceTransaccion({
           type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA,
         })
+        newAlert('success', 'Operación exitosa')
       } catch (error: any) {
+        newAlert('error', formatErrorMessage(error.message))
+
         reduceTransaccion({
           type: ReducerActionType.MARCAR_TRANSACCION_FALLIDA,
-          payload: error.message,
+          payload: formatErrorMessage(error.message),
         })
       }
     },
-    [setupContract]
+    [setupContract, newAlert]
   )
 
   const buscarOrdenEspejo = useCallback(
@@ -382,13 +398,15 @@ export const BlockchainProvider = (props: AppProps) => {
           payload: resultado,
         })
       } catch (error: any) {
+        newAlert('error', formatErrorMessage(error.message))
+
         reduceTokens({
           type: ReducerActionType.MARCAR_ERROR,
-          payload: error.message,
+          payload: formatErrorMessage(error.message),
         })
       }
     },
-    [setupContract]
+    [setupContract, newAlert]
   )
 
   const nuevoToken = useCallback(
@@ -406,14 +424,17 @@ export const BlockchainProvider = (props: AppProps) => {
         reduceTransaccion({
           type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA,
         })
+        newAlert('success', 'Operación exitosa')
       } catch (error: any) {
+        newAlert('error', formatErrorMessage(error.message))
+
         reduceTransaccion({
           type: ReducerActionType.MARCAR_TRANSACCION_FALLIDA,
-          payload: error.message,
+          payload: formatErrorMessage(error.message),
         })
       }
     },
-    [setupContract]
+    [setupContract, newAlert]
   )
 
   const activarToken = useCallback(
@@ -431,14 +452,17 @@ export const BlockchainProvider = (props: AppProps) => {
         reduceTransaccion({
           type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA,
         })
+        newAlert('success', 'Operación exitosa')
       } catch (error: any) {
+        newAlert('error', formatErrorMessage(error.message))
+
         reduceTransaccion({
           type: ReducerActionType.MARCAR_TRANSACCION_FALLIDA,
-          payload: error.message,
+          payload: formatErrorMessage(error.message),
         })
       }
     },
-    [setupContract]
+    [setupContract, newAlert]
   )
 
   const suspenderToken = useCallback(
@@ -456,14 +480,17 @@ export const BlockchainProvider = (props: AppProps) => {
         reduceTransaccion({
           type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA,
         })
+        newAlert('success', 'Operación exitosa')
       } catch (error: any) {
+        newAlert('error', formatErrorMessage(error.message))
+
         reduceTransaccion({
           type: ReducerActionType.MARCAR_TRANSACCION_FALLIDA,
-          payload: error.message,
+          payload: formatErrorMessage(error.message),
         })
       }
     },
-    [setupContract]
+    [setupContract, newAlert]
   )
 
   const modificarOraculoToken = useCallback(
@@ -481,14 +508,17 @@ export const BlockchainProvider = (props: AppProps) => {
         reduceTransaccion({
           type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA,
         })
+        newAlert('success', 'Operación exitosa')
       } catch (error: any) {
+        newAlert('error', formatErrorMessage(error.message))
+
         reduceTransaccion({
           type: ReducerActionType.MARCAR_TRANSACCION_FALLIDA,
-          payload: error.message,
+          payload: formatErrorMessage(error.message),
         })
       }
     },
-    [setupContract]
+    [setupContract, newAlert]
   )
 
   const consultarCotizacion = useCallback(
@@ -507,7 +537,6 @@ export const BlockchainProvider = (props: AppProps) => {
 
         return resultado.toString()
       } catch (error: any) {
-        console.log(error.message)
         return null
       }
     },
@@ -544,12 +573,14 @@ export const BlockchainProvider = (props: AppProps) => {
         },
       })
     } catch (error: any) {
+      newAlert('error', formatErrorMessage(error.message))
+
       reducePlataforma({
         type: ReducerActionType.MARCAR_ERROR,
-        payload: error.message,
+        payload: formatErrorMessage(error.message),
       })
     }
-  }, [setupContract])
+  }, [setupContract, newAlert])
 
   const bloquearPlataforma = useCallback(async () => {
     reduceTransaccion({
@@ -565,13 +596,16 @@ export const BlockchainProvider = (props: AppProps) => {
       reduceTransaccion({
         type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA,
       })
+      newAlert('success', 'Operación exitosa')
     } catch (error: any) {
+      newAlert('error', formatErrorMessage(error.message))
+
       reduceTransaccion({
         type: ReducerActionType.MARCAR_TRANSACCION_FALLIDA,
-        payload: error.message,
+        payload: formatErrorMessage(error.message),
       })
     }
-  }, [setupContract])
+  }, [setupContract, newAlert])
 
   const desbloquearPlataforma = useCallback(async () => {
     reduceTransaccion({
@@ -587,13 +621,16 @@ export const BlockchainProvider = (props: AppProps) => {
       reduceTransaccion({
         type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA,
       })
+      newAlert('success', 'Operación exitosa')
     } catch (error: any) {
+      newAlert('error', formatErrorMessage(error.message))
+
       reduceTransaccion({
         type: ReducerActionType.MARCAR_TRANSACCION_FALLIDA,
-        payload: error.message,
+        payload: formatErrorMessage(error.message),
       })
     }
-  }, [setupContract])
+  }, [setupContract, newAlert])
 
   const cambiarMontoMinimoPlataforma = useCallback(
     async (montoMinimoUSD: string) => {
@@ -610,14 +647,17 @@ export const BlockchainProvider = (props: AppProps) => {
         reduceTransaccion({
           type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA,
         })
+        newAlert('success', 'Operación exitosa')
       } catch (error: any) {
+        newAlert('error', formatErrorMessage(error.message))
+
         reduceTransaccion({
           type: ReducerActionType.MARCAR_TRANSACCION_FALLIDA,
-          payload: error.message,
+          payload: formatErrorMessage(error.message),
         })
       }
     },
-    [setupContract]
+    [setupContract, newAlert]
   )
 
   //**************************************************************************//
@@ -647,12 +687,14 @@ export const BlockchainProvider = (props: AppProps) => {
         payload: resultado,
       })
     } catch (error: any) {
+      newAlert('error', formatErrorMessage(error.message))
+
       reduceAdministradores({
         type: ReducerActionType.MARCAR_ERROR,
-        payload: error.message,
+        payload: formatErrorMessage(error.message),
       })
     }
-  }, [setupContract])
+  }, [setupContract, newAlert])
 
   const nuevoAdministrador = useCallback(
     async (billetera: string) => {
@@ -669,14 +711,17 @@ export const BlockchainProvider = (props: AppProps) => {
         reduceTransaccion({
           type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA,
         })
+        newAlert('success', 'Operación exitosa')
       } catch (error: any) {
+        newAlert('error', formatErrorMessage(error.message))
+
         reduceTransaccion({
           type: ReducerActionType.MARCAR_TRANSACCION_FALLIDA,
-          payload: error.message,
+          payload: formatErrorMessage(error.message),
         })
       }
     },
-    [setupContract]
+    [setupContract, newAlert]
   )
 
   const quitarAdministrador = useCallback(
@@ -694,14 +739,17 @@ export const BlockchainProvider = (props: AppProps) => {
         reduceTransaccion({
           type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA,
         })
+        newAlert('success', 'Operación exitosa')
       } catch (error: any) {
+        newAlert('error', formatErrorMessage(error.message))
+
         reduceTransaccion({
           type: ReducerActionType.MARCAR_TRANSACCION_FALLIDA,
-          payload: error.message,
+          payload: formatErrorMessage(error.message),
         })
       }
     },
-    [setupContract]
+    [setupContract, newAlert]
   )
 
   //**************************************************************************//
@@ -731,12 +779,14 @@ export const BlockchainProvider = (props: AppProps) => {
         payload: resultado,
       })
     } catch (error: any) {
+      newAlert('error', formatErrorMessage(error.message))
+
       reduceBloqueados({
         type: ReducerActionType.MARCAR_ERROR,
-        payload: error.message,
+        payload: formatErrorMessage(error.message),
       })
     }
-  }, [setupContract])
+  }, [setupContract, newAlert])
 
   const bloquearBilletera = useCallback(
     async (billetera: string) => {
@@ -753,14 +803,17 @@ export const BlockchainProvider = (props: AppProps) => {
         reduceTransaccion({
           type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA,
         })
+        newAlert('success', 'Operación exitosa')
       } catch (error: any) {
+        newAlert('error', formatErrorMessage(error.message))
+
         reduceTransaccion({
           type: ReducerActionType.MARCAR_TRANSACCION_FALLIDA,
-          payload: error.message,
+          payload: formatErrorMessage(error.message),
         })
       }
     },
-    [setupContract]
+    [setupContract, newAlert]
   )
 
   const desbloquearBilletera = useCallback(
@@ -778,14 +831,17 @@ export const BlockchainProvider = (props: AppProps) => {
         reduceTransaccion({
           type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA,
         })
+        newAlert('success', 'Operación exitosa')
       } catch (error: any) {
+        newAlert('error', formatErrorMessage(error.message))
+
         reduceTransaccion({
           type: ReducerActionType.MARCAR_TRANSACCION_FALLIDA,
-          payload: error.message,
+          payload: formatErrorMessage(error.message),
         })
       }
     },
-    [setupContract]
+    [setupContract, newAlert]
   )
 
   //**************************************************************************//
@@ -828,14 +884,16 @@ export const BlockchainProvider = (props: AppProps) => {
           payload: { direccion, estado, rol },
         })
       } catch (error: any) {
+        newAlert('error', formatErrorMessage(error.message))
+
         reduceSesion({
           type: ReducerActionType.MARCAR_ERROR,
-          payload: error.message,
+          payload: formatErrorMessage(error.message),
         })
         throw new Error(ERROR_AUTENTICAR_BILLETERA)
       }
     },
-    [setupContract]
+    [setupContract, newAlert]
   )
 
   //**************************************************************************//
