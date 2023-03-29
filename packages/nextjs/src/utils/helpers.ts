@@ -1,8 +1,10 @@
 import {
+  ERROR_ARGUMENTOS_INVALIDOS,
   ERROR_ESTADO_GENERAL_INVALIDO,
   ERROR_ESTADO_ORDEN_INVALIDO,
   ERROR_ROL_BILLETERA_INVALIDO,
   ERROR_TIPO_ORDEN_INVALIDO,
+  ERROR_TX_RECHAZADA,
 } from '@/constants/mensajes'
 import {
   Billetera,
@@ -220,6 +222,14 @@ export function getTimeAgoString(date: Date): string {
 }
 
 export function formatErrorMessage(errorRaw: string): string {
+  if (/ACTION_REJECTED/.test(errorRaw)) {
+    return ERROR_TX_RECHAZADA
+  }
+
+  if (/INVALID_ARGUMENT/.test(errorRaw)) {
+    return ERROR_ARGUMENTOS_INVALIDOS
+  }
+
   const indexStart = errorRaw.indexOf("'")
 
   if (indexStart === -1) return errorRaw

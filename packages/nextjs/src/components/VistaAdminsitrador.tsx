@@ -1,10 +1,13 @@
-import { NavMenu, RolesBilleteras, Billetera } from '@/types.d'
+import { NavMenu } from '@/types.d'
 import { Box, Tab, Tabs } from '@mui/material'
+import { blue } from '@mui/material/colors'
 import React, { useState } from 'react'
 import VistaBilleteras from './VistaBilleteras'
 import VistaBilleterasSuspendidas from './VistaBilleterasSuspendidas'
 import VistaConfiguracion from './VistaConfiguracion'
 import VistaTokens from './VistaTokens'
+
+/******************************************************************************/
 
 interface TabPanelProps {
   children?: React.ReactNode
@@ -12,21 +15,33 @@ interface TabPanelProps {
   value: NavMenu
 }
 
+const NAV_ITEMS = [
+  'Configuración',
+  'Billeteras',
+  'Billeteras Suspendidas',
+  'Tokens',
+]
+
+/******************************************************************************/
+
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props
 
   return (
-    <div
+    <Box
       role="tabpanel"
       hidden={value !== index}
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
+      sx={{ padding: 3, height: '100%', width: '100%' }}
       {...other}
     >
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
-    </div>
+      {value === index && children}
+    </Box>
   )
 }
+
+/******************************************************************************/
 
 export default function VistaAdminsitrador() {
   const [getTabValue, setTabValue] = useState(NavMenu.configuracion)
@@ -38,25 +53,40 @@ export default function VistaAdminsitrador() {
     setTabValue(nuevoValor)
   }
 
+  /****************************************************************************/
+
   return (
-    <div>
-      <Tabs
-        value={getTabValue}
-        onChange={handleCambiarNavMenu}
-        textColor="secondary"
-        indicatorColor="secondary"
-        aria-label="secondary tabs example"
+    <>
+      <Box
+        sx={{
+          backgroundColor: 'primary.dark',
+          color: 'common.white',
+        }}
       >
-        <Tab value={NavMenu.configuracion} label={NavMenu.configuracion} />
-
-        <Tab value={NavMenu.billeteras} label={NavMenu.billeteras} />
-
-        <Tab
-          value={NavMenu.billeterasSuspendidas}
-          label={NavMenu.billeterasSuspendidas}
-        />
-        <Tab value={NavMenu.tokens} label={NavMenu.tokens} />
-      </Tabs>
+        <Tabs
+          value={getTabValue}
+          onChange={handleCambiarNavMenu}
+          textColor="secondary"
+          indicatorColor="secondary"
+          aria-label="secondary tabs example"
+        >
+          {NAV_ITEMS.map((item, index) => (
+            <Tab
+              key={index}
+              sx={{
+                color: 'common.white',
+                '&.Mui-selected': {
+                  backgroundColor: blue[200],
+                  color: 'common.white',
+                  fontWeight: 'bold',
+                },
+              }}
+              label={item}
+              value={item}
+            />
+          ))}
+        </Tabs>
+      </Box>
 
       <TabPanel value={getTabValue} index={NavMenu.configuracion}>
         <VistaConfiguracion />
@@ -73,6 +103,6 @@ export default function VistaAdminsitrador() {
       <TabPanel value={getTabValue} index={NavMenu.tokens}>
         <VistaTokens />
       </TabPanel>
-    </div>
+    </>
   )
 }
