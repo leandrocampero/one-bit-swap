@@ -81,8 +81,8 @@ export default function VistaConfiguracion() {
             disabled={sesion.datos.rol != RolesBilleteras.propietario}
           >
             {(plataforma.datos?.estado == Estados.suspendido
-              ? 'Suspender'
-              : 'Activar') + ' Plataforma'}
+              ? 'Activar'
+              : 'Suspender') + ' Plataforma'}
           </Button>
         </Grid>
       </Grid>

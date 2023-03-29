@@ -16,7 +16,7 @@ import Nuevo from './NuevoAdministrador'
 
 export default function VistaBilleteras() {
   const { getters, actions } = useBlockchainContext()
-  const { administradores, transaccion } = getters
+  const { administradores, transaccion, sesion } = getters
   const { cargarAdministradores, quitarAdministrador } = actions
 
   const [getTextoBusqueda, setTextoBusqueda] = useState('')
@@ -53,7 +53,7 @@ export default function VistaBilleteras() {
               {row.direccion}
             </TableCell>
             <TableCell key={1} align="left">
-              {row.rol == RolesBilleteras.propietario && (
+              {sesion.datos.rol == RolesBilleteras.propietario && (
                 <Button
                   variant="contained"
                   onClick={() => handleQuitarRol(row.direccion)}
