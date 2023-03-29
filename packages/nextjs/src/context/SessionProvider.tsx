@@ -90,7 +90,7 @@ export const SessionProvider = (props: AppProps) => {
     useWeb3React<Web3Provider>()
 
   const { actions } = useBlockchainContext()
-  const { autenticarBilletera } = actions
+  const { autenticarBilletera, borrarSesion } = actions
 
   const { newAlert } = useAlertContext()
 
@@ -225,6 +225,7 @@ export const SessionProvider = (props: AppProps) => {
       setLoading(true)
 
       await deactivate()
+      borrarSesion()
 
       setConnected(false)
       setError(null)
@@ -233,7 +234,7 @@ export const SessionProvider = (props: AppProps) => {
     } finally {
       setLoading(false)
     }
-  }, [deactivate])
+  }, [deactivate, borrarSesion])
 
   //**************************************************************************//
   //                                                                          //

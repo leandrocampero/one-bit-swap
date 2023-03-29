@@ -896,6 +896,15 @@ export const BlockchainProvider = (props: AppProps) => {
     [setupContract, newAlert]
   )
 
+  const borrarSesion = useCallback(() => {
+    reduceSesion({ type: ReducerActionType.MARCAR_CARGANDO })
+
+    reduceSesion({
+      type: ReducerActionType.REINICIAR_ESTADO,
+      payload: SESION_INITIAL_STATE,
+    })
+  }, [])
+
   //**************************************************************************//
   //                                                                          //
   //           #####                                                          //
@@ -978,6 +987,7 @@ export const BlockchainProvider = (props: AppProps) => {
     bloquearBilletera,
     desbloquearBilletera,
     autenticarBilletera,
+    borrarSesion,
     consultarCotizacion,
   } as BlockchainActions
 
