@@ -131,6 +131,7 @@ export type BlockchainActions = {
   bloquearBilletera: (billetera: string) => Promise<void>
   desbloquearBilletera: (billetera: string) => Promise<void>
   autenticarBilletera: (signer: JsonRpcSigner) => Promise<void>
+  borrarSesion: () => void
 }
 
 //****************************************************************************//
