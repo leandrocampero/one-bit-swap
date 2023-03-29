@@ -65,7 +65,12 @@ export default function VistaBilleteras() {
           </TableRow>
         )
       })
-  }, [administradores, getTextoBusqueda, handleQuitarRol])
+  }, [
+    administradores.datos,
+    getTextoBusqueda,
+    handleQuitarRol,
+    sesion.datos.rol,
+  ])
 
   useEffect(() => {
     const { error, cargando } = transaccion
