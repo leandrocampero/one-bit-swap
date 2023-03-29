@@ -35,7 +35,7 @@ export default function Navbar() {
                 </Typography>
               </Grid>
 
-              {sesion.datos.rol == RolesBilleteras.administrador ? (
+              {sesion.datos.rol != RolesBilleteras.usuario ? (
                 <Grid item sx={{ marginLeft: 'auto' }}>
                   <Button
                     id="demo-customized-button"

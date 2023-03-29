@@ -16,18 +16,25 @@ import Nuevo from './NuevoSuspendido'
 
 export default function VistaBilleterasSuspendidas() {
   const { getters, actions } = useBlockchainContext()
-  const { bloqueados } = getters
-  const { cargarBloqueados } = actions
+  const { bloqueados, transaccion } = getters
+  const { cargarBloqueados, desbloquearBilletera } = actions
 
   const [getTextoBusqueda, setTextoBusqueda] = useState('')
 
-  const handleClicRecargar = () => {
-    // no se que hace aqui
+  const handleClicRecargar = async () => {
+    await cargarBloqueados()
   }
 
   const handleBuscar = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTextoBusqueda(event.target.value.trim())
   }
+
+  const handleActivar = useCallback(
+    async (direccion: string) => {
+      await desbloquearBilletera(direccion)
+    },
+    [desbloquearBilletera]
+  )
 
   const listarBilleterasSuspendidas = useCallback(() => {
     return bloqueados.datos
@@ -49,7 +56,7 @@ export default function VistaBilleterasSuspendidas() {
               {row.estado == Estados.suspendido && (
                 <Button
                   variant="contained"
-                  onClick={() => console.log('Activar Billetera')}
+                  onClick={() => handleActivar(row.direccion)}
                 >
                   Activar
                 </Button>
@@ -58,11 +65,14 @@ export default function VistaBilleterasSuspendidas() {
           </TableRow>
         )
       })
-  }, [bloqueados, getTextoBusqueda])
+  }, [bloqueados, getTextoBusqueda, handleActivar])
 
   useEffect(() => {
-    cargarBloqueados()
-  }, [cargarBloqueados])
+    const { error, cargando } = transaccion
+    if (!error && !cargando) {
+      cargarBloqueados()
+    }
+  }, [transaccion, cargarBloqueados])
 
   return (
     <>

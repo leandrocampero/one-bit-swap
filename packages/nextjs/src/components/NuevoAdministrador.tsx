@@ -1,5 +1,6 @@
 import { useBlockchainContext } from '@/context/BlockchainProvider'
 import { Box, Button, Modal, TextField } from '@mui/material'
+import { ethers } from 'ethers'
 import React, { useState } from 'react'
 
 const style = {
@@ -21,19 +22,23 @@ export default function NuevoAdministrador() {
   const [getEstadoModal, setEstadoModal] = useState(false)
   const [error, setError] = useState<boolean>(false)
 
-  const { actions } = useBlockchainContext()
-
+  const { getters, actions } = useBlockchainContext()
+  const { transaccion } = getters
   const { nuevoAdministrador } = actions
 
   const handleAbrirModal = () => {
     setEstadoModal(!getEstadoModal)
   }
 
-  const handleAgregar = () => {
-    console.log('Nuevo Administrador')
-    if (getDireccion.length > 1) {
-      nuevoAdministrador(getDireccion)
-      setEstadoModal(!getEstadoModal)
+  const handleOnChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    setDireccion(event.target.value.trim())
+  }
+
+  const handleAgregar = async () => {
+    const { error } = transaccion
+    if (ethers.utils.isAddress(getDireccion)) {
+      await nuevoAdministrador(getDireccion)
+      !error ? setEstadoModal(!getEstadoModal) : setError(true)
     } else {
       setError(true)
     }
@@ -59,9 +64,7 @@ export default function NuevoAdministrador() {
               label="direccion"
               variant="standard"
               value={getDireccion}
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                setDireccion(event.target.value.trim())
-              }
+              onChange={handleOnChange}
             />
             {error && <h3>Ingrese parametros validos</h3>}{' '}
           </Box>

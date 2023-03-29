@@ -21,19 +21,23 @@ export default function NuevoSuspendido() {
   const [getDireccion, setDireccion] = useState<string>('')
   const [getEstadoModal, setEstadoModal] = useState(false)
   const [error, setError] = useState<boolean>(false)
-  const { actions } = useBlockchainContext()
-
+  const { actions, getters } = useBlockchainContext()
+  const { transaccion } = getters
   const { bloquearBilletera } = actions
 
   const handleAbrirModal = () => {
     setEstadoModal(!getEstadoModal)
   }
 
-  const handleSuspender = () => {
-    console.log('Nuevo Suspendido')
+  const handleOnChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    setDireccion(event.target.value.trim())
+  }
+
+  const handleSuspender = async () => {
+    const { error } = transaccion
     if (ethers.utils.isAddress(getDireccion)) {
-      bloquearBilletera(getDireccion)
-      setEstadoModal(!getEstadoModal)
+      await bloquearBilletera(getDireccion)
+      !error ? setEstadoModal(!getEstadoModal) : setError(true)
     } else {
       setError(true)
     }
@@ -59,9 +63,7 @@ export default function NuevoSuspendido() {
               label="direccion"
               variant="standard"
               value={getDireccion}
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                setDireccion(event.target.value.trim())
-              }
+              onChange={handleOnChange}
             />
             {error && <h3>Ingrese parametros validos</h3>}
           </Box>

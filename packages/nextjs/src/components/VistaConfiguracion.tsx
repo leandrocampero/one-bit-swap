@@ -1,46 +1,56 @@
 import { useBlockchainContext } from '@/context/BlockchainProvider'
-import { Estados } from '@/types.d'
+import { Estados, RolesBilleteras } from '@/types.d'
 import { Button, Grid, InputAdornment, TextField } from '@mui/material'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function VistaConfiguracion() {
   const { getters, actions } = useBlockchainContext()
-  const { plataforma } = getters
+  const { plataforma, transaccion, sesion } = getters
   const {
     bloquearPlataforma,
     desbloquearPlataforma,
     cambiarMontoMinimoPlataforma,
+    cargarDatosPlataforma,
   } = actions
 
-  const [montoMinimo, setMontoMinimo] = useState<number>(
-    plataforma.datos.montoMinimo
-  )
+  const [montoMinimo, setMontoMinimo] = useState<string>('')
 
   const handleCambiarMontoMinimoText = (
     evt: React.ChangeEvent<HTMLInputElement>
   ) => {
-    setMontoMinimo(parseInt(evt.target.value.trim()))
+    setMontoMinimo(evt.target.value.trim())
   }
 
-  const handleCambiarMontoMinimoButton = () => {
-    cambiarMontoMinimoPlataforma(montoMinimo.toString())
+  const handleCambiarMontoMinimoButton = async () => {
+    await cambiarMontoMinimoPlataforma(montoMinimo)
+    setMontoMinimo('')
   }
 
-  const handleCambiarEstadoPlataforma = () => {
+  const handleCambiarEstadoPlataforma = async () => {
     if (plataforma.datos?.estado == Estados.activo) {
-      desbloquearPlataforma()
+      await desbloquearPlataforma()
     } else {
-      bloquearPlataforma()
+      await bloquearPlataforma()
     }
   }
+
+  useEffect(() => {
+    const { error, cargando } = transaccion
+    if (!error && !cargando) {
+      cargarDatosPlataforma()
+    }
+  }, [transaccion, cargarDatosPlataforma])
 
   return (
     <>
       <Grid container spacing={2}>
+        <Grid item xs={5} md={10}>
+          <h4>Monto Minimo Actual: ${plataforma.datos.montoMinimo}</h4>
+        </Grid>
         <Grid item xs={5} md={5}>
           <TextField
             id="txt-busqueda"
-            label={'Monto Minimo Actual'}
+            label={'Nuevo Monto Minimo'}
             value={montoMinimo}
             variant="outlined"
             onChange={handleCambiarMontoMinimoText}
@@ -65,10 +75,14 @@ export default function VistaConfiguracion() {
           </h3>
         </Grid>
         <Grid item xs={5} md={5}>
-          <Button variant="contained" onClick={handleCambiarEstadoPlataforma}>
+          <Button
+            variant="contained"
+            onClick={handleCambiarEstadoPlataforma}
+            disabled={sesion.datos.rol != RolesBilleteras.propietario}
+          >
             {(plataforma.datos?.estado == Estados.suspendido
-              ? 'Suspender'
-              : 'Activar') + ' Plataforma'}
+              ? 'Activar'
+              : 'Suspender') + ' Plataforma'}
           </Button>
         </Grid>
       </Grid>
