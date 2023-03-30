@@ -1,6 +1,5 @@
 import { useBlockchainContext } from '@/context/BlockchainProvider'
 import { Billetera, RolesBilleteras } from '@/types.d'
-import styled from '@emotion/styled'
 import {
   Button,
   CircularProgress,
@@ -26,6 +25,7 @@ import React, {
   useMemo,
   useState,
 } from 'react'
+import WindowPaper from './common/WindowPaper'
 
 const Transition = forwardRef(function Transition(
   props: TransitionProps & {
@@ -35,14 +35,6 @@ const Transition = forwardRef(function Transition(
 ) {
   return <Slide direction="up" ref={ref} {...props} />
 })
-
-const WindowPaper = styled(Paper)`
-  height: calc(
-    100vh - (96px + 32px) - (48px + 24px * 2) - (56px + 24px * 2 + 4px)
-  );
-  width: 100%;
-  overflow-y: auto;
-`
 
 export default function VistaBilleteras() {
   const { getters, actions } = useBlockchainContext()
@@ -260,21 +252,7 @@ export default function VistaBilleteras() {
         <Divider sx={{ borderBottomWidth: 4, marginY: 3 }} />
       )}
 
-      <WindowPaper
-        sx={{
-          backgroundColor: 'transparent',
-          paddingRight: 1,
-          '&::-webkit-scrollbar': {
-            width: 4,
-          },
-          '&::-webkit-scrollbar-thumb': {
-            backgroundColor: blueGrey[200],
-          },
-        }}
-        elevation={0}
-      >
-        {listarBilleterasAdministradoras}
-      </WindowPaper>
+      <WindowPaper>{listarBilleterasAdministradoras}</WindowPaper>
     </>
   )
 }
