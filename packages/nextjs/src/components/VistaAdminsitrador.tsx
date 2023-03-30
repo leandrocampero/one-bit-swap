@@ -17,7 +17,7 @@ interface TabPanelProps {
 
 const NAV_ITEMS = [
   'Configuración',
-  'Billeteras',
+  'Administradores',
   'Billeteras Suspendidas',
   'Tokens',
 ]
@@ -33,7 +33,7 @@ function TabPanel(props: TabPanelProps) {
       hidden={value !== index}
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
-      sx={{ padding: 3, height: '100%', width: '100%' }}
+      sx={{ padding: 3, width: '100%', flexGrow: 1 }}
       {...other}
     >
       {value === index && children}
@@ -92,7 +92,7 @@ export default function VistaAdminsitrador() {
         <VistaConfiguracion />
       </TabPanel>
 
-      <TabPanel value={getTabValue} index={NavMenu.billeteras}>
+      <TabPanel value={getTabValue} index={NavMenu.administradores}>
         <VistaBilleteras />
       </TabPanel>
 

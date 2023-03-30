@@ -1,5 +1,6 @@
 import {
   ERROR_ARGUMENTOS_INVALIDOS,
+  ERROR_DESCONOCIDO,
   ERROR_ESTADO_GENERAL_INVALIDO,
   ERROR_ESTADO_ORDEN_INVALIDO,
   ERROR_ROL_BILLETERA_INVALIDO,
@@ -228,6 +229,10 @@ export function formatErrorMessage(errorRaw: string): string {
 
   if (/INVALID_ARGUMENT/.test(errorRaw)) {
     return ERROR_ARGUMENTOS_INVALIDOS
+  }
+
+  if (/UNSUPPORTED_OPERATION/.test(errorRaw)) {
+    return ERROR_DESCONOCIDO
   }
 
   const indexStart = errorRaw.indexOf("'")

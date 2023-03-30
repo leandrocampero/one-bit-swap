@@ -34,15 +34,10 @@ export enum RolesBilleteras {
  * @miHistorial
  */
 export enum NavMenu {
-  ordenesAbiertas = 'Ordenes Abiertas',
-  misOrdenes = 'Mis Ordenes',
-  miHistorial = 'Historial',
-  billeteras = 'Billeteras',
+  configuracion = 'Configuración',
+  administradores = 'Administradores',
   tokens = 'Tokens',
   billeterasSuspendidas = 'Billeteras Suspendidas',
-  configuracion = 'Configuración',
-  intercambio = 'Intercambio',
-  compraVenta = 'Compra/Venta',
 }
 
 export enum Acciones {
