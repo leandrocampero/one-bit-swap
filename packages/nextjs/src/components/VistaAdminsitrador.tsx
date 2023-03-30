@@ -1,7 +1,9 @@
-import { NavMenu } from '@/types.d'
+import { useBlockchainContext } from '@/context/BlockchainProvider'
+import { NavMenu, RolesBilleteras } from '@/types.d'
 import { Box, Tab, Tabs } from '@mui/material'
 import { blue } from '@mui/material/colors'
-import React, { useState } from 'react'
+import { useRouter } from 'next/router'
+import React, { useEffect, useState } from 'react'
 import VistaBilleteras from './VistaBilleteras'
 import VistaBilleterasSuspendidas from './VistaBilleterasSuspendidas'
 import VistaConfiguracion from './VistaConfiguracion'
@@ -45,6 +47,10 @@ function TabPanel(props: TabPanelProps) {
 
 export default function VistaAdminsitrador() {
   const [getTabValue, setTabValue] = useState(NavMenu.configuracion)
+  const {
+    getters: { sesion },
+  } = useBlockchainContext()
+  const router = useRouter()
 
   const handleCambiarNavMenu = (
     event: React.SyntheticEvent,
@@ -52,6 +58,12 @@ export default function VistaAdminsitrador() {
   ) => {
     setTabValue(nuevoValor)
   }
+
+  useEffect(() => {
+    if (!sesion.cargando && sesion.datos.rol === RolesBilleteras.usuario) {
+      router.push('/')
+    }
+  }, [sesion, router])
 
   /****************************************************************************/
 
