@@ -99,7 +99,6 @@ export const AlertProvider = (props: AppProps) => {
   const closeAlert = useCallback(() => {
     setAlert(false)
     setMessage(undefined)
-    setType(undefined)
   }, [])
 
   //**************************************************************************//

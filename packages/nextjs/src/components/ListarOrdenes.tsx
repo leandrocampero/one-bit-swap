@@ -28,6 +28,7 @@ import { TransitionProps } from '@mui/material/transitions'
 import { BigNumber, ethers } from 'ethers'
 import { forwardRef, useCallback, useEffect, useMemo, useState } from 'react'
 import TarjetaOrden from './Ordenes/TarjetaOrden'
+import WindowPaper from './common/WindowPaper'
 import { ContainerBox, FlexBoxSpaceBetween } from './common/styles'
 
 /******************************************************************************/
@@ -410,7 +411,7 @@ export default function ListarOrdenes() {
             onChange={handleChangeTab}
             aria-label="ordenes-nav-tabs"
             variant="fullWidth"
-            sx={{ '&.MuiTabs-indicator': 'primary.dark' }}
+            sx={{ '&.MuiTabsindicator': 'primary.dark' }}
           >
             {NAV_ITEMS.map((item, index) => (
               <Tab
@@ -561,29 +562,31 @@ export default function ListarOrdenes() {
         <Box
           sx={{
             padding: 3,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            height: '100%',
-            overflowY: 'auto',
           }}
         >
-          {ordenes.datos.length === 0 ? 'No hay ordenes' : ordenesRender}
+          <WindowPaper>
+            {ordenes.datos.length === 0 ? 'No hay ordenes' : ordenesRender}
 
-          {ordenes.datos.length > 0 && vistaOrdenesActivas && (
-            <Button
-              variant="contained"
-              color="info"
-              sx={{ width: '60%', marginTop: 3 }}
-              onClick={handleCargarMas}
-            >
-              {ordenes.cargando ? (
-                <CircularProgress size={24} sx={{ color: 'common.white' }} />
-              ) : (
-                'Cargar más'
-              )}
-            </Button>
-          )}
+            {ordenes.datos.length > 0 && vistaOrdenesActivas && (
+              <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                <Button
+                  variant="contained"
+                  color="info"
+                  sx={{ width: '60%', marginTop: 3 }}
+                  onClick={handleCargarMas}
+                >
+                  {ordenes.cargando ? (
+                    <CircularProgress
+                      size={24}
+                      sx={{ color: 'common.white' }}
+                    />
+                  ) : (
+                    'Cargar más'
+                  )}
+                </Button>
+              </Box>
+            )}
+          </WindowPaper>
         </Box>
       </Box>
     </>

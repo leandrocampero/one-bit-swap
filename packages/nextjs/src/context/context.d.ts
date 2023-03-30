@@ -51,11 +51,11 @@ export type OrdenesState = IExternalData<Orden>
 export type TokensState = IExternalData<Token>
 export type AdministradoresState = IExternalData<Billetera>
 export type BloqueadosState = IExternalData<Billetera>
-export type TransaccionState = { cargando: boolean; error: Error | null }
+export type TransaccionState = { cargando: boolean; error: string | null }
 export type SesionState = {
   datos: Billetera
   cargando: boolean
-  error: Error | null
+  error: string | null
 }
 
 export const PLATAFORMA_INITIAL_STATE: PlataformaState = {

@@ -8,7 +8,7 @@ export default function IconUSDT(props: SVGProps<SVGSVGElement>) {
       viewBox="0 0 32 32"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <g fill="none" fill-rule="evenodd">
+      <g fill="none" fillRule="evenodd">
         <circle cx="16" cy="16" r="16" fill="#26A17B" />
 
         <path

@@ -11,6 +11,10 @@ export const ERROR_BILLETERA_SUSPENDIDA =
   'La billetera con la se quiere conectar se encuentra suspendida'
 export const ERROR_AUTENTICAR_BILLETERA =
   'Ocurrió un error al validar la billetera. Intente nuevamente'
+export const ERROR_TX_RECHAZADA = 'El usuario rechazó la transacción'
+export const ERROR_TX_FALLIDA =
+  'Se ha producido un error al procesar la transacción'
+export const ERROR_ARGUMENTOS_INVALIDOS = 'Los argumentos pasados son inválidos'
 
 export const ERROR_TIPO_ORDEN_INVALIDO =
   'El tipo de orden ingresado es invalido'

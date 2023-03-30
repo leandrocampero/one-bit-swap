@@ -1,4 +1,4 @@
-import Navbar from '@/components/navbar'
+import Navbar from '@/components/Navbar'
 import { AlertProvider } from '@/context/AlertProvider'
 import { BlockchainProvider } from '@/context/BlockchainProvider'
 import { SessionProvider } from '@/context/SessionProvider'

@@ -34,15 +34,10 @@ export enum RolesBilleteras {
  * @miHistorial
  */
 export enum NavMenu {
-  ordenesAbiertas = 'Ordenes Abiertas',
-  misOrdenes = 'Mis Ordenes',
-  miHistorial = 'Historial',
-  billeteras = 'Billeteras',
+  configuracion = 'Configuración',
+  administradores = 'Administradores',
   tokens = 'Tokens',
   billeterasSuspendidas = 'Billeteras Suspendidas',
-  configuracion = 'Configuración',
-  intercambio = 'Intercambio',
-  compraVenta = 'Compra/Venta',
 }
 
 export enum Acciones {
@@ -119,7 +114,7 @@ export type Orden = {
 export type Token = {
   ticker: string
   contrato: string
-  oraculo: string | undefined
+  oraculo: string
   decimales: number
   estado: Estados
   existe: boolean
