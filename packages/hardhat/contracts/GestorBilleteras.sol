@@ -69,6 +69,12 @@ contract GestorBilleteras is Datos {
       size := extcodesize(_billetera)
     }
     require(size == 0, "La billetera es invalida");
+
+    require(
+      _billetera != plataforma.propietario,
+      "No se puede cambiar el rol al propietario"
+    );
+
     require(
       _billetera != address(0),
       "La direccion de la billetera no puede ser cero"
@@ -190,6 +196,11 @@ contract GestorBilleteras is Datos {
     require(
       _billetera != address(0),
       "La direccion de la billetera no puede ser cero"
+    );
+
+    require(
+      _billetera != plataforma.propietario,
+      "No se puede bloquear al propietario"
     );
 
     require(
