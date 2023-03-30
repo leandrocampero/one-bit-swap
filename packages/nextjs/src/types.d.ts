@@ -114,7 +114,7 @@ export type Orden = {
 export type Token = {
   ticker: string
   contrato: string
-  oraculo: string | undefined
+  oraculo: string
   decimales: number
   estado: Estados
   existe: boolean

@@ -36,7 +36,7 @@ const Transition = forwardRef(function Transition(
   return <Slide direction="up" ref={ref} {...props} />
 })
 
-export default function VistaBilleteras() {
+export default function VistaBilleterasSuspendidas() {
   const { getters, actions } = useBlockchainContext()
   const { bloqueados, transaccion, sesion } = getters
   const { cargarBloqueados, desbloquearBilletera, bloquearBilletera } = actions
@@ -47,7 +47,7 @@ export default function VistaBilleteras() {
   const [timeOut, setTimeOut] = useState<NodeJS.Timeout | undefined>(undefined)
   const [showModal, setShowModal] = useState<boolean>(false)
 
-  /******************************************************************************/
+  /****************************************************************************/
 
   const handleOpenModal = useCallback(() => {
     setShowModal(true)
@@ -157,7 +157,7 @@ export default function VistaBilleteras() {
         maxWidth="xs"
         fullWidth
         onClose={handleCloseModal}
-        aria-describedby="dialog-nuevo-admin"
+        aria-describedby="dialogo-bloquear-billetera"
       >
         <DialogTitle
           sx={{
@@ -165,7 +165,7 @@ export default function VistaBilleteras() {
             color: 'common.white',
             marginBottom: 2,
           }}
-          id="dialog-nuevo-admin"
+          id="dialogo-bloquear-billetera"
         >
           {`Bloquear billetera`}
         </DialogTitle>
@@ -203,7 +203,6 @@ export default function VistaBilleteras() {
 
       <Grid container spacing={2}>
         <Grid item xs={4}>
-          {/* TOKEN VENTA */}
           <FormControl fullWidth variant="outlined">
             <TextField
               id="cadena-busqueda"

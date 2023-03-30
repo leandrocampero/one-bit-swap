@@ -5,6 +5,7 @@ import {
   ERROR_ESTADO_ORDEN_INVALIDO,
   ERROR_ROL_BILLETERA_INVALIDO,
   ERROR_TIPO_ORDEN_INVALIDO,
+  ERROR_TX_FALLIDA,
   ERROR_TX_RECHAZADA,
 } from '@/constants/mensajes'
 import {
@@ -205,20 +206,29 @@ export function getTimeAgoString(date: Date): string {
   const month = 30 * day
   const year = 365 * day
 
+  let time: number
+
   if (diff < minute) {
-    return Math.floor(diff / 1000) + ' segundos'
+    time = Math.floor(diff / 1000)
+    return `${time} ${time === 1 ? 'segundo' : 'segundos'}`
   } else if (diff < hour) {
-    return Math.floor(diff / minute) + ' minutos'
+    time = Math.floor(diff / minute)
+    return `${time} ${time === 1 ? 'minuto' : 'minutos'}`
   } else if (diff < day) {
-    return Math.floor(diff / hour) + ' horas'
+    time = Math.floor(diff / hour)
+    return `${time} ${time === 1 ? 'hora' : 'horas'}`
   } else if (diff < week) {
-    return Math.floor(diff / day) + ' días'
+    time = Math.floor(diff / day)
+    return `${time} ${time === 1 ? 'día' : 'días'}`
   } else if (diff < month) {
-    return Math.floor(diff / week) + ' semanas'
+    time = Math.floor(diff / week)
+    return `${time} ${time === 1 ? 'semana' : 'semanas'}`
   } else if (diff < year) {
-    return Math.floor(diff / month) + ' meses'
+    time = Math.floor(diff / month)
+    return `${time} ${time === 1 ? 'mes' : 'meses'}`
   } else {
-    return Math.floor(diff / year) + ' años'
+    time = Math.floor(diff / year)
+    return `${time} ${time === 1 ? 'año' : 'años'}`
   }
 }
 
@@ -233,6 +243,14 @@ export function formatErrorMessage(errorRaw: string): string {
 
   if (/UNSUPPORTED_OPERATION/.test(errorRaw)) {
     return ERROR_DESCONOCIDO
+  }
+
+  if (/UNSUPPORTED_OPERATION/.test(errorRaw)) {
+    return ERROR_DESCONOCIDO
+  }
+
+  if (/(32000|Nonce too high)/.test(errorRaw)) {
+    return ERROR_TX_FALLIDA
   }
 
   const indexStart = errorRaw.indexOf("'")

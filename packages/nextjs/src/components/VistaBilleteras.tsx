@@ -204,7 +204,6 @@ export default function VistaBilleteras() {
 
       <Grid container spacing={2}>
         <Grid item xs={4}>
-          {/* TOKEN VENTA */}
           <FormControl fullWidth variant="outlined">
             <TextField
               id="cadena-busqueda"
