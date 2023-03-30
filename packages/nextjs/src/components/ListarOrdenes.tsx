@@ -410,7 +410,7 @@ export default function ListarOrdenes() {
             onChange={handleChangeTab}
             aria-label="ordenes-nav-tabs"
             variant="fullWidth"
-            sx={{ '&.MuiTabs-indicator': 'primary.dark' }}
+            sx={{ '&.MuiTabsindicator': 'primary.dark' }}
           >
             {NAV_ITEMS.map((item, index) => (
               <Tab

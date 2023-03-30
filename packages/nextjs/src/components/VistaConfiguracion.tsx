@@ -29,7 +29,6 @@ const InfoCard = ({ children, sx, header, loading }: InfoCardProps) => (
     sx={{
       width: '100%',
       border: `1px solid ${blueGrey[900]}`,
-      overflow: 'hidden',
       minHeight: 200,
       display: 'flex',
       flexDirection: 'column',
