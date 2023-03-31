@@ -120,6 +120,7 @@ export default function CrearOrdenes() {
 
   const handleCloseModal = useCallback(() => {
     setShowModal(false)
+    setOrdenEspejo(undefined)
   }, [])
 
   const handleNuevaOrden = useCallback(async () => {
