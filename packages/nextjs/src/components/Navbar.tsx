@@ -31,7 +31,7 @@ export default function Navbar() {
             >
               <Grid item>
                 <Typography variant="h4" noWrap>
-                  <Link href="/">OneBitSwap</Link>
+                  <Link href={connected ? '/' : '/conectar'}>OneBitSwap</Link>
                 </Typography>
               </Grid>
 
