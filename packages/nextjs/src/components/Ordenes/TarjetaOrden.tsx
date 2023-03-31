@@ -6,8 +6,6 @@ import {
   Box,
   Button,
   Card,
-  CardActions,
-  CardContent,
   CardProps,
   Chip,
   Divider,
@@ -17,35 +15,11 @@ import {
 import { blueGrey } from '@mui/material/colors'
 import { ethers } from 'ethers'
 import { useMemo } from 'react'
-import IconDAI from '../Icon/DAI'
-import IconLINK from '../Icon/LINK'
-import IconMATIC from '../Icon/MATIC'
-import IconSAND from '../Icon/SAND'
-import IconUSDT from '../Icon/USDT'
-import IconWETH from '../Icon/WETH'
+import SelectIcon from '../common/SelectIcon'
 
 export interface TarjetaOrdenProps extends CardProps {
   orden: Orden
   onAccion: (idOrden: string, accion: 'ejecutar' | 'cancelar') => Promise<void>
-}
-
-const selectIcon = (ticker: string): JSX.Element | undefined => {
-  switch (ticker) {
-    case 'USDT':
-      return <IconUSDT />
-    case 'LINK':
-      return <IconLINK />
-    case 'SAND':
-      return <IconSAND />
-    case 'WETH':
-      return <IconWETH />
-    case 'MATIC':
-      return <IconMATIC />
-    case 'DAI':
-      return <IconDAI />
-    default:
-      break
-  }
 }
 
 export default function TarjetaOrden({
@@ -97,8 +71,7 @@ export default function TarjetaOrden({
           <Chip
             label="Finalizada"
             color="success"
-            size={'small'}
-            sx={{ marginLeft: 1 }}
+            sx={{ fontWeight: 'bold', fontSize: 14 }}
           />
         )
       case EstadosOrdenes.cancelada:
@@ -106,8 +79,7 @@ export default function TarjetaOrden({
           <Chip
             label="Cancelada"
             color="error"
-            size={'small'}
-            sx={{ marginLeft: 1 }}
+            sx={{ fontWeight: 'bold', fontSize: 14 }}
           />
         )
       default:
@@ -115,8 +87,7 @@ export default function TarjetaOrden({
           <Chip
             label="Activa"
             color="primary"
-            size={'small'}
-            sx={{ marginLeft: 1 }}
+            sx={{ fontWeight: 'bold', fontSize: 14 }}
           />
         )
     }
@@ -129,108 +100,105 @@ export default function TarjetaOrden({
       sx={{
         width: '100%',
         border: `1px solid ${blueGrey[900]}`,
+        backgroundColor: 'common.white',
+        padding: 2,
         ...sx,
       }}
       elevation={3}
     >
-      <Box
-        sx={{
-          backgroundColor: blueGrey[50],
-          padding: 2,
-          display: 'flex',
-          alignItems: 'center',
-        }}
-      >
-        <Grid container spacing={0} alignItems={'center'} wrap="nowrap">
-          <Grid item xs={6}>
-            <Box sx={{ marginRight: 'auto' }}>
-              <Typography
-                variant="button"
-                color="primary.dark"
-                fontSize={20}
-                fontWeight={'bold'}
-              >
-                {ordenComputada.tipo === 0 ? 'Compra-Venta' : 'Intercambio'}
-                {badge}
-              </Typography>
+      <Grid container spacing={0} alignItems={'center'}>
+        <Grid item xs={4}>
+          <Typography
+            variant="button"
+            component="div"
+            color="primary.dark"
+            fontSize={16}
+            fontWeight={'bold'}
+          >
+            {ordenComputada.tipo === 0 ? 'Compra-Venta' : 'Intercambio'}
+          </Typography>
+
+          <Typography
+            variant="caption"
+            component="div"
+            marginRight={1}
+            lineHeight={1}
+          >
+            {`Creada hace ${tiempo} - ${fechaCreacion.toLocaleDateString()}`}
+          </Typography>
+        </Grid>
+
+        <Grid
+          item
+          xs={5}
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
+        >
+          <Box display="flex" alignItems="center">
+            <Box marginRight={1}>
+              <SelectIcon ticker={ordenComputada.tokenVenta} />
+            </Box>
+            <Box>
               <Typography
                 variant="body2"
                 fontWeight={'bold'}
                 sx={{ color: blueGrey[700] }}
               >
-                {`${ordenComputada.tokenVenta} por ${ordenComputada.tokenCompra}`}
+                {ordenComputada.tokenVenta}
               </Typography>
-            </Box>
-          </Grid>
-
-          <Grid item xs={3} sx={{ display: 'flex', alignItems: 'center' }}>
-            {selectIcon(ordenComputada.tokenVenta)}
-            <Typography
-              sx={{ marginLeft: 1, color: 'common.black' }}
-              variant="button"
-              fontSize={24}
-              fontWeight={'bold'}
-            >
-              {montoVenta}
-            </Typography>
-          </Grid>
-
-          <Grid item xs={1}>
-            <SwapHorizIcon color="primary" fontSize="large" />
-          </Grid>
-
-          <Grid item xs={3} sx={{ display: 'flex', alignItems: 'center' }}>
-            {selectIcon(ordenComputada.tokenCompra)}
-            {(ordenComputada.tipo === 0 ||
-              ordenComputada.estado === EstadosOrdenes.finalizada) && (
               <Typography
-                sx={{ marginLeft: 1, color: 'common.black' }}
+                sx={{ color: 'common.black' }}
                 variant="button"
-                fontSize={24}
+                fontSize={16}
                 fontWeight={'bold'}
               >
-                {montoCompra}
+                {montoVenta}
               </Typography>
-            )}
-          </Grid>
+            </Box>
+          </Box>
+
+          <SwapHorizIcon color="primary" fontSize="large" />
+
+          <Box display="flex" alignItems="center" minWidth={120}>
+            <Box marginRight={1}>
+              <SelectIcon ticker={ordenComputada.tokenCompra} />
+            </Box>
+
+            <Box>
+              <Typography
+                variant="body2"
+                fontWeight={'bold'}
+                sx={{ color: blueGrey[700] }}
+              >
+                {ordenComputada.tokenCompra}
+              </Typography>
+              <Typography
+                sx={{ color: 'common.black' }}
+                variant="button"
+                fontSize={16}
+                fontWeight={'bold'}
+                textTransform={'inherit'}
+              >
+                {ordenComputada.tipo === 0 ||
+                ordenComputada.estado === EstadosOrdenes.finalizada
+                  ? montoCompra
+                  : 'A cotizar'}
+              </Typography>
+            </Box>
+          </Box>
         </Grid>
-      </Box>
-      <Box sx={{ display: 'flex' }}>
-        <CardContent sx={{ flexGrow: 1 }}>
-          <Typography variant="body1">{`Creada hace ${tiempo} - ${fechaCreacion.toLocaleDateString()}`}</Typography>
 
-          <Divider sx={{ marginY: 1 }} />
-          <Typography variant="body2">{`Vendedor: ${ordenComputada.vendedor}`}</Typography>
-
-          {ordenComputada.estado === EstadosOrdenes.finalizada && (
-            <>
-              <Typography variant="body2">{`Comprador: ${ordenComputada.comprador}`}</Typography>
-            </>
-          )}
-          {ordenComputada.estado !== EstadosOrdenes.activa && (
-            <>
-              <Typography variant="body2">{`Finalizada en ${fechaFinalizacion.toLocaleString()}`}</Typography>
-            </>
-          )}
-
-          <Divider sx={{ marginY: 1 }} />
-
-          <Typography variant="caption" sx={{ fontWeight: 'bold' }}>
-            {`ID: ${ordenComputada.idOrden}`}
-          </Typography>
-        </CardContent>
-        {ordenComputada.estado === EstadosOrdenes.activa && (
-          <CardActions>
-            {esPropia ? (
-              <>
-                <Button
-                  variant="contained"
-                  color="error"
-                  onClick={() => onAccion(ordenComputada.idOrden, 'cancelar')}
-                >
-                  Cancelar
-                </Button>
-              </>
+        <Grid item xs={3} display="flex" justifyContent="end">
+          {ordenComputada.estado === EstadosOrdenes.activa ? (
+            esPropia ? (
+              <Button
+                variant="contained"
+                color="error"
+                onClick={() => onAccion(ordenComputada.idOrden, 'cancelar')}
+              >
+                Cancelar
+              </Button>
             ) : (
               <Button
                 variant="contained"
@@ -240,12 +208,27 @@ export default function TarjetaOrden({
               >
                 Ejecutar
               </Button>
-            )}
+            )
+          ) : (
+            badge
+          )}
+        </Grid>
 
-            {/* <Button variant="contained" color='primary'>Learn More</Button> */}
-          </CardActions>
+        {ordenComputada.estado !== EstadosOrdenes.activa && (
+          <Grid xs={12} marginTop={1}>
+            <Divider sx={{ marginY: 1 }} />
+            <Typography variant="caption" component="div">
+              {`Finalizada en ${fechaFinalizacion.toLocaleString()}`}
+            </Typography>
+
+            {ordenComputada.estado === EstadosOrdenes.finalizada && (
+              <Typography variant="caption" component="div">
+                {`Comprador: ${ordenComputada.comprador}`}
+              </Typography>
+            )}
+          </Grid>
         )}
-      </Box>
+      </Grid>
     </Card>
   )
 }
