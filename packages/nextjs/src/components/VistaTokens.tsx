@@ -353,7 +353,7 @@ export default function VistaTokens() {
           <FormControl fullWidth variant="outlined">
             <TextField
               id="cadena-busqueda"
-              label="Buscar billetera"
+              label="Buscar token"
               type="text"
               value={preBusqueda}
               onChange={handleSearchInputChange}
