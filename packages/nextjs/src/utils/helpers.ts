@@ -3,6 +3,7 @@ import {
   ERROR_DESCONOCIDO,
   ERROR_ESTADO_GENERAL_INVALIDO,
   ERROR_ESTADO_ORDEN_INVALIDO,
+  ERROR_LLAMADA_FALLIDA,
   ERROR_ROL_BILLETERA_INVALIDO,
   ERROR_TIPO_ORDEN_INVALIDO,
   ERROR_TX_FALLIDA,
@@ -241,8 +242,8 @@ export function formatErrorMessage(errorRaw: string): string {
     return ERROR_ARGUMENTOS_INVALIDOS
   }
 
-  if (/UNSUPPORTED_OPERATION/.test(errorRaw)) {
-    return ERROR_DESCONOCIDO
+  if (/CALL_EXCEPTION/.test(errorRaw)) {
+    return ERROR_LLAMADA_FALLIDA
   }
 
   if (/UNSUPPORTED_OPERATION/.test(errorRaw)) {
