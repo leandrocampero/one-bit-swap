@@ -50,7 +50,7 @@ const config: HardhatUserConfig = {
     path: './../nextjs/src/contracts/',
     runOnCompile: true,
     clear: true,
-    only: [':Plataforma$', ':ERC20$'],
+    only: [':Plataforma$', ':ERC20$', ':ERC20Mock'],
     format: 'json',
   },
 }
