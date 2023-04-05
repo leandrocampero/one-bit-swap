@@ -124,18 +124,12 @@ abstract contract Datos {
   /****************************************************************************/
 
   modifier plataformaActiva() {
-    require(
-      plataforma.estado == EstadoGeneral.ACTIVO,
-      "La plataforma se encuentra inactiva"
-    );
+    require(plataforma.estado == EstadoGeneral.ACTIVO, "P01");
     _;
   }
 
   modifier soloPropietario() {
-    require(
-      msg.sender == plataforma.propietario,
-      "Solo el propietario puede acceder"
-    );
+    require(msg.sender == plataforma.propietario, "P02");
     _;
   }
 
@@ -144,7 +138,7 @@ abstract contract Datos {
       (billeterasRegistradas[msg.sender].existe &&
         billeterasRegistradas[msg.sender].rol == RolBilletera.ADMINISTRADOR) ||
         msg.sender == plataforma.propietario,
-      "Solo pueden acceder administradores"
+      "P03"
     );
     _;
   }
@@ -154,7 +148,7 @@ abstract contract Datos {
       (billeterasRegistradas[msg.sender].existe &&
         billeterasRegistradas[msg.sender].estado == EstadoGeneral.ACTIVO) ||
         !billeterasRegistradas[msg.sender].existe,
-      "La billetera esta bloqueada"
+      "P04"
     );
     _;
   }

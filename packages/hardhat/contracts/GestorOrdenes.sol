@@ -80,27 +80,27 @@ contract GestorOrdenes is Datos, GestorTokens {
         emptyString(_tokenVenta) ||
         _montoVenta == 0 ||
         (_montoCompra == 0 && _tipo == TipoOrden.COMPRA_VENTA)),
-      "No se aceptan campos vacios"
+      "O01"
     );
 
     // Montos válidos
     require(
       _montoVenta > 0 && (_montoCompra > 0 || _tipo != TipoOrden.COMPRA_VENTA),
-      "Los montos ingresados son invalidos"
+      "O02"
     );
 
     // Tokens registrados
     require(
       tokensRegistrados[_tokenCompra].existe &&
         tokensRegistrados[_tokenVenta].existe,
-      "Los tokens no son validos o no estan registrados"
+      "T06"
     );
 
     // Tokens activos
     require(
       tokensRegistrados[_tokenCompra].estado == EstadoGeneral.ACTIVO &&
         tokensRegistrados[_tokenVenta].estado == EstadoGeneral.ACTIVO,
-      "Uno o ambos tokens se encuentran inactivos para operar"
+      "O03"
     );
 
     // Monto mínimo (equivalente en USD)
@@ -117,23 +117,17 @@ contract GestorOrdenes is Datos, GestorTokens {
         10 ** (decimalesToken + decimalesCotizacion);
     }
 
-    require(
-      montoUSD >= plataforma.montoMinimoUSD,
-      "El monto a intercambiar es inferior al minimo aceptable en USD"
-    );
+    require(montoUSD >= plataforma.montoMinimoUSD, "O04");
 
     // Saldo suficiente para la transferencia
     uint256 monto;
     ERC20 contratoToken = ERC20(tokensRegistrados[_tokenVenta].contrato);
     monto = contratoToken.balanceOf(msg.sender);
-    require(monto >= _montoVenta, "Saldo de token insuficiente para cambiar");
+    require(monto >= _montoVenta, "O05");
 
     // Credito aprobado suficiente
     monto = contratoToken.allowance(msg.sender, address(this));
-    require(
-      monto >= _montoVenta,
-      "Saldo aprobado insuficiente para transferir"
-    );
+    require(monto >= _montoVenta, "O06");
 
     // Transferir fondos desde el vendedor
     bool respuestaTransferencia = contratoToken.transferFrom(
@@ -144,7 +138,7 @@ contract GestorOrdenes is Datos, GestorTokens {
 
     // Revertir transacción si falla el depósito de tokens
     if (!respuestaTransferencia) {
-      revert("Fallo en la transferencia de tokens al contrato");
+      revert("O07");
     }
 
     idOrdenAux = keccak256(
@@ -223,29 +217,20 @@ contract GestorOrdenes is Datos, GestorTokens {
   ) public plataformaActiva billeteraActiva returns (bool exito) {
     Orden storage ordenEjecutada = ordenes.archivo[_idOrden];
 
-    require(
-      ordenEjecutada.existe,
-      "La orden a ejecutar no existe o el Id es incorrecto"
-    );
+    require(ordenEjecutada.existe, "O08");
 
     // Comprador diferente a vendedor
-    require(
-      msg.sender != ordenEjecutada.vendedor,
-      "El creador de la orden no puede ejecutar la misma"
-    );
+    require(msg.sender != ordenEjecutada.vendedor, "O09");
 
     // Vendedor activo
     require(
       billeterasRegistradas[ordenEjecutada.vendedor].estado ==
         EstadoGeneral.ACTIVO,
-      "La orden se encuentra bloqueada y no se puede ejecutar"
+      "O10"
     );
 
     // Orden activa
-    require(
-      ordenEjecutada.estado == EstadoOrden.ACTIVA,
-      "La orden ya no se encuentra activa"
-    );
+    require(ordenEjecutada.estado == EstadoOrden.ACTIVA, "O11");
 
     /**************************************************************************/
 
@@ -260,10 +245,7 @@ contract GestorOrdenes is Datos, GestorTokens {
         uint8 decimalesPrecioTokenCompra
       ) = consultarCotizacion(ordenEjecutada.tokenCompra);
 
-      require(
-        precioTokenCompra != 0 && precioTokenVenta != 0,
-        "No se pudo obtener datos de cotizacion"
-      );
+      require(precioTokenCompra != 0 && precioTokenVenta != 0, "T07");
 
       int256 exponenteDecimales;
 
@@ -301,17 +283,11 @@ contract GestorOrdenes is Datos, GestorTokens {
       tokensRegistrados[ordenEjecutada.tokenCompra].contrato
     );
     uint256 saldo = contratoTokenCompra.balanceOf(msg.sender);
-    require(
-      saldo >= ordenEjecutada.montoCompra,
-      "Saldo de token insuficiente para cambiar"
-    );
+    require(saldo >= ordenEjecutada.montoCompra, "O05");
 
     // Credito aprobado suficiente
     uint256 credito = contratoTokenCompra.allowance(msg.sender, address(this));
-    require(
-      credito >= ordenEjecutada.montoCompra,
-      "Saldo aprobado insuficiente para transferir"
-    );
+    require(credito >= ordenEjecutada.montoCompra, "O06");
 
     // Transferir fondos de comprador a vendedor
     bool respuestaTransferencia;
@@ -323,7 +299,7 @@ contract GestorOrdenes is Datos, GestorTokens {
 
     // Revertir transacción si falla el depósito de tokens
     if (!respuestaTransferencia) {
-      revert("Fallo en la transferencia de tokens al vendedor");
+      revert("O12");
     }
 
     // Transferir fondos del contrato a comprador
@@ -337,7 +313,7 @@ contract GestorOrdenes is Datos, GestorTokens {
 
     // Revertir transacción si falla el depósito de tokens
     if (!respuestaTransferencia) {
-      revert("Fallo en la transferencia de tokens al comprador");
+      revert("O13");
     }
 
     /**************************************************************************/
@@ -427,16 +403,10 @@ contract GestorOrdenes is Datos, GestorTokens {
     Orden storage ordenCancelada = ordenes.archivo[_idOrden];
 
     // Solo el creador/vendedor puede cancelar su orden
-    require(
-      msg.sender == ordenCancelada.vendedor,
-      "Solo el creador de la orden puede cancelar misma"
-    );
+    require(msg.sender == ordenCancelada.vendedor, "O14");
 
     // Orden activa
-    require(
-      ordenCancelada.estado == EstadoOrden.ACTIVA,
-      "La orden ya se encuentra cancelada o finalizada"
-    );
+    require(ordenCancelada.estado == EstadoOrden.ACTIVA, "O15");
 
     // Devolver fondos del contrato a vendedor
     ERC20 contratoTokenVenta = ERC20(
@@ -449,7 +419,7 @@ contract GestorOrdenes is Datos, GestorTokens {
 
     // Revertir transacción si falla el depósito de tokens
     if (!respuestaTransferencia) {
-      revert("Fallo en la devolucion de tokens al vendedor");
+      revert("O16");
     }
 
     /**************************************************************************/
@@ -548,7 +518,7 @@ contract GestorOrdenes is Datos, GestorTokens {
 
   function buscarOrden(bytes32 _idOrden) public view returns (Orden memory) {
     Orden storage resultado = ordenes.archivo[_idOrden];
-    require(resultado.existe, "La orden solicitada no existe");
+    require(resultado.existe, "O17");
     return resultado;
   }
 }
