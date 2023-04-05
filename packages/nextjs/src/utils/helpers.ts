@@ -1,8 +1,10 @@
+import MENSAJES_CONTRATO from '@/constants/contract'
 import {
   ERROR_ARGUMENTOS_INVALIDOS,
   ERROR_DESCONOCIDO,
   ERROR_ESTADO_GENERAL_INVALIDO,
   ERROR_ESTADO_ORDEN_INVALIDO,
+  ERROR_LLAMADA_FALLIDA,
   ERROR_ROL_BILLETERA_INVALIDO,
   ERROR_TIPO_ORDEN_INVALIDO,
   ERROR_TX_FALLIDA,
@@ -241,8 +243,8 @@ export function formatErrorMessage(errorRaw: string): string {
     return ERROR_ARGUMENTOS_INVALIDOS
   }
 
-  if (/UNSUPPORTED_OPERATION/.test(errorRaw)) {
-    return ERROR_DESCONOCIDO
+  if (/CALL_EXCEPTION/.test(errorRaw)) {
+    return ERROR_LLAMADA_FALLIDA
   }
 
   if (/UNSUPPORTED_OPERATION/.test(errorRaw)) {
@@ -260,5 +262,5 @@ export function formatErrorMessage(errorRaw: string): string {
   const indexEnd = errorRaw.indexOf("'", indexStart + 1)
   const error = errorRaw.slice(indexStart + 1, indexEnd)
 
-  return error
+  return MENSAJES_CONTRATO[error]
 }

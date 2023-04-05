@@ -21,6 +21,7 @@ async function main() {
     JSON.stringify(deploy),
     'utf-8'
   )
+  writeFileSync(`./deployed/platform.json`, JSON.stringify(deploy), 'utf-8')
 }
 
 // We recommend this pattern to be able to use async/await everywhere

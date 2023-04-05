@@ -58,24 +58,18 @@ contract GestorTokens is Datos {
     assembly {
       size := extcodesize(_contrato) // OBS: es para ayudar determinar la validez de la dirección
     }
-    require(size > 0, "La direccion del contrato es invalida");
+    require(size > 0, "T01");
 
     assembly {
       size := extcodesize(_oraculo)
     }
-    require(size > 0, "La direccion del oraculo es invalida");
-    require(
-      _oraculo != address(0),
-      "La direccion del oraculo no puede ser cero"
-    );
+    require(size > 0, "T02");
+    require(_oraculo != address(0), "T03");
 
     ERC20 contratoToken = ERC20(_contrato);
     string memory ticker = contratoToken.symbol();
 
-    require(
-      !tokensRegistrados[ticker].existe,
-      "El token ya esta registrado en la plataforma"
-    );
+    require(!tokensRegistrados[ticker].existe, "T04");
 
     tokensRegistrados[ticker].ticker = contratoToken.symbol();
     tokensRegistrados[ticker].decimales = contratoToken.decimals();
@@ -104,20 +98,14 @@ contract GestorTokens is Datos {
   ) public soloAdministrador returns (bool resultado) {
     resultado = false;
 
-    require(
-      tokensRegistrados[_ticker].existe,
-      "El token ingresado no esta registrado"
-    );
+    require(tokensRegistrados[_ticker].existe, "T05");
 
     uint256 size;
     assembly {
       size := extcodesize(_oraculo)
     }
-    require(size > 0, "La direccion del oraculo es invalida");
-    require(
-      _oraculo != address(0),
-      "La direccion del oraculo no puede ser cero"
-    );
+    require(size > 0, "T02");
+    require(_oraculo != address(0), "T03");
 
     tokensRegistrados[_ticker].oraculo = _oraculo;
     resultado = true;
@@ -134,10 +122,7 @@ contract GestorTokens is Datos {
   ) public soloAdministrador returns (bool resultado) {
     resultado = false;
 
-    require(
-      tokensRegistrados[_ticker].existe,
-      "El token ingresado no esta registrado"
-    );
+    require(tokensRegistrados[_ticker].existe, "T05");
 
     tokensRegistrados[_ticker].estado = EstadoGeneral.SUSPENDIDO;
     tokensCantidadActivos--;
@@ -154,10 +139,7 @@ contract GestorTokens is Datos {
   ) public soloAdministrador returns (bool resultado) {
     resultado = false;
 
-    require(
-      tokensRegistrados[_ticker].existe,
-      "El token ingresado no esta registrado"
-    );
+    require(tokensRegistrados[_ticker].existe, "T05");
 
     tokensRegistrados[_ticker].estado = EstadoGeneral.ACTIVO;
     tokensCantidadActivos++;
@@ -173,10 +155,7 @@ contract GestorTokens is Datos {
   function consultarCotizacion(
     string memory _ticker
   ) public view returns (int256 precio, uint8 decimales) {
-    require(
-      tokensRegistrados[_ticker].existe,
-      "El token ingresado no esta registrado"
-    );
+    require(tokensRegistrados[_ticker].existe, "T05");
 
     AggregatorV3Interface oraculo = AggregatorV3Interface(
       tokensRegistrados[_ticker].oraculo
@@ -207,7 +186,7 @@ contract GestorTokens is Datos {
     require(
       tokensRegistrados[_tokenCompra].existe &&
         tokensRegistrados[_tokenVenta].existe,
-      "Los tokens no son validos o no estan registrados"
+      "T06"
     );
 
     (
@@ -220,10 +199,7 @@ contract GestorTokens is Datos {
       uint8 decimalesPrecioTokenCompra
     ) = consultarCotizacion(_tokenCompra);
 
-    require(
-      precioTokenCompra != 0 && precioTokenVenta != 0,
-      "No se pudo obtener datos de cotizacion"
-    );
+    require(precioTokenCompra != 0 && precioTokenVenta != 0, "T07");
 
     int256 exponenteDecimales;
 

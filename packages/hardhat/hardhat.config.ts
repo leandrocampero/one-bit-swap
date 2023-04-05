@@ -13,6 +13,7 @@ const config: HardhatUserConfig = {
     settings: {
       optimizer: {
         enabled: true,
+        runs: 200,
       },
     },
   },
@@ -41,7 +42,9 @@ const config: HardhatUserConfig = {
     },
   },
   etherscan: {
-    apiKey: `${POLYGON_API_KEY}`,
+    apiKey: {
+      polygonMumbai: `${POLYGON_API_KEY}`,
+    },
   },
   paths: {
     tests: './test',
@@ -50,7 +53,7 @@ const config: HardhatUserConfig = {
     path: './../nextjs/src/contracts/',
     runOnCompile: true,
     clear: true,
-    only: [':Plataforma$', ':ERC20$'],
+    only: [':Plataforma$', ':ERC20$', ':ERC20Mock'],
     format: 'json',
   },
 }
