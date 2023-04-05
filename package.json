@@ -14,6 +14,7 @@
     "compile": "yarn workspace @one-bit-swap/hardhat compile",
     "deploy": "yarn workspace @one-bit-swap/hardhat deploy",
     "deploy-fill": "yarn workspace @one-bit-swap/hardhat fill",
+    "deploy-faucets": "yarn workspace @one-bit-swap/hardhat faucets",
     "dev": "yarn workspace @one-bit-swap/nextjs dev",
     "build": "yarn workspace @one-bit-swap/nextjs build",
     "start": "yarn workspace @one-bit-swap/nextjs start",

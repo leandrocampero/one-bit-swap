@@ -1,13 +1,18 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { writeFileSync } from 'fs'
 import { ethers } from 'hardhat'
+import prettier from 'prettier'
 import {
   ERC20Mock,
   ERC20Mock__factory,
   Plataforma,
   Plataforma__factory,
 } from '../typechain-types/'
-import { formatArrayOrdenes, showConsoleTable } from '../utils/helpers'
+import {
+  formatArrayOrdenes,
+  formatArrayTokens,
+  showConsoleTable,
+} from '../utils/helpers'
 
 /*******************************************************************************
 
@@ -30,7 +35,7 @@ interface IOrdenInput {
   vendedorIndice: number
 }
 
-const CANTIDAD_ORDENES = 100
+const CANTIDAD_ORDENES = 0
 
 const ORACULOS = {
   TOKEN_USDT_ORACULO: '0x92C09849638959196E976289418e5973CC96d645',
@@ -110,7 +115,7 @@ async function main() {
 
   for (const token of TOKENS) {
     const contract = (await ERC20Factory.deploy(
-      `${token} Token Mock`,
+      `${token} Token Mock - OBS`,
       token,
       billeteras[0].address,
       ethers.utils.parseEther('1000000')
@@ -269,6 +274,18 @@ async function main() {
   writeFileSync(
     './../nextjs/src/contracts/deploy.json',
     JSON.stringify(deploy),
+    'utf-8'
+  )
+
+  const faucets = formatArrayTokens(await plataforma.listarTokens(true))
+
+  const faucetsFormated = prettier.format(JSON.stringify(faucets), {
+    parser: 'json',
+  })
+
+  writeFileSync(
+    './../nextjs/src/contracts/tokens.json',
+    faucetsFormated,
     'utf-8'
   )
 }
