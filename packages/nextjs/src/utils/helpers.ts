@@ -1,3 +1,4 @@
+import MENSAJES_CONTRATO from '@/constants/contract'
 import {
   ERROR_ARGUMENTOS_INVALIDOS,
   ERROR_DESCONOCIDO,
@@ -261,5 +262,5 @@ export function formatErrorMessage(errorRaw: string): string {
   const indexEnd = errorRaw.indexOf("'", indexStart + 1)
   const error = errorRaw.slice(indexStart + 1, indexEnd)
 
-  return error
+  return MENSAJES_CONTRATO[error]
 }
