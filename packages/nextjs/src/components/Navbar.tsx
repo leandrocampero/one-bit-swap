@@ -1,6 +1,7 @@
 import { useBlockchainContext } from '@/context/BlockchainProvider'
 import { useSessionContext } from '@/context/SessionProvider'
-import { Estados, RolesBilleteras, Token } from '@/types.d'
+import tokens from '@/contracts/tokens.json'
+import { RolesBilleteras, Token } from '@/types.d'
 import CloseIcon from '@mui/icons-material/Close'
 import SettingsIcon from '@mui/icons-material/Settings'
 import {
@@ -44,7 +45,7 @@ const Transition = forwardRef(function Transition(
 export default function Navbar() {
   const { disconnect, connected, addAsset } = useSessionContext()
   const { getters, actions } = useBlockchainContext()
-  const { sesion, transaccion, tokens } = getters
+  const { sesion, transaccion } = getters
   const { emitirTokens, consultarCredito, aprobarDeposito } = actions
 
   const [showModal, setShowModal] = useState<boolean>(false)
@@ -54,11 +55,11 @@ export default function Navbar() {
   /****************************************************************************/
 
   const mapTokens = useMemo((): { [key: string]: Token } => {
-    return tokens.datos.reduce(
+    return tokens.reduce(
       (objeto, token) => ({ ...objeto, [token.contrato]: { ...token } }),
       {}
     )
-  }, [tokens.datos])
+  }, [])
 
   const handleOpenModal = useCallback(() => {
     setShowModal(true)
@@ -155,16 +156,14 @@ export default function Navbar() {
                 '.MuiSelect-select': { display: 'flex', alignItems: 'center' },
               }}
             >
-              {tokens.datos
-                .filter((token: Token) => token.estado === Estados.activo)
-                .map((token: Token) => (
-                  <MenuItem key={token.ticker} value={token.contrato}>
-                    <SelectIcon ticker={token.ticker} />
-                    <Typography variant="body1" color="initial" marginLeft={1}>
-                      {token.ticker}
-                    </Typography>
-                  </MenuItem>
-                ))}
+              {tokens.map((token) => (
+                <MenuItem key={token.ticker} value={token.contrato}>
+                  <SelectIcon ticker={token.ticker} />
+                  <Typography variant="body1" color="initial" marginLeft={1}>
+                    {token.ticker}
+                  </Typography>
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
 
@@ -230,7 +229,7 @@ export default function Navbar() {
                   <span>
                     {`La billetera tiene ${ethers.utils
                       .formatUnits(allowance)
-                      .toString()} tokens aprobados. Pero se puede aprobar más si lo desea`}
+                      .toString()} tokens aprobados.`}
                   </span>
                 )}
               </Typography>
