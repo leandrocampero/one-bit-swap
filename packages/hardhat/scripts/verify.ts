@@ -1,11 +1,14 @@
 import hre from 'hardhat'
+import deploy from './deployed/platform.json'
 
 export async function main() {
+  console.log(`Verificando contrato de plataforma`)
   await hre.run('verify:verify', {
-    address: '0xA3e6Fbe2707A7217Be8B4876979E77754FE88259',
+    address: deploy.platform,
     constructorArguments: [5],
     contract: 'contracts/Plataforma.sol:Plataforma',
   })
+  console.log(`Verificación completa`)
 }
 
 main()

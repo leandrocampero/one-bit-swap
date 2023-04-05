@@ -20,11 +20,8 @@ contract GestorBilleteras is Datos {
     assembly {
       size := extcodesize(_billetera)
     }
-    require(size == 0, "La billetera es invalida");
-    require(
-      _billetera != address(0),
-      "La direccion de la billetera no puede ser cero"
-    );
+    require(size == 0, "B01");
+    require(_billetera != address(0), "B02");
 
     return billetera;
   }
@@ -57,7 +54,7 @@ contract GestorBilleteras is Datos {
    * @notice convertir una billetera en administrador
    * @param _billetera dirección de la billetera a convertr
    * @return modificado indica si la operación fué exitosa o no
-   * @dev si la billetera no existe, la registra con rol administrador
+   * @dev si B05, la registra con rol administrador
    */
   function hacerAdministrador(
     address _billetera
@@ -68,21 +65,15 @@ contract GestorBilleteras is Datos {
     assembly {
       size := extcodesize(_billetera)
     }
-    require(size == 0, "La billetera es invalida");
+    require(size == 0, "B01");
 
-    require(
-      _billetera != plataforma.propietario,
-      "No se puede cambiar el rol al propietario"
-    );
+    require(_billetera != plataforma.propietario, "B03");
 
-    require(
-      _billetera != address(0),
-      "La direccion de la billetera no puede ser cero"
-    );
+    require(_billetera != address(0), "B02");
 
     require(
       billeterasRegistradas[_billetera].rol != RolBilletera.ADMINISTRADOR,
-      "La billetera ya tiene rol de administrador"
+      "B04"
     );
 
     billeterasRegistradas[_billetera].rol = RolBilletera.ADMINISTRADOR;
@@ -118,17 +109,14 @@ contract GestorBilleteras is Datos {
     assembly {
       size := extcodesize(_billetera)
     }
-    require(size == 0, "La billetera es invalida");
-    require(
-      _billetera != address(0),
-      "La direccion de la billetera no puede ser cero"
-    );
+    require(size == 0, "B01");
+    require(_billetera != address(0), "B02");
 
-    require(billeterasRegistradas[_billetera].existe, "La billetera no existe");
+    require(billeterasRegistradas[_billetera].existe, "B05");
 
     require(
       billeterasRegistradas[_billetera].rol == RolBilletera.ADMINISTRADOR,
-      "La billetera no tiene rol administrador"
+      "B06"
     );
 
     billeterasRegistradas[_billetera].rol = RolBilletera.USUARIO;
@@ -181,7 +169,7 @@ contract GestorBilleteras is Datos {
    * @notice bloquear una billetera
    * @param _billetera dirección de la billetera a bloquear
    * @return modificado indica si la operación fué exitosa o no
-   * @dev si la billetera no existe, la registra bloqueada con rol usuario
+   * @dev si B05, la registra bloqueada con rol usuario
    */
   function bloquearBilletera(
     address _billetera
@@ -192,20 +180,14 @@ contract GestorBilleteras is Datos {
     assembly {
       size := extcodesize(_billetera)
     }
-    require(size == 0, "La billetera es invalida");
-    require(
-      _billetera != address(0),
-      "La direccion de la billetera no puede ser cero"
-    );
+    require(size == 0, "B01");
+    require(_billetera != address(0), "B02");
 
-    require(
-      _billetera != plataforma.propietario,
-      "No se puede bloquear al propietario"
-    );
+    require(_billetera != plataforma.propietario, "B07");
 
     require(
       billeterasRegistradas[_billetera].estado == EstadoGeneral.ACTIVO,
-      "La billetera ya se encuentra bloqueada"
+      "B08"
     );
 
     billeterasRegistradas[_billetera].estado = EstadoGeneral.SUSPENDIDO;
@@ -241,17 +223,14 @@ contract GestorBilleteras is Datos {
     assembly {
       size := extcodesize(_billetera)
     }
-    require(size == 0, "La billetera es invalida");
-    require(
-      _billetera != address(0),
-      "La direccion de la billetera no puede ser cero"
-    );
+    require(size == 0, "B01");
+    require(_billetera != address(0), "B02");
 
-    require(billeterasRegistradas[_billetera].existe, "La billetera no existe");
+    require(billeterasRegistradas[_billetera].existe, "B05");
 
     require(
       billeterasRegistradas[_billetera].estado == EstadoGeneral.SUSPENDIDO,
-      "La billetera ya se encuentra activa"
+      "B09"
     );
 
     billeterasRegistradas[_billetera].estado = EstadoGeneral.ACTIVO;

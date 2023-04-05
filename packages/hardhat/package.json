@@ -11,6 +11,9 @@
     "chain": "hardhat node",
     "compile": "hardhat compile",
     "deploy": "hardhat run scripts/deploy.ts",
+    "faucets": "hardhat run scripts/faucets.ts",
+    "verify:platform": "hardhat run scripts/verify.ts",
+    "verify:faucets": "hardhat run scripts/verifyFaucets.ts",
     "fill": "hardhat run scripts/fill.ts --network localhost",
     "test": "hardhat test --network localhost"
   },

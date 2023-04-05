@@ -123,3 +123,8 @@ function simpleAddress(address: string): string {
   const last4char = address.slice(-4)
   return `${first6char}..${last4char}`
 }
+
+export async function sleep() {
+  const sleep = new Promise((resolve) => setTimeout(resolve, 5000))
+  await sleep
+}

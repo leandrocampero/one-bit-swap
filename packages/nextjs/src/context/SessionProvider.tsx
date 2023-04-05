@@ -10,7 +10,7 @@
 //                                                                          //
 //**************************************************************************//
 import networks from '@/contracts/networks'
-import { AppProps } from '@/types'
+import { AppProps, Token } from '@/types'
 import { Web3Provider } from '@ethersproject/providers'
 import { useWeb3React } from '@web3-react/core'
 import { InjectedConnector } from '@web3-react/injected-connector'
@@ -45,6 +45,7 @@ export type SessionContextProps = {
   connect: () => Promise<void>
   disconnect: () => Promise<void>
   changeNetwork: () => Promise<void>
+  addAsset: (token: Token) => Promise<void>
 }
 
 //**************************************************************************//
@@ -236,6 +237,30 @@ export const SessionProvider = (props: AppProps) => {
     }
   }, [deactivate, borrarSesion])
 
+  const addAsset = useCallback(
+    async (token: Token) => {
+      try {
+        const connector = setupInjectedConnector()
+        const provider = await connector.getProvider()
+
+        await provider.request({
+          method: 'wallet_watchAsset',
+          params: {
+            type: 'ERC20', // Initially only supports ERC20, but eventually more!
+            options: {
+              address: token.contrato, // The address that the token is at.
+              symbol: `${token.ticker}-OBS`, // A ticker symbol or shorthand, up to 5 chars.
+              decimals: token.decimales, // The number of decimals in the token
+            },
+          },
+        })
+      } catch (error: any) {
+        newAlert('error', error.message)
+      }
+    },
+    [setupInjectedConnector, newAlert]
+  )
+
   //**************************************************************************//
   //                                                                          //
   //          #######                                                         //
@@ -335,6 +360,7 @@ export const SessionProvider = (props: AppProps) => {
         connect,
         disconnect,
         changeNetwork,
+        addAsset,
       }}
     >
       {props.children}

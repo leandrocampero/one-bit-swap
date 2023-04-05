@@ -20,20 +20,14 @@ contract Plataforma is Datos, GestorTokens, GestorBilleteras, GestorOrdenes {
   }
 
   function bloquearPlataforma() public soloPropietario returns (bool) {
-    require(
-      plataforma.estado == EstadoGeneral.ACTIVO,
-      "La plataforma ya se encuentra bloqueada"
-    );
+    require(plataforma.estado == EstadoGeneral.ACTIVO, "P05");
 
     plataforma.estado = EstadoGeneral.SUSPENDIDO;
     return true;
   }
 
   function desbloquearPlataforma() public soloPropietario returns (bool) {
-    require(
-      plataforma.estado == EstadoGeneral.SUSPENDIDO,
-      "La plataforma ya se encuentra activa"
-    );
+    require(plataforma.estado == EstadoGeneral.SUSPENDIDO, "P06");
 
     plataforma.estado = EstadoGeneral.ACTIVO;
     return true;
@@ -42,7 +36,7 @@ contract Plataforma is Datos, GestorTokens, GestorBilleteras, GestorOrdenes {
   function establecerMontoMinimo(
     uint256 _monto
   ) public soloAdministrador plataformaActiva returns (bool) {
-    require(_monto > 0, "El monto nuevo no puede ser cero");
+    require(_monto > 0, "P07");
 
     plataforma.montoMinimoUSD = _monto;
     return true;

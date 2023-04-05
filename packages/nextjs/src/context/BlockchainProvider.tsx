@@ -14,7 +14,9 @@ import {
   ERROR_AUTENTICAR_BILLETERA,
   ERROR_BILLETERA_SUSPENDIDA,
   ERROR_NO_CONTRACT_ADDRESS,
+  ERROR_NO_FAUCET_ADDRESS,
   ERROR_NO_SIGNER,
+  ERROR_NO_TOKEN_ADDRESS,
 } from '@/constants/mensajes'
 import {
   administradoresReducer,
@@ -34,6 +36,8 @@ import {
   SESION_INITIAL_STATE,
   TRANSACCION_INITIAL_STATE,
 } from '@/context/context.d'
+import ERC20 from '@/contracts/@openzeppelin/contracts/token/ERC20/ERC20.sol/ERC20.json'
+import ERC20Mock from '@/contracts/contracts/ERC20Mock.sol/ERC20Mock.json'
 import Plataforma from '@/contracts/contracts/Plataforma.sol/Plataforma.json'
 import deploy from '@/contracts/deploy.json'
 import { AppProps, Estados, Orden, TiposOrdenes } from '@/types.d'
@@ -46,8 +50,12 @@ import {
   sleep,
 } from '@/utils/helpers'
 import { JsonRpcSigner } from '@ethersproject/providers'
-import { Plataforma as ContratoPlataforma } from '@one-bit-swap/hardhat/typechain-types/'
-import { ethers } from 'ethers'
+import {
+  ERC20Mock as ContratoFaucet,
+  Plataforma as ContratoPlataforma,
+  ERC20 as ContratoToken,
+} from '@one-bit-swap/hardhat/typechain-types/'
+import { BigNumber, ethers } from 'ethers'
 import {
   createContext,
   useCallback,
@@ -72,6 +80,7 @@ import { useAlertContext } from './AlertProvider'
 //**************************************************************************//
 
 const ORDENES_OFFSET = 20
+const FAUCET_AMOUNT = '1000'
 
 type BlockchainContextProps = {
   actions: BlockchainActions
@@ -184,6 +193,48 @@ export const BlockchainProvider = (props: AppProps) => {
       return newContract
     },
     [contract, signer, contractAddress]
+  )
+
+  const setupFaucet = useCallback(
+    (contractAddress: string): ContratoFaucet => {
+      if (!signer) {
+        throw new Error(ERROR_NO_SIGNER)
+      }
+
+      if (!contractAddress) {
+        throw new Error(ERROR_NO_FAUCET_ADDRESS)
+      }
+
+      const contrato = new ethers.Contract(
+        contractAddress,
+        ERC20Mock,
+        signer
+      ) as ContratoFaucet
+
+      return contrato
+    },
+    [signer]
+  )
+
+  const setupTokenContract = useCallback(
+    (contractAddress: string): ContratoToken => {
+      if (!signer) {
+        throw new Error(ERROR_NO_SIGNER)
+      }
+
+      if (!contractAddress) {
+        throw new Error(ERROR_NO_TOKEN_ADDRESS)
+      }
+
+      const contrato = new ethers.Contract(
+        contractAddress,
+        ERC20,
+        signer
+      ) as ContratoToken
+
+      return contrato
+    },
+    [signer]
   )
 
   //**************************************************************************//
@@ -541,6 +592,85 @@ export const BlockchainProvider = (props: AppProps) => {
       }
     },
     [setupContract]
+  )
+
+  const emitirTokens = useCallback(
+    async (contratoToken: string) => {
+      reduceTransaccion({
+        type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO,
+      })
+      await sleep()
+
+      try {
+        const faucet = setupFaucet(contratoToken)
+        const receipt = await faucet.mint(
+          sesion.datos.direccion,
+          ethers.utils.parseUnits(FAUCET_AMOUNT).toString()
+        )
+        await receipt.wait()
+
+        reduceTransaccion({
+          type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA,
+        })
+        newAlert('success', 'Operación exitosa')
+      } catch (error: any) {
+        newAlert('error', formatErrorMessage(error.message))
+
+        reduceTransaccion({
+          type: ReducerActionType.MARCAR_TRANSACCION_FALLIDA,
+          payload: formatErrorMessage(error.message),
+        })
+      }
+    },
+    [setupFaucet, newAlert, sesion.datos.direccion]
+  )
+
+  const aprobarDeposito = useCallback(
+    async (contratoToken: string) => {
+      reduceTransaccion({
+        type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO,
+      })
+      await sleep()
+
+      try {
+        const faucet = setupTokenContract(contratoToken)
+        const receipt = await faucet.approve(
+          contractAddress,
+          ethers.utils.parseUnits(FAUCET_AMOUNT)
+        )
+        await receipt.wait()
+
+        reduceTransaccion({
+          type: ReducerActionType.MARCAR_TRANSACCION_REALIZADA,
+        })
+        newAlert('success', 'Operación exitosa')
+      } catch (error: any) {
+        newAlert('error', formatErrorMessage(error.message))
+
+        reduceTransaccion({
+          type: ReducerActionType.MARCAR_TRANSACCION_FALLIDA,
+          payload: formatErrorMessage(error.message),
+        })
+      }
+    },
+    [setupTokenContract, contractAddress, newAlert]
+  )
+
+  const consultarCredito = useCallback(
+    async (contratoToken: string): Promise<BigNumber> => {
+      try {
+        const contract = setupTokenContract(contratoToken)
+        const credito = await contract.allowance(
+          sesion.datos.direccion,
+          contractAddress
+        )
+
+        return credito
+      } catch (error: any) {
+        return BigNumber.from('0')
+      }
+    },
+    [setupTokenContract, contractAddress, sesion.datos.direccion]
   )
 
   //**************************************************************************//
@@ -989,6 +1119,9 @@ export const BlockchainProvider = (props: AppProps) => {
     autenticarBilletera,
     borrarSesion,
     consultarCotizacion,
+    emitirTokens,
+    aprobarDeposito,
+    consultarCredito,
   } as BlockchainActions
 
   const getters: BlockchainGetters = {

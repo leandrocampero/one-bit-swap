@@ -215,7 +215,7 @@ export default function TarjetaOrden({
         </Grid>
 
         {ordenComputada.estado !== EstadosOrdenes.activa && (
-          <Grid xs={12} marginTop={1}>
+          <Grid item xs={12} marginTop={1}>
             <Divider sx={{ marginY: 1 }} />
             <Typography variant="caption" component="div">
               {`Finalizada en ${fechaFinalizacion.toLocaleString()}`}
