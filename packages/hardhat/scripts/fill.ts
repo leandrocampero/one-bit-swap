@@ -35,7 +35,7 @@ interface IOrdenInput {
   vendedorIndice: number
 }
 
-const CANTIDAD_ORDENES = 0
+const CANTIDAD_ORDENES = 100
 
 const ORACULOS = {
   TOKEN_USDT_ORACULO: '0x92C09849638959196E976289418e5973CC96d645',

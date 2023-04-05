@@ -13,6 +13,7 @@ const config: HardhatUserConfig = {
     settings: {
       optimizer: {
         enabled: true,
+        runs: 200,
       },
     },
   },
@@ -41,7 +42,9 @@ const config: HardhatUserConfig = {
     },
   },
   etherscan: {
-    apiKey: `${POLYGON_API_KEY}`,
+    apiKey: {
+      polygonMumbai: `${POLYGON_API_KEY}`,
+    },
   },
   paths: {
     tests: './test',

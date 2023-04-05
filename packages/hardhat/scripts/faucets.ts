@@ -4,6 +4,7 @@ import { ethers } from 'hardhat'
 import prettier from 'prettier'
 import 'typechain'
 import { ERC20Mock, ERC20Mock__factory } from '../typechain-types'
+import { sleep } from '../utils/helpers'
 dotenv.config()
 
 const { OWNER_PUBLIC_KEY } = process.env
@@ -42,6 +43,7 @@ async function main() {
     tokensData.push({ contrato: address, ticker: symbol, decimales: decimals })
 
     console.log(`Faucet de ${token} desplegado en ${contract.address}`)
+    await sleep()
   }
 
   const faucetsFormated = prettier.format(JSON.stringify(tokensData), {
@@ -53,6 +55,10 @@ async function main() {
     faucetsFormated,
     'utf-8'
   )
+
+  await sleep()
+
+  writeFileSync(`./deployed/tokens.json`, faucetsFormated, 'utf-8')
 }
 
 // We recommend this pattern to be able to use async/await everywhere
