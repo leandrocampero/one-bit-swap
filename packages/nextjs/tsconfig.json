@@ -18,7 +18,8 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "types": ["./src/context/context.d.ts", "./src/types.d.ts"]
+    "typeRoots": [],
+    "types": []
   },
   "include": [
     "next-env.d.ts",
