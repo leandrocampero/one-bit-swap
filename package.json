@@ -19,6 +19,7 @@
     "verify-faucets": "yarn workspace @one-bit-swap/hardhat verify:faucets",
     "dev": "yarn workspace @one-bit-swap/nextjs dev",
     "build": "yarn workspace @one-bit-swap/nextjs build",
+    "export": "yarn workspace @one-bit-swap/nextjs next export",
     "start": "yarn workspace @one-bit-swap/nextjs start",
     "test:contracts": "yarn workspace @one-bit-swap/hardhat test",
     "test:client": "yarn workspace @one-bit-swap/nextjs test"
