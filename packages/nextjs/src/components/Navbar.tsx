@@ -268,7 +268,7 @@ export default function Navbar() {
               >
                 <Grid item marginRight="auto">
                   <Typography variant="h4" noWrap>
-                    <Link href={connected ? '/' : '/conectar'}>OneBitSwap</Link>
+                    <Link href={connected ? '/' : '/conectar'}>P2PSwap</Link>
                   </Typography>
                 </Grid>
 
