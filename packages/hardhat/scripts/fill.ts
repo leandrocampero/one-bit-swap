@@ -243,7 +243,7 @@ async function main() {
     }
   }
 
-  // agrega adminsitradores
+  // agrega administradores
   await plataforma.hacerAdministrador(
     '0xB6101E241Df60EAF1b3735f6D73c511602fb8453'
   ) // Leandro

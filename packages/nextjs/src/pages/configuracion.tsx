@@ -1,6 +1,6 @@
 import { ContainerBox } from '@/components/common/styles'
 import BaseLayout from '@/components/layout/BaseLayout'
-import VistaAdminsitrador from '@/components/VistaAdminsitrador'
+import VistaAdministrador from '@/components/VistaAdministrador'
 import { Box } from '@mui/material'
 
 export default function configuracion() {
@@ -15,7 +15,7 @@ export default function configuracion() {
           flexDirection: 'column',
         }}
       >
-        <VistaAdminsitrador />
+        <VistaAdministrador />
       </Box>
     </BaseLayout>
   )
