@@ -36,10 +36,7 @@ export default function Conectar() {
   return (
     <BaseLayout style={FlexBox}>
       <Card elevation={5} sx={ActionBox}>
-        <CardHeader
-          title="OneBitSwap"
-          subheader="Conectar billetera para usar"
-        />
+        <CardHeader title="P2PSwap" subheader="Conectar billetera para usar" />
         <Divider />
         <CardContent>
           {switchNetwork ? (

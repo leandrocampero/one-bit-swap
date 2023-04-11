@@ -37,7 +37,7 @@ export enum NavMenu {
   configuracion = 'Configuración',
   administradores = 'Administradores',
   tokens = 'Tokens',
-  billeterasSuspendidas = 'Billeteras Suspendidas',
+  billeterasBloqueadas = 'Billeteras Bloqueadas',
 }
 
 export enum Acciones {

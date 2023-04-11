@@ -36,7 +36,7 @@ const Transition = forwardRef(function Transition(
   return <Slide direction="up" ref={ref} {...props} />
 })
 
-export default function VistaBilleterasSuspendidas() {
+export default function VistaBilleterasBloqueadas() {
   const { getters, actions } = useBlockchainContext()
   const { bloqueados, transaccion, sesion } = getters
   const { cargarBloqueados, desbloquearBilletera, bloquearBilletera } = actions

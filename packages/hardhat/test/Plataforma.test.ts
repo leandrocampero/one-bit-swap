@@ -22,7 +22,7 @@ const ORACULO_WETH = '0x0715A7794a1dc8e42615F059dD6e406A6594651A'
 const CONTRATO_DAI = '0xd393b1E02dA9831Ff419e22eA105aAe4c47E1253'
 const ORACULO_DAI = '0x0FCAa9c899EC5A91eBc3D5Dd869De833b06fB046'
 
-describe('OneBitSwap', function () {
+describe('P2PSwap', function () {
   let propietario: SignerWithAddress,
     administrador: SignerWithAddress,
     usuario: SignerWithAddress,
