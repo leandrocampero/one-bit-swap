@@ -75,7 +75,7 @@ export default function ListarOrdenes() {
   const [preMontoMaximo, setPreMontoMaximo] = useState<number | undefined>()
   const [timeOut, setTimeOut] = useState<NodeJS.Timeout | undefined>(undefined)
 
-  const { ordenes, tokens, transaccion } = getters
+  const { ordenes, tokens, transaccion, sesion } = getters
   const {
     cargarOrdenesActivas,
     consultarCotizacion,
@@ -240,6 +240,9 @@ export default function ListarOrdenes() {
           key={orden.idOrden}
           orden={orden}
           sx={{ ...(index !== 0 && { marginTop: 3 }) }}
+          deshabilitarAccion={
+            tab === 0 && sesion.datos.direccion === orden.vendedor
+          }
           onAccion={handleOpenModal}
         />
       ))
@@ -250,6 +253,7 @@ export default function ListarOrdenes() {
     tokenVenta,
     tipoOrden,
     tab,
+    sesion,
     handleOpenModal,
   ])
 

@@ -19,12 +19,14 @@ import SelectIcon from '../common/SelectIcon'
 
 export interface TarjetaOrdenProps extends CardProps {
   orden: Orden
+  deshabilitarAccion: boolean
   onAccion: (idOrden: string, accion: 'ejecutar' | 'cancelar') => Promise<void>
 }
 
 export default function TarjetaOrden({
   orden,
   sx,
+  deshabilitarAccion,
   onAccion,
 }: TarjetaOrdenProps) {
   const { getters } = useBlockchainContext()
@@ -190,28 +192,29 @@ export default function TarjetaOrden({
         </Grid>
 
         <Grid item xs={3} display="flex" justifyContent="end">
-          {ordenComputada.estado === EstadosOrdenes.activa ? (
-            esPropia ? (
-              <Button
-                variant="contained"
-                color="error"
-                onClick={() => onAccion(ordenComputada.idOrden, 'cancelar')}
-              >
-                Cancelar
-              </Button>
+          {!deshabilitarAccion &&
+            (ordenComputada.estado === EstadosOrdenes.activa ? (
+              esPropia ? (
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={() => onAccion(ordenComputada.idOrden, 'cancelar')}
+                >
+                  Cancelar
+                </Button>
+              ) : (
+                <Button
+                  variant="contained"
+                  color="success"
+                  disabled={ordenComputada.vendedor === sesion.datos.direccion}
+                  onClick={() => onAccion(ordenComputada.idOrden, 'ejecutar')}
+                >
+                  Ejecutar
+                </Button>
+              )
             ) : (
-              <Button
-                variant="contained"
-                color="success"
-                disabled={ordenComputada.vendedor === sesion.datos.direccion}
-                onClick={() => onAccion(ordenComputada.idOrden, 'ejecutar')}
-              >
-                Ejecutar
-              </Button>
-            )
-          ) : (
-            badge
-          )}
+              badge
+            ))}
         </Grid>
 
         {ordenComputada.estado !== EstadosOrdenes.activa && (
