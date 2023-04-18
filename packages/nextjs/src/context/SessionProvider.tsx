@@ -118,7 +118,7 @@ export const SessionProvider = (props: AppProps) => {
     })
 
     window.ethereum.on('chainChanged', async (chainIdHex: string) => {
-      const mode = process.env.NODE_ENV as keyof typeof networks
+      const mode = process.env.NETWORK_MODE as keyof typeof networks
       const networkToSwitch = networks[mode]
       const { chainId: expectedNetwork } = networkToSwitch
 
@@ -138,7 +138,7 @@ export const SessionProvider = (props: AppProps) => {
     const currentNetwork = await connector.getChainId()
 
     // Red esperada
-    const mode = process.env.NODE_ENV as keyof typeof networks
+    const mode = process.env.NETWORK_MODE as keyof typeof networks
     const networkToSwitch = networks[mode]
     const { chainId: expectedNetwork } = networkToSwitch
 
@@ -150,7 +150,7 @@ export const SessionProvider = (props: AppProps) => {
    */
   const changeNetwork = useCallback(async () => {
     try {
-      const mode = process.env.NODE_ENV as keyof typeof networks
+      const mode = process.env.NETWORK_MODE as keyof typeof networks
       const networkToSwitch = networks[mode]
       const { chainId, blockExplorerUrls, chainName, nativeCurrency, rpcUrls } =
         networkToSwitch

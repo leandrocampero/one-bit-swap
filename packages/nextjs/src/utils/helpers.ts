@@ -191,7 +191,7 @@ export function simpleAddress(address: string): string {
 }
 
 export async function sleep() {
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NETWORK_MODE === 'hardhat') {
     const sleep = new Promise((resolve) => setTimeout(resolve, 1000))
     await sleep
   }

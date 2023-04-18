@@ -1,5 +1,5 @@
 const networks = {
-  development: {
+  hardhat: {
     chainId: `0x${Number(31337).toString(16)}`,
     rpcUrls: [`http://127.0.0.1:8545/`],
     chainName: 'Hardhat Network (Mumbai Local Fork)',
@@ -10,7 +10,7 @@ const networks = {
     },
     blockExplorerUrls: ['https://mumbai.polygonscan.com/'],
   },
-  production: {
+  mumbai: {
     chainId: `0x${Number(80001).toString(16)}`,
     rpcUrls: [
       `https://polygon-mumbai.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
