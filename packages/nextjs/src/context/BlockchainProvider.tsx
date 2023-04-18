@@ -12,7 +12,6 @@
 
 import {
   ERROR_AUTENTICAR_BILLETERA,
-  ERROR_BILLETERA_SUSPENDIDA,
   ERROR_NO_CONTRACT_ADDRESS,
   ERROR_NO_FAUCET_ADDRESS,
   ERROR_NO_SIGNER,
@@ -40,7 +39,7 @@ import ERC20 from '@/contracts/@openzeppelin/contracts/token/ERC20/ERC20.sol/ERC
 import ERC20Mock from '@/contracts/contracts/ERC20Mock.sol/ERC20Mock.json'
 import Plataforma from '@/contracts/contracts/Plataforma.sol/Plataforma.json'
 import deploy from '@/contracts/deploy.json'
-import { AppProps, Estados, Orden, TiposOrdenes } from '@/types.d'
+import { AppProps, Orden, TiposOrdenes } from '@/types.d'
 import {
   formatArrayBilleteras,
   formatArrayOrdenes,
@@ -1005,9 +1004,9 @@ export const BlockchainProvider = (props: AppProps) => {
 
         const { estado, rol } = billetera
 
-        if (estado === Estados.suspendido) {
-          throw new Error(ERROR_BILLETERA_SUSPENDIDA)
-        }
+        // if (estado === Estados.suspendido) {
+        //   throw new Error(ERROR_BILLETERA_SUSPENDIDA)
+        // }
 
         reduceSesion({
           type: ReducerActionType.GUARDAR_DATOS,
