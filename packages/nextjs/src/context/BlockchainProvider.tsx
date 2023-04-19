@@ -19,10 +19,10 @@ import {
 } from '@/constants/mensajes'
 import {
   administradoresReducer,
-  bloqueadosReducer,
   ordenesReducer,
   plataformaReducer,
   sesionReducer,
+  suspendidosReducer,
   tokensReducer,
   transaccionReducer,
 } from '@/context/blockchainReducer'
@@ -132,8 +132,8 @@ export const BlockchainProvider = (props: AppProps) => {
     DATOS_INITIAL_STATE
   )
 
-  const [bloqueados, reduceBloqueados] = useReducer(
-    bloqueadosReducer,
+  const [suspendidos, reduceSuspendidos] = useReducer(
+    suspendidosReducer,
     DATOS_INITIAL_STATE
   )
 
@@ -711,7 +711,7 @@ export const BlockchainProvider = (props: AppProps) => {
     }
   }, [setupContract, newAlert])
 
-  const bloquearPlataforma = useCallback(async () => {
+  const suspenderPlataforma = useCallback(async () => {
     reduceTransaccion({
       type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO,
     })
@@ -736,7 +736,7 @@ export const BlockchainProvider = (props: AppProps) => {
     }
   }, [setupContract, newAlert])
 
-  const desbloquearPlataforma = useCallback(async () => {
+  const activarPlataforma = useCallback(async () => {
     reduceTransaccion({
       type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO,
     })
@@ -893,8 +893,8 @@ export const BlockchainProvider = (props: AppProps) => {
   //                                                                          //
   //**************************************************************************//
 
-  const cargarBloqueados = useCallback(async () => {
-    reduceBloqueados({ type: ReducerActionType.MARCAR_CARGANDO })
+  const cargarSuspendidos = useCallback(async () => {
+    reduceSuspendidos({ type: ReducerActionType.MARCAR_CARGANDO })
     await sleep()
 
     try {
@@ -903,21 +903,21 @@ export const BlockchainProvider = (props: AppProps) => {
         await contract.listarBilleterasBloqueadas()
       )
 
-      reduceBloqueados({
+      reduceSuspendidos({
         type: ReducerActionType.GUARDAR_DATOS,
         payload: resultado,
       })
     } catch (error: any) {
       newAlert('error', formatErrorMessage(error.message))
 
-      reduceBloqueados({
+      reduceSuspendidos({
         type: ReducerActionType.MARCAR_ERROR,
         payload: formatErrorMessage(error.message),
       })
     }
   }, [setupContract, newAlert])
 
-  const bloquearBilletera = useCallback(
+  const suspenderBilletera = useCallback(
     async (billetera: string) => {
       reduceTransaccion({
         type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO,
@@ -945,7 +945,7 @@ export const BlockchainProvider = (props: AppProps) => {
     [setupContract, newAlert]
   )
 
-  const desbloquearBilletera = useCallback(
+  const activarBilletera = useCallback(
     async (billetera: string) => {
       reduceTransaccion({
         type: ReducerActionType.MARCAR_TRANSACCION_EN_PROGRESO,
@@ -1050,7 +1050,7 @@ export const BlockchainProvider = (props: AppProps) => {
   const getOrdenes = useMemo(() => ordenes, [ordenes])
   const getTokens = useMemo(() => tokens, [tokens])
   const getAdministradores = useMemo(() => administradores, [administradores])
-  const getBloqueados = useMemo(() => bloqueados, [bloqueados])
+  const getSuspendidos = useMemo(() => suspendidos, [suspendidos])
   const getTransaccion = useMemo(() => transaccion, [transaccion])
   const getSesion = useMemo(() => sesion, [sesion])
 
@@ -1106,15 +1106,15 @@ export const BlockchainProvider = (props: AppProps) => {
     suspenderToken,
     modificarOraculoToken,
     cargarDatosPlataforma,
-    bloquearPlataforma,
-    desbloquearPlataforma,
+    suspenderPlataforma,
+    activarPlataforma,
     cambiarMontoMinimoPlataforma,
     cargarAdministradores,
     nuevoAdministrador,
     quitarAdministrador,
-    cargarBloqueados,
-    bloquearBilletera,
-    desbloquearBilletera,
+    cargarSuspendidos: cargarSuspendidos,
+    suspenderBilletera,
+    activarBilletera,
     autenticarBilletera,
     borrarSesion,
     consultarCotizacion,
@@ -1128,7 +1128,7 @@ export const BlockchainProvider = (props: AppProps) => {
     ordenes: getOrdenes,
     tokens: getTokens,
     administradores: getAdministradores,
-    bloqueados: getBloqueados,
+    suspendidos: getSuspendidos,
     transaccion: getTransaccion,
     sesion: getSesion,
   }

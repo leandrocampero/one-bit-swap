@@ -50,7 +50,7 @@ export type PlataformaState = {
 export type OrdenesState = IExternalData<Orden>
 export type TokensState = IExternalData<Token>
 export type AdministradoresState = IExternalData<Billetera>
-export type BloqueadosState = IExternalData<Billetera>
+export type SuspendidosState = IExternalData<Billetera>
 export type TransaccionState = { cargando: boolean; error: string | null }
 export type SesionState = {
   datos: Billetera
@@ -121,15 +121,15 @@ export type BlockchainActions = {
     montoVenta: string
   ) => Promise<string | null>
   cargarDatosPlataforma: () => Promise<void>
-  bloquearPlataforma: () => Promise<void>
-  desbloquearPlataforma: () => Promise<void>
+  suspenderPlataforma: () => Promise<void>
+  activarPlataforma: () => Promise<void>
   cambiarMontoMinimoPlataforma: (monto: string) => Promise<void>
   cargarAdministradores: () => Promise<void>
   nuevoAdministrador: (billetera: string) => Promise<void>
   quitarAdministrador: (billetera: string) => Promise<void>
-  cargarBloqueados: () => Promise<void>
-  bloquearBilletera: (billetera: string) => Promise<void>
-  desbloquearBilletera: (billetera: string) => Promise<void>
+  cargarSuspendidos: () => Promise<void>
+  suspenderBilletera: (billetera: string) => Promise<void>
+  activarBilletera: (billetera: string) => Promise<void>
   autenticarBilletera: (signer: JsonRpcSigner) => Promise<void>
   borrarSesion: () => void
   emitirTokens: (contratoToken: string) => Promise<void>
@@ -148,7 +148,7 @@ export type BlockchainGetters = {
   ordenes: OrdenesState
   tokens: TokensState
   administradores: AdministradoresState
-  bloqueados: BloqueadosState
+  suspendidos: SuspendidosState
   transaccion: TransaccionState
   sesion: SesionState
 }

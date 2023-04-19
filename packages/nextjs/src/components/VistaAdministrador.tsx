@@ -5,7 +5,7 @@ import { green, red } from '@mui/material/colors'
 import { useRouter } from 'next/router'
 import React, { useEffect, useMemo, useState } from 'react'
 import VistaBilleteras from './VistaBilleteras'
-import VistaBilleterasBloqueadas from './VistaBilleterasBloqueadas'
+import VistaBilleterasSuspendidas from './VistaBilleterasBloqueadas'
 import VistaConfiguracion from './VistaConfiguracion'
 import VistaTokens from './VistaTokens'
 
@@ -20,7 +20,7 @@ interface TabPanelProps {
 const NAV_ITEMS = [
   'Configuración',
   'Administradores',
-  'Billeteras Bloqueadas',
+  'Billeteras Suspendidas',
   'Tokens',
 ]
 
@@ -132,8 +132,8 @@ export default function VistaAdministrador() {
         <VistaBilleteras />
       </TabPanel>
 
-      <TabPanel value={getTabValue} index={NavMenu.billeterasBloqueadas}>
-        <VistaBilleterasBloqueadas />
+      <TabPanel value={getTabValue} index={NavMenu.billeterasSuspendidas}>
+        <VistaBilleterasSuspendidas />
       </TabPanel>
 
       <TabPanel value={getTabValue} index={NavMenu.tokens}>
