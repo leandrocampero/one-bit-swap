@@ -259,7 +259,7 @@ export default function Navbar() {
       <AppBar position="fixed">
         <Box sx={{ flexGrow: 1 }}>
           <Toolbar>
-            <Container maxWidth="lg">
+            <Container maxWidth={false}>
               <Grid
                 container
                 spacing={1}

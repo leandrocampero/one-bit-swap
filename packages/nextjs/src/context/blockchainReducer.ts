@@ -1,11 +1,11 @@
 import {
   AdministradoresState,
-  BloqueadosState,
   OrdenesState,
   PlataformaState,
   ReducerAction,
   ReducerActionType,
   SesionState,
+  SuspendidosState,
   TokensState,
   TransaccionState,
 } from '@/context/context.d'
@@ -207,13 +207,13 @@ export const administradoresReducer = (
 //                                                                            //
 //****************************************************************************//
 
-export const bloqueadosReducer = (
-  state: BloqueadosState,
+export const suspendidosReducer = (
+  state: SuspendidosState,
   action: ReducerAction
-): BloqueadosState => {
+): SuspendidosState => {
   switch (action.type) {
     case ReducerActionType.REINICIAR_ESTADO:
-      return { ...(action.payload as BloqueadosState) }
+      return { ...(action.payload as SuspendidosState) }
 
     case ReducerActionType.MARCAR_CARGANDO:
       return { ...state, cargando: true, error: null }

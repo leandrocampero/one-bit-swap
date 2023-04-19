@@ -1,11 +1,11 @@
 import { useBlockchainContext } from '@/context/BlockchainProvider'
 import { NavMenu, RolesBilleteras } from '@/types.d'
 import { Box, Tab, Tabs } from '@mui/material'
-import { blue } from '@mui/material/colors'
+import { green, red } from '@mui/material/colors'
 import { useRouter } from 'next/router'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import VistaBilleteras from './VistaBilleteras'
-import VistaBilleterasBloqueadas from './VistaBilleterasBloqueadas'
+import VistaBilleterasSuspendidas from './VistaBilleterasBloqueadas'
 import VistaConfiguracion from './VistaConfiguracion'
 import VistaTokens from './VistaTokens'
 
@@ -20,7 +20,7 @@ interface TabPanelProps {
 const NAV_ITEMS = [
   'Configuración',
   'Administradores',
-  'Billeteras Bloqueadas',
+  'Billeteras Suspendidas',
   'Tokens',
 ]
 
@@ -65,22 +65,46 @@ export default function VistaAdministrador() {
     }
   }, [sesion, router])
 
+  const sessionColor = useMemo((): { regular: string; active: string } => {
+    let regular: string
+    let active: string
+
+    switch (sesion.datos.rol) {
+      case RolesBilleteras.propietario:
+        regular = red[700]
+        active = red[200]
+        break
+      case RolesBilleteras.administrador:
+        regular = green[700]
+        active = green[200]
+        break
+      default:
+        regular = green[700]
+        active = green[200]
+        break
+    }
+
+    return { regular, active }
+  }, [sesion.datos.rol])
+
   /****************************************************************************/
 
   return (
     <>
       <Box
         sx={{
-          backgroundColor: 'primary.dark',
+          backgroundColor: sessionColor.regular,
           color: 'common.white',
         }}
       >
         <Tabs
           value={getTabValue}
           onChange={handleCambiarNavMenu}
-          textColor="secondary"
-          indicatorColor="secondary"
-          aria-label="secondary tabs example"
+          sx={{
+            '.MuiTabs-indicator': {
+              backgroundColor: sessionColor.regular,
+            },
+          }}
         >
           {NAV_ITEMS.map((item, index) => (
             <Tab
@@ -88,7 +112,7 @@ export default function VistaAdministrador() {
               sx={{
                 color: 'common.white',
                 '&.Mui-selected': {
-                  backgroundColor: blue[200],
+                  backgroundColor: sessionColor.active,
                   color: 'common.white',
                   fontWeight: 'bold',
                 },
@@ -108,8 +132,8 @@ export default function VistaAdministrador() {
         <VistaBilleteras />
       </TabPanel>
 
-      <TabPanel value={getTabValue} index={NavMenu.billeterasBloqueadas}>
-        <VistaBilleterasBloqueadas />
+      <TabPanel value={getTabValue} index={NavMenu.billeterasSuspendidas}>
+        <VistaBilleterasSuspendidas />
       </TabPanel>
 
       <TabPanel value={getTabValue} index={NavMenu.tokens}>

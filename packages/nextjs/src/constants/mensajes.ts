@@ -1,7 +1,7 @@
 export const NOMBRE_TOKEN_SESION = 'one-bit-swap'
 
 export const ERROR_DESCONOCIDO =
-  'Un error desconocido a ocurrido. Intente nuevamente'
+  'Un error desconocido ha ocurrido. Intente nuevamente'
 export const ERROR_NO_SIGNER = 'Error al cargar el Signer'
 export const ERROR_NO_METAMASK =
   'No se pudo detectar metamask. Instale metamask para poder continuar'
