@@ -67,6 +67,7 @@ export default function ListarOrdenes() {
   const [ordenSeleccionada, setOrdenSeleccionada] = useState<Orden | undefined>(
     undefined
   )
+  const [ultimaOrden, setUltimaOrden] = useState<string | undefined>(undefined)
 
   const [tab, setTab] = useState(0)
   const [showModalEjecutar, setShowModalEjecutar] = useState<boolean>(false)
@@ -75,7 +76,7 @@ export default function ListarOrdenes() {
   const [preMontoMaximo, setPreMontoMaximo] = useState<number | undefined>()
   const [timeOut, setTimeOut] = useState<NodeJS.Timeout | undefined>(undefined)
 
-  const { ordenes, tokens, transaccion } = getters
+  const { ordenes, tokens, transaccion, sesion } = getters
   const {
     cargarOrdenesActivas,
     consultarCotizacion,
@@ -83,6 +84,13 @@ export default function ListarOrdenes() {
     cancelarOrden,
     cargarOrdenesPropias,
   } = actions
+
+  const cargarMás = useMemo(() => {
+    const length = ordenes.datos.length
+    return ordenes.datos.length
+      ? ordenes.datos[length - 1].idOrden !== ultimaOrden
+      : true
+  }, [ordenes.datos, ultimaOrden])
 
   const ordenesObjeto = useMemo(
     () =>
@@ -104,6 +112,7 @@ export default function ListarOrdenes() {
       (cantidadOrdenes !== 0 && ordenes.datos[cantidadOrdenes - 1].idOrden) ||
       ethers.constants.HashZero
 
+    setUltimaOrden(ultimaOrden)
     cargarOrdenesActivas(ultimaOrden)
   }, [ordenes, cargarOrdenesActivas])
 
@@ -240,6 +249,9 @@ export default function ListarOrdenes() {
           key={orden.idOrden}
           orden={orden}
           sx={{ ...(index !== 0 && { marginTop: 3 }) }}
+          deshabilitarAccion={
+            tab === 0 && sesion.datos.direccion === orden.vendedor
+          }
           onAccion={handleOpenModal}
         />
       ))
@@ -250,6 +262,7 @@ export default function ListarOrdenes() {
     tokenVenta,
     tipoOrden,
     tab,
+    sesion,
     handleOpenModal,
   ])
 
@@ -573,6 +586,7 @@ export default function ListarOrdenes() {
                   variant="contained"
                   color="info"
                   sx={{ width: '60%', marginTop: 3 }}
+                  disabled={!cargarMás}
                   onClick={handleCargarMas}
                 >
                   {ordenes.cargando ? (

@@ -191,7 +191,7 @@ export function simpleAddress(address: string): string {
 }
 
 export async function sleep() {
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NETWORK_MODE === 'hardhat') {
     const sleep = new Promise((resolve) => setTimeout(resolve, 1000))
     await sleep
   }
@@ -255,12 +255,15 @@ export function formatErrorMessage(errorRaw: string): string {
     return ERROR_TX_FALLIDA
   }
 
-  const indexStart = errorRaw.indexOf("'")
+  const indexStart = errorRaw.indexOf('"')
 
   if (indexStart === -1) return errorRaw
 
-  const indexEnd = errorRaw.indexOf("'", indexStart + 1)
-  const error = errorRaw.slice(indexStart + 1, indexEnd)
+  const indexEnd = errorRaw.indexOf('"', indexStart + 1)
+
+  const indexStartoffset = process.env.NETWORK_MODE === 'hardhat' ? 1 : 21
+
+  const error = errorRaw.slice(indexStart + indexStartoffset, indexEnd)
 
   return MENSAJES_CONTRATO[error]
 }

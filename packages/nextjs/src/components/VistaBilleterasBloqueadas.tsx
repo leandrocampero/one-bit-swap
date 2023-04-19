@@ -36,10 +36,10 @@ const Transition = forwardRef(function Transition(
   return <Slide direction="up" ref={ref} {...props} />
 })
 
-export default function VistaBilleterasBloqueadas() {
+export default function VistaBilleterasSuspendidas() {
   const { getters, actions } = useBlockchainContext()
-  const { bloqueados, transaccion, sesion } = getters
-  const { cargarBloqueados, desbloquearBilletera, bloquearBilletera } = actions
+  const { suspendidos, transaccion, sesion } = getters
+  const { cargarSuspendidos, activarBilletera, suspenderBilletera } = actions
 
   const [billetera, setBilletera] = useState('')
   const [cadenaBusqueda, setCadenaBusqueda] = useState('')
@@ -59,20 +59,20 @@ export default function VistaBilleterasBloqueadas() {
   }, [])
 
   const handleRecargar = async () => {
-    await cargarBloqueados()
+    await cargarSuspendidos()
   }
 
-  const handleQuitarRol = useCallback(
+  const handleActivar = useCallback(
     async (billetera: string) => {
-      await desbloquearBilletera(billetera)
+      await activarBilletera(billetera)
     },
-    [desbloquearBilletera]
+    [activarBilletera]
   )
 
-  const handleAgregarAdministrador = useCallback(async () => {
-    await bloquearBilletera(billetera)
+  const handleSuspender = useCallback(async () => {
+    await suspenderBilletera(billetera)
     handleCloseModal()
-  }, [bloquearBilletera, billetera, handleCloseModal])
+  }, [suspenderBilletera, billetera, handleCloseModal])
 
   const handleSearchInputChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -100,8 +100,8 @@ export default function VistaBilleterasBloqueadas() {
 
   /******************************************************************************/
 
-  const listarBilleterasAdministradoras = useMemo(() => {
-    return bloqueados.datos
+  const listarBilleterasSuspendidas = useMemo(() => {
+    return suspendidos.datos
       .filter((billetera: Billetera) =>
         billetera.direccion.toLowerCase().includes(cadenaBusqueda)
       )
@@ -128,23 +128,23 @@ export default function VistaBilleterasBloqueadas() {
               variant="contained"
               color="success"
               disabled={sesion.datos.rol !== RolesBilleteras.propietario}
-              onClick={() => handleQuitarRol(billetera.direccion)}
+              onClick={() => handleActivar(billetera.direccion)}
             >
-              {'Desbloquear'}
+              {'Activar'}
             </Button>
           </Paper>
         )
       })
-  }, [bloqueados.datos, cadenaBusqueda, handleQuitarRol, sesion.datos.rol])
+  }, [suspendidos.datos, cadenaBusqueda, handleActivar, sesion.datos.rol])
 
   /******************************************************************************/
 
   useEffect(() => {
     const { error, cargando } = transaccion
     if (!error && !cargando) {
-      cargarBloqueados()
+      cargarSuspendidos()
     }
-  }, [transaccion, cargarBloqueados])
+  }, [transaccion, cargarSuspendidos])
 
   /******************************************************************************/
 
@@ -157,7 +157,7 @@ export default function VistaBilleterasBloqueadas() {
         maxWidth="xs"
         fullWidth
         onClose={handleCloseModal}
-        aria-describedby="dialogo-bloquear-billetera"
+        aria-describedby="dialogo-suspender-billetera"
       >
         <DialogTitle
           sx={{
@@ -165,15 +165,15 @@ export default function VistaBilleterasBloqueadas() {
             color: 'common.white',
             marginBottom: 2,
           }}
-          id="dialogo-bloquear-billetera"
+          id="dialogo-suspender-billetera"
         >
-          {`Bloquear billetera`}
+          {`Suspender billetera`}
         </DialogTitle>
 
         <DialogContent>
           <FormControl sx={{ marginTop: 1 }} fullWidth variant="outlined">
             <TextField
-              id="nuevo-admin"
+              id="suspender-billetera"
               label="Ingresa billetera"
               type="text"
               value={billetera}
@@ -187,11 +187,7 @@ export default function VistaBilleterasBloqueadas() {
             Cerrar
           </Button>
 
-          <Button
-            onClick={handleAgregarAdministrador}
-            variant="contained"
-            color="success"
-          >
+          <Button onClick={handleSuspender} variant="contained" color="success">
             {transaccion.cargando ? (
               <CircularProgress size={24} sx={{ color: 'common.white' }} />
             ) : (
@@ -220,7 +216,7 @@ export default function VistaBilleterasBloqueadas() {
             sx={{ height: '100%', width: '100%' }}
             onClick={handleRecargar}
           >
-            {bloqueados.cargando ? (
+            {suspendidos.cargando ? (
               <CircularProgress size={24} sx={{ color: 'common.white' }} />
             ) : (
               'Recargar'
@@ -238,19 +234,19 @@ export default function VistaBilleterasBloqueadas() {
             {transaccion.cargando ? (
               <CircularProgress size={24} sx={{ color: 'common.white' }} />
             ) : (
-              'Bloquear'
+              'Suspender'
             )}
           </Button>
         </Grid>
       </Grid>
 
-      {bloqueados.cargando || transaccion.cargando ? (
+      {suspendidos.cargando || transaccion.cargando ? (
         <LinearProgress sx={{ marginY: 3 }} />
       ) : (
         <Divider sx={{ borderBottomWidth: 4, marginY: 3 }} />
       )}
 
-      <WindowPaper>{listarBilleterasAdministradoras}</WindowPaper>
+      <WindowPaper>{listarBilleterasSuspendidas}</WindowPaper>
     </>
   )
 }

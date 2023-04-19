@@ -77,8 +77,8 @@ export default function VistaConfiguracion() {
   const { getters, actions } = useBlockchainContext()
   const { plataforma, transaccion, sesion } = getters
   const {
-    bloquearPlataforma,
-    desbloquearPlataforma,
+    suspenderPlataforma,
+    activarPlataforma,
     cambiarMontoMinimoPlataforma,
     cargarDatosPlataforma,
   } = actions
@@ -100,9 +100,9 @@ export default function VistaConfiguracion() {
 
   const handleCambiarEstadoPlataforma = async () => {
     if (plataforma.datos.estado === Estados.activo) {
-      await bloquearPlataforma()
+      await suspenderPlataforma()
     } else {
-      await desbloquearPlataforma()
+      await activarPlataforma()
     }
   }
 
