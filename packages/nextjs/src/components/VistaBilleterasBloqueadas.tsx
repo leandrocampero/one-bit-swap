@@ -127,7 +127,7 @@ export default function VistaBilleterasSuspendidas() {
             <Button
               variant="contained"
               color="success"
-              disabled={sesion.datos.rol !== RolesBilleteras.propietario}
+              disabled={sesion.datos.rol === RolesBilleteras.usuario}
               onClick={() => handleActivar(billetera.direccion)}
             >
               {'Activar'}
