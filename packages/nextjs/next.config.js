@@ -4,9 +4,6 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  env: {
-    NETWORK_MODE: process.env.NETWORK_MODE,
-  },
 }
 
 module.exports = nextConfig

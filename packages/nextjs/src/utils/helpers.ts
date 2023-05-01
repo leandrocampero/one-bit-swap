@@ -191,7 +191,7 @@ export function simpleAddress(address: string): string {
 }
 
 export async function sleep() {
-  if (process.env.NETWORK_MODE === 'hardhat') {
+  if (process.env.NEXT_PUBLIC_NETWORK_MODE === 'hardhat') {
     const sleep = new Promise((resolve) => setTimeout(resolve, 1000))
     await sleep
   }
@@ -261,7 +261,8 @@ export function formatErrorMessage(errorRaw: string): string {
 
   const indexEnd = errorRaw.indexOf('"', indexStart + 1)
 
-  const indexStartoffset = process.env.NETWORK_MODE === 'hardhat' ? 1 : 21
+  const indexStartoffset =
+    process.env.NEXT_PUBLIC_NETWORK_MODE === 'hardhat' ? 1 : 21
 
   const error = errorRaw.slice(indexStart + indexStartoffset, indexEnd)
 
