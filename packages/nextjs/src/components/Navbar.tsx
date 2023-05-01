@@ -1,13 +1,15 @@
 import { useBlockchainContext } from '@/context/BlockchainProvider'
 import { useSessionContext } from '@/context/SessionProvider'
 import tokens from '@/contracts/tokens.json'
-import { RolesBilleteras, Token } from '@/types.d'
+import { Estados, RolesBilleteras, Token } from '@/types.d'
+import { simpleAddress } from '@/utils/helpers'
 import CloseIcon from '@mui/icons-material/Close'
 import SettingsIcon from '@mui/icons-material/Settings'
 import {
   AppBar,
   Box,
   Button,
+  Chip,
   CircularProgress,
   Container,
   Dialog,
@@ -41,6 +43,8 @@ const Transition = forwardRef(function Transition(
 ) {
   return <Slide direction="up" ref={ref} {...props} />
 })
+
+const faucetHabilitado = process.env.NEXT_PUBLIC_FAUCET_ENABLED === 'true'
 
 export default function Navbar() {
   const { disconnect, connected, addAsset } = useSessionContext()
@@ -79,6 +83,25 @@ export default function Navbar() {
   const handleAprobarTokens = useCallback(async () => {
     await aprobarDeposito(token)
   }, [aprobarDeposito, token])
+
+  const userData = useMemo(() => {
+    let rol
+
+    switch (sesion.datos.rol) {
+      case RolesBilleteras.administrador:
+        rol = 'Administrador'
+        break
+      case RolesBilleteras.propietario:
+        rol = 'Propietario'
+        break
+      default:
+        rol = 'Billetera'
+        break
+    }
+
+    const address = sesion.datos.direccion
+    return `${rol}: ${simpleAddress(address)}`
+  }, [sesion])
 
   /****************************************************************************/
 
@@ -266,11 +289,42 @@ export default function Navbar() {
                 direction={'row'}
                 alignItems={'center'}
               >
-                <Grid item marginRight="auto">
+                <Grid item>
                   <Typography variant="h4" noWrap>
                     <Link href={connected ? '/' : '/conectar'}>P2PSwap</Link>
                   </Typography>
                 </Grid>
+
+                <Grid item marginLeft={2}>
+                  <Divider
+                    orientation="vertical"
+                    sx={{
+                      height: 30,
+                      borderColor: 'common.white',
+                    }}
+                  />
+                </Grid>
+
+                <Grid item>
+                  <Typography
+                    variant="button"
+                    sx={{ color: 'common.white', fontWeight: 'bold' }}
+                  >
+                    {userData}
+                  </Typography>
+                </Grid>
+
+                {sesion.datos.estado === Estados.suspendido && (
+                  <Grid item>
+                    <Chip
+                      label="Suspendido"
+                      color="error"
+                      sx={{ fontWeight: 'bold', fontSize: 14 }}
+                    />
+                  </Grid>
+                )}
+
+                <Grid item marginRight={'auto'} />
 
                 {sesion.datos.rol != RolesBilleteras.usuario ? (
                   <Grid item>
@@ -285,36 +339,36 @@ export default function Navbar() {
                   </Grid>
                 ) : null}
 
-                {connected && (
-                  <>
-                    <Grid item>
-                      <Button
-                        variant="contained"
-                        onClick={handleOpenModal}
-                        sx={{
-                          '&.MuiButton-containedPrimary': {
-                            backgroundColor: 'common.white',
-                            color: 'common.black',
-                          },
-                          '&.MuiButton-containedPrimary:hover': {
-                            backgroundColor: blueGrey[100],
-                          },
-                        }}
-                      >
-                        Recibir tokens
-                      </Button>
-                    </Grid>
+                {connected && faucetHabilitado && (
+                  <Grid item>
+                    <Button
+                      variant="contained"
+                      onClick={handleOpenModal}
+                      sx={{
+                        '&.MuiButton-containedPrimary': {
+                          backgroundColor: 'common.white',
+                          color: 'common.black',
+                        },
+                        '&.MuiButton-containedPrimary:hover': {
+                          backgroundColor: blueGrey[100],
+                        },
+                      }}
+                    >
+                      Recibir tokens
+                    </Button>
+                  </Grid>
+                )}
 
-                    <Grid item>
-                      <Button
-                        variant="contained"
-                        color="info"
-                        onClick={disconnect}
-                      >
-                        Desconectar
-                      </Button>
-                    </Grid>
-                  </>
+                {connected && (
+                  <Grid item>
+                    <Button
+                      variant="contained"
+                      color="info"
+                      onClick={disconnect}
+                    >
+                      Desconectar
+                    </Button>
+                  </Grid>
                 )}
               </Grid>
             </Container>

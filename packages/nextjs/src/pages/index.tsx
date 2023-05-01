@@ -3,6 +3,7 @@ import ListarOrdenes from '@/components/ListarOrdenes'
 import BaseLayout from '@/components/layout/BaseLayout'
 import { useBlockchainContext } from '@/context/BlockchainProvider'
 import { Grid } from '@mui/material'
+import Head from 'next/head'
 import { useEffect } from 'react'
 
 export default function Home() {
@@ -15,6 +16,10 @@ export default function Home() {
 
   return (
     <BaseLayout>
+      <Head>
+        <title>P2PSwap | Inicio</title>
+      </Head>
+
       <Grid container spacing={2} height={'100%'}>
         <Grid item xs={8}>
           <ListarOrdenes />
