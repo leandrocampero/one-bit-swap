@@ -1,5 +1,7 @@
 import { useBlockchainContext } from '@/context/BlockchainProvider'
 import { useSessionContext } from '@/context/SessionProvider'
+import deploy from '@/contracts/deploy.json'
+import networks from '@/contracts/networks'
 import tokens from '@/contracts/tokens.json'
 import { Estados, RolesBilleteras, Token } from '@/types.d'
 import { simpleAddress } from '@/utils/helpers'
@@ -102,6 +104,14 @@ export default function Navbar() {
     const address = sesion.datos.direccion
     return `${rol}: ${simpleAddress(address)}`
   }, [sesion])
+
+  const blockExplorer = useMemo(() => {
+    const mode = process.env.NEXT_PUBLIC_NETWORK_MODE as keyof typeof networks
+    const networkToSwitch = networks[mode]
+    const { blockExplorerUrls } = networkToSwitch
+
+    return blockExplorerUrls[0]
+  }, [])
 
   /****************************************************************************/
 
@@ -295,24 +305,33 @@ export default function Navbar() {
                   </Typography>
                 </Grid>
 
-                <Grid item marginLeft={2}>
-                  <Divider
-                    orientation="vertical"
-                    sx={{
-                      height: 30,
-                      borderColor: 'common.white',
-                    }}
-                  />
-                </Grid>
+                {sesion.datos.direccion && (
+                  <>
+                    <Grid item marginLeft={2}>
+                      <Divider
+                        orientation="vertical"
+                        sx={{
+                          height: 30,
+                          borderColor: 'common.white',
+                        }}
+                      />
+                    </Grid>
 
-                <Grid item>
-                  <Typography
-                    variant="button"
-                    sx={{ color: 'common.white', fontWeight: 'bold' }}
-                  >
-                    {userData}
-                  </Typography>
-                </Grid>
+                    <Grid item>
+                      <Link
+                        href={`${blockExplorer}/address/${sesion.datos.direccion}`}
+                        target="_blank"
+                      >
+                        <Typography
+                          variant="button"
+                          sx={{ color: 'common.white', fontWeight: 'bold' }}
+                        >
+                          {userData}
+                        </Typography>
+                      </Link>
+                    </Grid>
+                  </>
+                )}
 
                 {sesion.datos.estado === Estados.suspendido && (
                   <Grid item>
@@ -326,7 +345,29 @@ export default function Navbar() {
 
                 <Grid item marginRight={'auto'} />
 
-                {sesion.datos.rol != RolesBilleteras.usuario ? (
+                <Grid item>
+                  <Link
+                    href={`${blockExplorer}/address/${deploy.platform}#code`}
+                    target="_blank"
+                  >
+                    <Button
+                      variant="outlined"
+                      color="info"
+                      sx={{
+                        '&.MuiButton-outlinedInfo': {
+                          borderColor: 'common.white',
+                          color: 'common.white',
+                        },
+                      }}
+                    >
+                      {'Ir al Contrato'}
+                    </Button>
+                  </Link>
+                </Grid>
+
+                {sesion.datos.direccion && <Grid item marginRight={'auto'} />}
+
+                {sesion.datos.rol !== RolesBilleteras.usuario ? (
                   <Grid item>
                     <Button
                       id="demo-customized-button"

@@ -8,7 +8,7 @@ const networks = {
       symbol: 'Matic token',
       decimals: 18,
     },
-    blockExplorerUrls: ['https://mumbai.polygonscan.com/'],
+    blockExplorerUrls: ['https://mumbai.polygonscan.com'],
   },
   mumbai: {
     chainId: `0x${Number(80001).toString(16)}`,
@@ -21,7 +21,7 @@ const networks = {
       symbol: 'Matic token',
       decimals: 18,
     },
-    blockExplorerUrls: ['https://mumbai.polygonscan.com/'],
+    blockExplorerUrls: ['https://mumbai.polygonscan.com'],
   },
 }
 
