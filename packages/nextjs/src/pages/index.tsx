@@ -17,7 +17,7 @@ export default function Home() {
   return (
     <BaseLayout>
       <Head>
-        <title>P2PSwap | Inicio</title>
+        <title>RoyalSwap | Inicio</title>
       </Head>
 
       <Grid container spacing={2} height={'100%'}>

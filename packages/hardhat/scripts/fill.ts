@@ -1,4 +1,5 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
+import dotenv from 'dotenv'
 import { writeFileSync } from 'fs'
 import { ethers } from 'hardhat'
 import prettier from 'prettier'
@@ -13,6 +14,10 @@ import {
   formatArrayTokens,
   showConsoleTable,
 } from '../utils/helpers'
+
+dotenv.config()
+
+const { OWNER_PRIVATE_KEY } = process.env
 
 /*******************************************************************************
 
@@ -132,11 +137,15 @@ async function main() {
   //           Contrato de Plataforma             //
   //**********************************************//
 
+  const ownerSigner = new ethers.Wallet(OWNER_PRIVATE_KEY!, ethers.provider)
+
   const PlataformaFactory = (await ethers.getContractFactory(
     'contracts/Plataforma.sol:Plataforma'
   )) as Plataforma__factory
 
-  const plataforma = (await PlataformaFactory.deploy(1)) as Plataforma
+  const plataforma = (await PlataformaFactory.connect(ownerSigner).deploy(
+    1
+  )) as Plataforma
 
   await plataforma.deployed()
   console.log(`Contrato de plataforma desplegado en ${plataforma.address}`)
@@ -245,7 +254,7 @@ async function main() {
 
   // agrega administradores
   await plataforma.hacerAdministrador(
-    '0xB6101E241Df60EAF1b3735f6D73c511602fb8453'
+    '0x11a226591dcaa88B8E026dEd511AaEa3b9bA25d2'
   ) // Leandro
   await plataforma.hacerAdministrador(
     '0x6b4830E71048A69E5a71b1FebF085610c7012EF3'

@@ -1,4 +1,4 @@
-# P2PSwap
+# RoyalSwap
 
 Monorepo del proyecto de graduación titulado "Plataforma Descentralizada para Intercambio de Criptomonedas" para acceder al título de Ingenieros en Computación. El proyecto consiste en desarrollar una Plataforma web descentralizada que permita el intercambio de criptomonedas entre pares, de manera transparente y anónima. Donde los usuarios puedan conectarse con su billetera virtual y crear una orden de compra/venta de criptomonedas.
 

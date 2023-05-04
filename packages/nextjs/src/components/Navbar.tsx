@@ -301,7 +301,7 @@ export default function Navbar() {
               >
                 <Grid item>
                   <Typography variant="h4" noWrap>
-                    <Link href={connected ? '/' : '/conectar'}>P2PSwap</Link>
+                    <Link href={connected ? '/' : '/conectar'}>RoyalSwap</Link>
                   </Typography>
                 </Grid>
 

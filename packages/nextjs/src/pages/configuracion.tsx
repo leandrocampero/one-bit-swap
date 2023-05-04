@@ -8,7 +8,7 @@ export default function configuracion() {
   return (
     <BaseLayout>
       <Head>
-        <title>P2PSwap | Configuración</title>
+        <title>RoyalSwap | Configuración</title>
       </Head>
 
       <Box
