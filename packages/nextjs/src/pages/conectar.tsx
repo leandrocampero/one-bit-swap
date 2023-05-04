@@ -37,11 +37,14 @@ export default function Conectar() {
   return (
     <BaseLayout style={FlexBox}>
       <Head>
-        <title>P2PSwap | Conectar billetera</title>
+        <title>RoyalSwap | Conectar billetera</title>
       </Head>
 
       <Card elevation={5} sx={ActionBox}>
-        <CardHeader title="P2PSwap" subheader="Conectar billetera para usar" />
+        <CardHeader
+          title="RoyalSwap"
+          subheader="Conectar billetera para usar"
+        />
         <Divider />
         <CardContent>
           {switchNetwork ? (
