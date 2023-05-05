@@ -104,7 +104,7 @@ export default function VistaBilleteras() {
   const listarBilleterasAdministradoras = useMemo(() => {
     return administradores.datos
       .filter((billetera: Billetera) =>
-        billetera.direccion.toLowerCase().includes(cadenaBusqueda)
+        billetera.direccion.toLowerCase().includes(cadenaBusqueda.toLowerCase())
       )
       .map((billetera: Billetera, index) => {
         return (
@@ -235,6 +235,7 @@ export default function VistaBilleteras() {
             color="success"
             sx={{ height: '100%', width: '100%' }}
             onClick={handleOpenModal}
+            disabled={sesion.datos.rol !== RolesBilleteras.propietario}
           >
             {transaccion.cargando ? (
               <CircularProgress size={24} sx={{ color: 'common.white' }} />

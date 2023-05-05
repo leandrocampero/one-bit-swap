@@ -103,7 +103,7 @@ export default function VistaBilleterasSuspendidas() {
   const listarBilleterasSuspendidas = useMemo(() => {
     return suspendidos.datos
       .filter((billetera: Billetera) =>
-        billetera.direccion.toLowerCase().includes(cadenaBusqueda)
+        billetera.direccion.toLowerCase().includes(cadenaBusqueda.toLowerCase())
       )
       .map((billetera: Billetera, index) => {
         return (

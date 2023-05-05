@@ -17,7 +17,7 @@ import {
 
 dotenv.config()
 
-const { OWNER_PRIVATE_KEY } = process.env
+const { OWNER_PRIVATE_KEY, MAXI_PRIVATE_KEY, GUILLO_PRIVATE_KEY } = process.env
 
 /*******************************************************************************
 
@@ -87,6 +87,9 @@ const MONTOS = [
   MONTO_15,
 ]
 
+const BILLETERA_MAXI = '0xAB6602F4AE6029543c922E9A3373b67C98206048'
+const BILLETERA_GUILLO = '0xD461E1c8339a51b7d97231a6F574f0E67B9baf98'
+
 /*******************************************************************************
 
 ########  ######## ########  ##        #######  ##    ##
@@ -107,6 +110,8 @@ async function main() {
   const cantidadOrdenes = CANTIDAD_ORDENES
   const ordenes: IOrdenInput[] = []
 
+  const ownerSigner = new ethers.Wallet(OWNER_PRIVATE_KEY!, ethers.provider)
+
   //**********************************************//
   //             Contratos de Tokens              //
   //**********************************************//
@@ -119,8 +124,8 @@ async function main() {
   } = {}
 
   for (const token of TOKENS) {
-    const contract = (await ERC20Factory.deploy(
-      `${token} Token Mock - OBS`,
+    const contract = (await ERC20Factory.connect(ownerSigner).deploy(
+      `${token} Token Mock`,
       token,
       billeteras[0].address,
       ethers.utils.parseEther('1000000')
@@ -136,8 +141,6 @@ async function main() {
   //**********************************************//
   //           Contrato de Plataforma             //
   //**********************************************//
-
-  const ownerSigner = new ethers.Wallet(OWNER_PRIVATE_KEY!, ethers.provider)
 
   const PlataformaFactory = (await ethers.getContractFactory(
     'contracts/Plataforma.sol:Plataforma'
@@ -169,6 +172,23 @@ async function main() {
         .connect(billetera)
         .approve(plataforma.address, ethers.utils.parseEther('1000000'))
     }
+
+    //**********************************************//
+    //        Emitir a Billeteras de prueba         //
+    //**********************************************//
+    const maxiSigner = new ethers.Wallet(MAXI_PRIVATE_KEY!, ethers.provider)
+    const guilloSigner = new ethers.Wallet(GUILLO_PRIVATE_KEY!, ethers.provider)
+
+    await contrato.mint(BILLETERA_MAXI, ethers.utils.parseEther('1000000'))
+    await contrato.mint(BILLETERA_GUILLO, ethers.utils.parseEther('1000000'))
+
+    await contrato
+      .connect(maxiSigner)
+      .approve(plataforma.address, ethers.utils.parseEther('1000000'))
+
+    await contrato
+      .connect(guilloSigner)
+      .approve(plataforma.address, ethers.utils.parseEther('1000000'))
 
     //**********************************************//
     //       Guardar tokens en la Plataforma        //
