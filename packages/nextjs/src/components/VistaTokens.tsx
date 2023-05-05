@@ -178,7 +178,7 @@ export default function VistaTokens() {
   const listarTokens = useMemo(() => {
     return tokens.datos
       .filter((token: Token) =>
-        token.ticker.toLowerCase().includes(cadenaBusqueda)
+        token.ticker.toLowerCase().includes(cadenaBusqueda.toLowerCase())
       )
       .map((token: Token, index) => {
         return (
