@@ -1,4 +1,5 @@
 import { useBlockchainContext } from '@/context/BlockchainProvider'
+import { useSessionContext } from '@/context/SessionProvider'
 import { EstadosOrdenes, Orden, TiposOrdenes, Token } from '@/types.d'
 import { simpleAddress } from '@/utils/helpers'
 import {
@@ -58,6 +59,7 @@ const Transition = forwardRef(function Transition(
 
 export default function ListarOrdenes() {
   const { getters, actions } = useBlockchainContext()
+  const { connected } = useSessionContext()
 
   const [tokenVenta, setTokenVenta] = useState<string>('-')
   const [tokenCompra, setTokenCompra] = useState<string>('-')
@@ -273,9 +275,9 @@ export default function ListarOrdenes() {
   /****************************************************************************/
 
   useEffect(() => {
-    handleSincronizar()
+    connected && handleSincronizar()
     //eslint-disable-next-line
-  }, [])
+  }, [connected])
 
   /****************************************************************************/
 
@@ -450,7 +452,7 @@ export default function ListarOrdenes() {
           }}
         >
           <Grid container spacing={2}>
-            <Grid item xs={2}>
+            <Grid item xs={6} lg={2} xl={2}>
               {/* TOKEN VENTA */}
               <FormControl fullWidth>
                 <InputLabel id="token-venta-input">Token Venta</InputLabel>
@@ -473,7 +475,7 @@ export default function ListarOrdenes() {
               </FormControl>
             </Grid>
 
-            <Grid item xs={2}>
+            <Grid item xs={6} lg={2} xl={2}>
               {/* TOKEN COMPRA */}
               <FormControl fullWidth>
                 <InputLabel id="token-compra-input">Token Compra</InputLabel>
@@ -496,7 +498,7 @@ export default function ListarOrdenes() {
               </FormControl>
             </Grid>
 
-            <Grid item xs>
+            <Grid item xs lg={3}>
               <FormControl fullWidth>
                 <InputLabel id="tipo-orden-input">Tipo</InputLabel>
                 <Select
@@ -530,7 +532,7 @@ export default function ListarOrdenes() {
               </FormControl>
             </Grid>
 
-            <Grid item xs={2}>
+            <Grid item xs={4} lg={2} xl={3}>
               {tab === 0 ? (
                 <Button
                   variant="contained"

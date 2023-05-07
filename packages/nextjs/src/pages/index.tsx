@@ -1,33 +1,77 @@
-import CrearOrdenes from '@/components/CrearOrdenes'
-import ListarOrdenes from '@/components/ListarOrdenes'
 import BaseLayout from '@/components/layout/BaseLayout'
-import { useBlockchainContext } from '@/context/BlockchainProvider'
-import { Grid } from '@mui/material'
+import { useSessionContext } from '@/context/SessionProvider'
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Divider,
+  SxProps,
+} from '@mui/material'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
-export default function Home() {
-  const { actions } = useBlockchainContext()
-  const { cargarTokens } = actions
+const FlexBox = {
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+}
+
+const ActionBox: SxProps = {
+  maxWidth: '500px',
+  width: '100%',
+}
+
+export default function Conectar() {
+  const { connect, changeNetwork, loading, connected, switchNetwork } =
+    useSessionContext()
+  const router = useRouter()
 
   useEffect(() => {
-    cargarTokens(false)
-  }, [cargarTokens])
+    if (connected && !loading) {
+      router.push('/intercambiar')
+    }
+  }, [connected, loading, router])
 
   return (
-    <BaseLayout>
+    <BaseLayout style={FlexBox}>
       <Head>
-        <title>RoyalSwap | Inicio</title>
+        <title>RoyalSwap | Conectar billetera</title>
       </Head>
 
-      <Grid container spacing={2} height={'100%'}>
-        <Grid item xs={8}>
-          <ListarOrdenes />
-        </Grid>
-        <Grid item xs={4}>
-          <CrearOrdenes />
-        </Grid>
-      </Grid>
+      <Card elevation={5} sx={ActionBox}>
+        <CardHeader
+          title="RoyalSwap"
+          subheader="Conectar billetera para usar"
+        />
+        <Divider />
+        <CardContent>
+          {switchNetwork ? (
+            <Button
+              key={'network'}
+              variant="contained"
+              color="primary"
+              size="large"
+              sx={{ width: '100%' }}
+              onClick={changeNetwork}
+            >
+              Cambiar de red
+            </Button>
+          ) : (
+            <Button
+              key={'connect'}
+              variant="contained"
+              color="success"
+              size="large"
+              sx={{ width: '100%' }}
+              onClick={connect}
+            >
+              Conectar Metamask
+            </Button>
+          )}
+        </CardContent>
+      </Card>
     </BaseLayout>
   )
 }
