@@ -1,4 +1,5 @@
 import { useBlockchainContext } from '@/context/BlockchainProvider'
+import { useSessionContext } from '@/context/SessionProvider'
 import { NavMenu, RolesBilleteras } from '@/types.d'
 import { Box, Tab, Tabs } from '@mui/material'
 import { green, red } from '@mui/material/colors'
@@ -51,6 +52,7 @@ export default function VistaAdministrador() {
     getters: { sesion },
   } = useBlockchainContext()
   const router = useRouter()
+  const { connected } = useSessionContext()
 
   const handleCambiarNavMenu = (
     event: React.SyntheticEvent,
@@ -60,10 +62,14 @@ export default function VistaAdministrador() {
   }
 
   useEffect(() => {
-    if (!sesion.cargando && sesion.datos.rol === RolesBilleteras.usuario) {
-      router.push('/')
+    if (
+      !sesion.cargando &&
+      connected &&
+      sesion.datos.rol === RolesBilleteras.usuario
+    ) {
+      router.push('/intercambiar')
     }
-  }, [sesion, router])
+  }, [sesion, router, connected])
 
   const sessionColor = useMemo((): { regular: string; active: string } => {
     let regular: string

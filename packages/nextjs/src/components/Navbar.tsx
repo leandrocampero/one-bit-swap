@@ -29,6 +29,7 @@ import {
   Slide,
   Toolbar,
   Typography,
+  useMediaQuery,
 } from '@mui/material'
 import { blue, blueGrey, green, grey } from '@mui/material/colors'
 import { TransitionProps } from '@mui/material/transitions'
@@ -57,6 +58,8 @@ export default function Navbar() {
   const [showModal, setShowModal] = useState<boolean>(false)
   const [allowance, setAllowance] = useState<BigNumber | undefined>(undefined)
   const [token, setToken] = useState<string>('')
+
+  const isLgAndUp = useMediaQuery('(min-width:1200px)')
 
   /****************************************************************************/
 
@@ -301,11 +304,27 @@ export default function Navbar() {
               >
                 <Grid item>
                   <Typography variant="h4" noWrap>
-                    <Link href={connected ? '/' : '/conectar'}>RoyalSwap</Link>
+                    <Link href={connected ? '/intercambiar' : '/'}>
+                      RoyalSwap
+                    </Link>
                   </Typography>
+
+                  {!isLgAndUp && connected && sesion.datos.direccion && (
+                    <Link
+                      href={`${blockExplorer}/address/${sesion.datos.direccion}`}
+                      target="_blank"
+                    >
+                      <Typography
+                        variant="button"
+                        sx={{ color: 'common.white', fontWeight: 'bold' }}
+                      >
+                        {userData}
+                      </Typography>
+                    </Link>
+                  )}
                 </Grid>
 
-                {sesion.datos.direccion && (
+                {isLgAndUp && connected && sesion.datos.direccion && (
                   <>
                     <Grid item marginLeft={2}>
                       <Divider
@@ -333,7 +352,7 @@ export default function Navbar() {
                   </>
                 )}
 
-                {sesion.datos.estado === Estados.suspendido && (
+                {connected && sesion.datos.estado === Estados.suspendido && (
                   <Grid item>
                     <Chip
                       label="Suspendido"
@@ -365,9 +384,9 @@ export default function Navbar() {
                   </Link>
                 </Grid>
 
-                {sesion.datos.direccion && <Grid item marginRight={'auto'} />}
+                {connected && <Grid item marginRight={'auto'} />}
 
-                {sesion.datos.rol !== RolesBilleteras.usuario ? (
+                {connected && sesion.datos.rol !== RolesBilleteras.usuario ? (
                   <Grid item>
                     <Button
                       id="demo-customized-button"

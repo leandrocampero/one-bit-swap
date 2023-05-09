@@ -19,7 +19,7 @@ export default function BaseLayout({
 }) {
   const { loading: recuperandoSesion } = useSessionContext()
   const router = useRouter()
-  const paginaConectar = router.pathname.startsWith('/conectar')
+  const paginaConectar = router.pathname.startsWith('/')
 
   return (
     <Box

@@ -308,7 +308,7 @@ export const SessionProvider = (props: AppProps) => {
 
       if (!active) {
         setConnected(false)
-        router.push('/conectar')
+        router.push('/')
       }
     },
     //eslint-disable-next-line
